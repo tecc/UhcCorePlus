@@ -63,7 +63,11 @@ public class Scenario {
     public static final Scenario NINE_SLOTS = new Scenario("nine_slots", UniversalMaterial.BARRIER, NineSlotsListener.class);
     public static final Scenario NETHER_START = new Scenario("nether_start", UniversalMaterial.LAVA_BUCKET, NetherStartListener.class);
 
+    public static final Scenario POWER_SWAP = new Scenario("power_swap", Material.APPLE, PowerSwapListener.class);
+
     public static final Scenario[] BUILD_IN_SCENARIOS = new Scenario[]{
+            POWER_SWAP,
+
             CUTCLEAN,
             FIRELESS,
             BOWLESS,

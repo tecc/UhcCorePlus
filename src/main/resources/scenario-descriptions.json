@@ -1,4 +1,13 @@
 {
+  "power_swap": {
+    "name": "Power Swap",
+    "description":[
+      "Every 5 minutes, the player with the least health gets their health swapped with the player with the most health.",
+      "If more than 1 player has the most health, nothing happens.",
+      "If more than 1 player has the least health, the player will be picked at random.",
+      "This event does not have any effect before PVP enables nor after Meetup."
+    ]
+  },
   "cutclean":{
     "name":"CutClean",
     "description":[
