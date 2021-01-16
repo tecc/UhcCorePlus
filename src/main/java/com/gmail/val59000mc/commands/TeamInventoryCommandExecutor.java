@@ -13,46 +13,46 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class TeamInventoryCommandExecutor implements CommandExecutor{
+public class TeamInventoryCommandExecutor implements CommandExecutor {
 
     private final PlayersManager playersManager;
     private final ScenarioManager scenarioManager;
 
-    public TeamInventoryCommandExecutor(PlayersManager playersManager, ScenarioManager scenarioManager){
+    public TeamInventoryCommandExecutor(PlayersManager playersManager, ScenarioManager scenarioManager) {
         this.playersManager = playersManager;
         this.scenarioManager = scenarioManager;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
-        if (!(sender instanceof Player)){
+        if (!(sender instanceof Player)) {
             sender.sendMessage("Only players can use this command!");
             return true;
         }
         Player player = (Player) sender;
 
-        if (!scenarioManager.isEnabled(Scenario.TEAM_INVENTORY)){
+        if (!scenarioManager.isEnabled(Scenario.TEAM_INVENTORY)) {
             player.sendMessage(Lang.SCENARIO_TEAMINVENTORY_DISABLED);
             return true;
         }
 
         UhcPlayer uhcPlayer = playersManager.getUhcPlayer(player);
 
-        if (args.length == 1 && player.hasPermission("scenarios.teaminventory.other")){
+        if (args.length == 1 && player.hasPermission("scenarios.teaminventory.other")) {
             try {
                 uhcPlayer = playersManager.getUhcPlayer(args[0]);
-            }catch (UhcPlayerDoesntExistException ex){
+            } catch (UhcPlayerDoesntExistException ex) {
                 player.sendMessage(ChatColor.RED + "That player cannot be found!");
                 return true;
             }
 
-            if (uhcPlayer.getState() != PlayerState.PLAYING){
+            if (uhcPlayer.getState() != PlayerState.PLAYING) {
                 player.sendMessage(ChatColor.RED + "That player is currently not playing!");
                 return true;
             }
         }
 
-        if (uhcPlayer.getState() != PlayerState.PLAYING){
+        if (uhcPlayer.getState() != PlayerState.PLAYING) {
             player.sendMessage(Lang.SCENARIO_TEAMINVENTORY_ERROR);
             return true;
         }

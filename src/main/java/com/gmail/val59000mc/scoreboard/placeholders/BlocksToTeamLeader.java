@@ -8,13 +8,13 @@ import org.bukkit.entity.Player;
 
 public class BlocksToTeamLeader extends Placeholder {
 
-    public BlocksToTeamLeader(){
+    public BlocksToTeamLeader() {
         super("blocksToTeamLeader");
     }
 
     @Override
-    public String getReplacement(UhcPlayer uhcPlayer, Player player, ScoreboardType scoreboardType, String placeholder){
-        if (uhcPlayer.getTeam().getMembers().size() == 1){
+    public String getReplacement(UhcPlayer uhcPlayer, Player player, ScoreboardType scoreboardType, String placeholder) {
+        if (uhcPlayer.getTeam().getMembers().size() == 1) {
             return "0";
         }
 
@@ -23,7 +23,7 @@ public class BlocksToTeamLeader extends Placeholder {
         try {
             int distance = ((Double) teamMember.getPlayer().getLocation().distance(player.getLocation())).intValue();
             return String.valueOf(distance);
-        }catch (UhcPlayerNotOnlineException ex){
+        } catch (UhcPlayerNotOnlineException ex) {
             return "?";
         }
     }

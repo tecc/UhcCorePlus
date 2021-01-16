@@ -22,11 +22,11 @@ public class LootConfigOption<T extends Enum<T>> implements Option<Map<T, LootCo
         Map<T, LootConfiguration<T>> lootConfigs = new HashMap<>();
         ConfigurationSection allLootsSection = config.getConfigurationSection(path);
 
-        if(allLootsSection != null){
-            for(String lootSectionName : allLootsSection.getKeys(false)){
+        if (allLootsSection != null) {
+            for (String lootSectionName : allLootsSection.getKeys(false)) {
                 ConfigurationSection lootSection = allLootsSection.getConfigurationSection(lootSectionName);
                 LootConfiguration<T> lootConfig = new LootConfiguration<>(type);
-                if(lootConfig.parseConfiguration(lootSection)){
+                if (lootConfig.parseConfiguration(lootSection)) {
                     lootConfigs.put(lootConfig.getType(), lootConfig);
                 }
             }

@@ -10,20 +10,20 @@ import org.bukkit.block.Furnace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.FurnaceBurnEvent;
 
-public class FastSmeltingListener extends ScenarioListener{
+public class FastSmeltingListener extends ScenarioListener {
 
     @Option
     private int speed = 10;
 
     @EventHandler
-    public void onFurnaceBurn(FurnaceBurnEvent e){
+    public void onFurnaceBurn(FurnaceBurnEvent e) {
         Block block = e.getBlock();
 
         Bukkit.getScheduler().runTaskLater(UhcCore.getPlugin(), new Runnable() {
             @Override
             public void run() {
                 // If the furnace is broken stop thread.
-                if (block.getType() == Material.AIR){
+                if (block.getType() == Material.AIR) {
                     return;
                 }
 
@@ -35,7 +35,7 @@ public class FastSmeltingListener extends ScenarioListener{
                 }
 
                 // If no item is cooking don't speed up cooking time but show down thread while waiting for the burning to stop.
-                if (furnace.getCookTime() <= 0){
+                if (furnace.getCookTime() <= 0) {
                     Bukkit.getScheduler().runTaskLater(UhcCore.getPlugin(), this, 5);
                     return;
                 }
@@ -44,7 +44,7 @@ public class FastSmeltingListener extends ScenarioListener{
                 short newCookTime = (short) (furnace.getCookTime() + speed);
 
                 // If new cook time is greater than the max cook time of item set to 199.
-                if (newCookTime >= 200){
+                if (newCookTime >= 200) {
                     newCookTime = 199;
                 }
 

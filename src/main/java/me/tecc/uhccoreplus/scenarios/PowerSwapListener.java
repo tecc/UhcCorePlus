@@ -1,7 +1,5 @@
 package me.tecc.uhccoreplus.scenarios;
 
-import com.gmail.val59000mc.UhcCore;
-import com.gmail.val59000mc.events.UhcGameStateChangedEvent;
 import com.gmail.val59000mc.events.UhcTimeEvent;
 import com.gmail.val59000mc.exceptions.UhcPlayerNotOnlineException;
 import com.gmail.val59000mc.game.GameState;
@@ -9,13 +7,13 @@ import com.gmail.val59000mc.players.UhcPlayer;
 import com.gmail.val59000mc.scenarios.Option;
 import com.gmail.val59000mc.scenarios.ScenarioListener;
 import org.apache.commons.lang.math.RandomUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.scheduler.BukkitScheduler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 public class PowerSwapListener extends ScenarioListener {
     @Option
@@ -58,6 +56,7 @@ public class PowerSwapListener extends ScenarioListener {
             else broadcast("&fSwapping health in &e&l" + (timeUntilNextSwap / 60) + "&f minutes.");
         }
     }
+
     private void broadcast(String message) {
         getGameManager().broadcastInfoMessage(ChatColor.translateAlternateColorCodes('&', message));
     }
@@ -115,6 +114,7 @@ public class PowerSwapListener extends ScenarioListener {
 
         return "&fSwapped " + highestPlayer.getDisplayName() + "&f's health with " + lowestPlayer.getDisplayName() + "&f's.";
     }
+
     @SafeVarargs
     private final <T> List<T> mutableList(T... ts) {
         return new ArrayList<>(Arrays.asList(ts));

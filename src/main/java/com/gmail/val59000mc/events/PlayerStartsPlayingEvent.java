@@ -5,11 +5,11 @@ import com.gmail.val59000mc.players.UhcPlayer;
 /**
  * Event gets called when a player starts playing. This includes when someone gets revived.
  */
-public class PlayerStartsPlayingEvent extends UhcEvent{
+public class PlayerStartsPlayingEvent extends UhcEvent {
 
     private final UhcPlayer uhcPlayer;
 
-    public PlayerStartsPlayingEvent(UhcPlayer uhcPlayer){
+    public PlayerStartsPlayingEvent(UhcPlayer uhcPlayer) {
         this.uhcPlayer = uhcPlayer;
     }
 

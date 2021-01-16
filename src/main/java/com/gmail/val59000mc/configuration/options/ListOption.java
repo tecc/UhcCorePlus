@@ -4,7 +4,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.util.List;
 
-public class ListOption<T> implements Option<List<T>>{
+public class ListOption<T> implements Option<List<T>> {
 
     public enum Type {
         STRING_LIST,
@@ -16,14 +16,14 @@ public class ListOption<T> implements Option<List<T>>{
     private final String path;
     private final Type type;
 
-    public ListOption(String path, Type type){
+    public ListOption(String path, Type type) {
         this.path = path;
         this.type = type;
     }
 
     @Override
-    public List<T> getValue(YamlConfiguration config){
-        switch (type){
+    public List<T> getValue(YamlConfiguration config) {
+        switch (type) {
             case INT_LIST:
                 return (List<T>) config.getIntegerList(path);
             case STRING_LIST:

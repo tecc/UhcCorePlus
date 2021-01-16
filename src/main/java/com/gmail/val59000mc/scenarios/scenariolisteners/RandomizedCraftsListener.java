@@ -11,18 +11,18 @@ import org.bukkit.inventory.ShapedRecipe;
 
 import java.util.*;
 
-public class RandomizedCraftsListener extends ScenarioListener{
+public class RandomizedCraftsListener extends ScenarioListener {
 
     @Override
-    public void onEnable(){
+    public void onEnable() {
         Iterator<Recipe> iterator = Bukkit.recipeIterator();
         List<ItemStack> results = new ArrayList<>();
         Set<ShapedRecipe> removeRecipes = new HashSet<>();
 
         Recipe recipe;
-        while (iterator.hasNext()){
+        while (iterator.hasNext()) {
             recipe = iterator.next();
-            if (!(recipe instanceof ShapedRecipe)){
+            if (!(recipe instanceof ShapedRecipe)) {
                 continue;
             }
 
@@ -34,7 +34,7 @@ public class RandomizedCraftsListener extends ScenarioListener{
         Iterator<ItemStack> resultIterator = results.iterator();
         Set<ShapedRecipe> randomizedRecipes = new HashSet<>();
 
-        for (ShapedRecipe oldRecipe : removeRecipes){
+        for (ShapedRecipe oldRecipe : removeRecipes) {
             ShapedRecipe newRecipe = cloneRecipeWithResult(oldRecipe, resultIterator.next());
             randomizedRecipes.add(newRecipe);
 
@@ -45,18 +45,18 @@ public class RandomizedCraftsListener extends ScenarioListener{
     }
 
     @Override
-    public void onDisable(){
+    public void onDisable() {
         Bukkit.resetRecipes();
         CraftsManager.loadBannedCrafts();
         CraftsManager.loadCrafts();
     }
 
-    private ShapedRecipe cloneRecipeWithResult(ShapedRecipe recipe, ItemStack result){
+    private ShapedRecipe cloneRecipeWithResult(ShapedRecipe recipe, ItemStack result) {
         ShapedRecipe clone = VersionUtils.getVersionUtils().createShapedRecipe(result, UUID.randomUUID().toString());
         clone.shape(recipe.getShape());
 
         Map<Character, RecipeChoice> recipeChoiceMap = recipe.getChoiceMap();
-        for (char c : recipeChoiceMap.keySet()){
+        for (char c : recipeChoiceMap.keySet()) {
             clone.setIngredient(c, recipeChoiceMap.get(c));
         }
 

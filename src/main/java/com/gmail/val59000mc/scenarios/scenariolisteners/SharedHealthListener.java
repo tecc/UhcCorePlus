@@ -13,49 +13,49 @@ import org.bukkit.event.entity.EntityDamageEvent;
 
 import java.util.List;
 
-public class SharedHealthListener extends ScenarioListener{
+public class SharedHealthListener extends ScenarioListener {
 
-    @EventHandler (priority = EventPriority.HIGH)
-    public void onPlayerDamage(EntityDamageEvent e){
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerDamage(EntityDamageEvent e) {
         // Check if entity is player
-        if (e.getEntityType() != EntityType.PLAYER){
+        if (e.getEntityType() != EntityType.PLAYER) {
             return;
         }
 
-        if (e.isCancelled()){
+        if (e.isCancelled()) {
             return;
         }
 
         // Check if GameState is Playing | Deathmatch
         GameState state = getGameManager().getGameState();
-        if (state != GameState.PLAYING && state != GameState.DEATHMATCH){
+        if (state != GameState.PLAYING && state != GameState.DEATHMATCH) {
             return;
         }
 
         UhcPlayer uhcPlayer = getPlayersManager().getUhcPlayer((Player) e.getEntity());
 
         // Check if player is playing
-        if (uhcPlayer.getState() != PlayerState.PLAYING){
+        if (uhcPlayer.getState() != PlayerState.PLAYING) {
             return;
         }
 
         // If solo player don't share damage
         List<UhcPlayer> onlinePlayingMembers = uhcPlayer.getTeam().getOnlinePlayingMembers();
-        if (onlinePlayingMembers.size() <= 1){
+        if (onlinePlayingMembers.size() <= 1) {
             return;
         }
 
-        double damage = e.getDamage()/onlinePlayingMembers.size();
+        double damage = e.getDamage() / onlinePlayingMembers.size();
         e.setDamage(damage);
 
-        for (UhcPlayer uhcMember : onlinePlayingMembers){
-            if (uhcMember == uhcPlayer){
+        for (UhcPlayer uhcMember : onlinePlayingMembers) {
+            if (uhcMember == uhcPlayer) {
                 continue;
             }
 
             try {
                 uhcMember.getPlayer().damage(damage);
-            }catch (UhcPlayerNotOnlineException ex){
+            } catch (UhcPlayerNotOnlineException ex) {
                 ex.printStackTrace();
             }
         }

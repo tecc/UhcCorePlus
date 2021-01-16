@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-public class FirelessListener extends ScenarioListener{
+public class FirelessListener extends ScenarioListener {
 
     @EventHandler
     public void onPlayerDamage(EntityDamageEvent e) {

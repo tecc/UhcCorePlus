@@ -8,9 +8,9 @@ import com.gmail.val59000mc.scoreboard.ScoreboardType;
 import com.gmail.val59000mc.utils.TimeUtils;
 import org.bukkit.entity.Player;
 
-public class TimersPlaceholder extends Placeholder{
+public class TimersPlaceholder extends Placeholder {
 
-    private enum Event{
+    private enum Event {
         PVP,
         DEATHMATCH,
         BORDER,
@@ -19,29 +19,29 @@ public class TimersPlaceholder extends Placeholder{
 
     private Event nextEvent;
 
-    public TimersPlaceholder(){
+    public TimersPlaceholder() {
         super("timers", "timer-name", "timer-time");
     }
 
     @Override
-    public String getReplacement(UhcPlayer uhcPlayer, Player player, ScoreboardType scoreboardType, String placeholder){
-        if (nextEvent == null){
+    public String getReplacement(UhcPlayer uhcPlayer, Player player, ScoreboardType scoreboardType, String placeholder) {
+        if (nextEvent == null) {
             nextEvent = getNextEvent();
         }
 
         long timeRemaining = getTimeRemaining(nextEvent);
 
-        if (timeRemaining < 0 && nextEvent != Event.NONE){
+        if (timeRemaining < 0 && nextEvent != Event.NONE) {
             nextEvent = getNextEvent();
             timeRemaining = getTimeRemaining(nextEvent);
         }
 
         // When all events have passed return empty string.
-        if (timeRemaining == -1){
+        if (timeRemaining == -1) {
             return "";
         }
 
-        switch (placeholder){
+        switch (placeholder) {
             case "timers":
                 return getEventName(nextEvent) + ": " + TimeUtils.getFormattedTime(timeRemaining);
             case "timer-name":
@@ -53,12 +53,12 @@ public class TimersPlaceholder extends Placeholder{
         }
     }
 
-    private Event getNextEvent(){
+    private Event getNextEvent() {
         Event nearestEvent = Event.NONE;
         long nearestEventTime = -1;
-        for (Event event : Event.values()){
+        for (Event event : Event.values()) {
             long l = getTimeRemaining(event);
-            if (l > 0 && (nearestEventTime < 0 || l < nearestEventTime)){
+            if (l > 0 && (nearestEventTime < 0 || l < nearestEventTime)) {
                 nearestEvent = event;
                 nearestEventTime = l;
             }
@@ -67,8 +67,8 @@ public class TimersPlaceholder extends Placeholder{
         return nearestEvent;
     }
 
-    private String getEventName(Event event){
-        switch (event){
+    private String getEventName(Event event) {
+        switch (event) {
             case PVP:
                 return "PvP";
             case DEATHMATCH:
@@ -80,10 +80,10 @@ public class TimersPlaceholder extends Placeholder{
         }
     }
 
-    private long getTimeRemaining(Event event){
+    private long getTimeRemaining(Event event) {
         GameManager gm = GameManager.getGameManager();
         MainConfig cfg = gm.getConfig();
-        switch (event){
+        switch (event) {
             case PVP:
                 return cfg.get(MainConfig.TIME_BEFORE_PVP) - gm.getElapsedTime();
             case DEATHMATCH:

@@ -18,7 +18,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class LoveAtFirstSightListener extends ScenarioListener{
+public class LoveAtFirstSightListener extends ScenarioListener {
 
     @Option(key = "disable-broadcasts")
     private boolean disableBroadcasts = false;
@@ -36,9 +36,9 @@ public class LoveAtFirstSightListener extends ScenarioListener{
         }
     }
 
-    @EventHandler (priority = EventPriority.LOW)
-    public void onPlayerDamage(EntityDamageByEntityEvent e){
-        if (e.getEntityType() != EntityType.PLAYER || !(e.getDamager() instanceof Player)){
+    @EventHandler(priority = EventPriority.LOW)
+    public void onPlayerDamage(EntityDamageByEntityEvent e) {
+        if (e.getEntityType() != EntityType.PLAYER || !(e.getDamager() instanceof Player)) {
             return;
         }
 
@@ -46,52 +46,52 @@ public class LoveAtFirstSightListener extends ScenarioListener{
         UhcPlayer uhcDamaged = pm.getUhcPlayer((Player) e.getEntity());
         UhcPlayer uhcDamager = pm.getUhcPlayer((Player) e.getDamager());
 
-        if (getGameManager().getGameState() != GameState.PLAYING){
+        if (getGameManager().getGameState() != GameState.PLAYING) {
             return;
         }
 
-        if (uhcDamaged.getTeam().isFull() || uhcDamager.getTeam().isFull()){
+        if (uhcDamaged.getTeam().isFull() || uhcDamager.getTeam().isFull()) {
             return; // One of the teams is full so no team can be made
         }
 
-        if (!uhcDamaged.getTeam().isSolo() && !uhcDamager.getTeam().isSolo()){
+        if (!uhcDamaged.getTeam().isSolo() && !uhcDamager.getTeam().isSolo()) {
             return; // Neither of the players are solo so a team can't be created
         }
 
-        if (getTeamManager().getPlayingUhcTeams().size() <= 2){
+        if (getTeamManager().getPlayingUhcTeams().size() <= 2) {
             return; // Only 2 teams left, don't team them up but let them first.
         }
 
         boolean result;
-        if (uhcDamaged.getTeam().isSolo()){
+        if (uhcDamaged.getTeam().isSolo()) {
             // add to damager team
             result = addPlayerToTeam(uhcDamaged, uhcDamager.getTeam());
-        }else{
+        } else {
             // add damager to damaged
             result = addPlayerToTeam(uhcDamager, uhcDamaged.getTeam());
         }
 
-        if (result){
+        if (result) {
             e.setCancelled(true);
         }
     }
 
-    private boolean addPlayerToTeam(UhcPlayer player, UhcTeam team){
+    private boolean addPlayerToTeam(UhcPlayer player, UhcTeam team) {
         if (team.isFull()) return false;
         Inventory teamInventory = team.getTeamInventory();
 
-        for (ItemStack item : player.getTeam().getTeamInventory().getContents()){
-            if (item == null || item.getType() == Material.AIR){
+        for (ItemStack item : player.getTeam().getTeamInventory().getContents()) {
+            if (item == null || item.getType() == Material.AIR) {
                 continue;
             }
 
-            if (teamInventory.getContents().length < teamInventory.getSize()){
+            if (teamInventory.getContents().length < teamInventory.getSize()) {
                 teamInventory.addItem(item);
-            }else {
+            } else {
                 try {
                     Player bukkitPlayer = player.getPlayer();
                     bukkitPlayer.getWorld().dropItem(bukkitPlayer.getLocation(), item);
-                }catch (UhcPlayerNotOnlineException ex){
+                } catch (UhcPlayerNotOnlineException ex) {
                     ex.printStackTrace();
                 }
             }
@@ -103,7 +103,7 @@ public class LoveAtFirstSightListener extends ScenarioListener{
         team.sendMessage(Lang.TEAM_MESSAGE_PLAYER_JOINS.replace("%player%", player.getName()));
         GameManager gm = GameManager.getGameManager();
         gm.getScoreboardManager().updatePlayerTab(player);
-        if (!disableBroadcasts){
+        if (!disableBroadcasts) {
             gm.broadcastMessage(Lang.SCENARIO_LOVEATFIRSTSIGHT_JOIN_BROADCAST.replace("%player%", player.getName()).replace("%leader%", team.getLeader().getName()));
         }
         return true;

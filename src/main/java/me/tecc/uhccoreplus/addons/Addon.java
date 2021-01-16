@@ -5,7 +5,6 @@ import com.gmail.val59000mc.game.GameManager;
 import com.gmail.val59000mc.players.PlayersManager;
 import com.gmail.val59000mc.scenarios.Scenario;
 import com.gmail.val59000mc.scenarios.ScenarioManager;
-import org.bukkit.configuration.ConfigurationSection;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -74,6 +73,7 @@ public abstract class Addon {
     public GameManager getGameManager() {
         return GameManager.getGameManager();
     }
+
     public PlayersManager getPlayersManager() {
         return getGameManager().getPlayersManager();
     }

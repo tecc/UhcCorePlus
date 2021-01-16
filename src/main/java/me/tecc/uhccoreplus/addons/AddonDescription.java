@@ -1,6 +1,5 @@
 package me.tecc.uhccoreplus.addons;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 

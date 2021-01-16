@@ -15,22 +15,22 @@ import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
-public class ReviveCommandExecutor implements CommandExecutor{
+public class ReviveCommandExecutor implements CommandExecutor {
 
     private final GameManager gameManager;
 
-    public ReviveCommandExecutor(GameManager gameManager){
+    public ReviveCommandExecutor(GameManager gameManager) {
         this.gameManager = gameManager;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
-        if (args.length != 1 && args.length != 2){
+        if (args.length != 1 && args.length != 2) {
             sender.sendMessage(ChatColor.RED + "Correct usage: '/revive <player>' or use '/revive <player> clear' to respawn the player without giving their items back.");
             return true;
         }
 
-        if (gameManager.getGameState() != GameState.PLAYING){
+        if (gameManager.getGameState() != GameState.PLAYING) {
             sender.sendMessage(ChatColor.RED + "You can only use this command while playing!");
             return true;
         }
@@ -41,7 +41,7 @@ public class ReviveCommandExecutor implements CommandExecutor{
         Player player = Bukkit.getPlayer(name);
         boolean spawnWithItems = args.length != 2 || !args[1].equalsIgnoreCase("clear");
 
-        if (player != null){
+        if (player != null) {
             uuidCallback(player.getUniqueId(), player.getName(), spawnWithItems, sender);
             return true;
         }
@@ -50,14 +50,14 @@ public class ReviveCommandExecutor implements CommandExecutor{
         return true;
     }
 
-    private void uuidCallback(UUID uuid, String name, boolean spawnWithItems, CommandSender caller){
-        if (!Bukkit.isPrimaryThread()){
+    private void uuidCallback(UUID uuid, String name, boolean spawnWithItems, CommandSender caller) {
+        if (!Bukkit.isPrimaryThread()) {
             // Run in main bukkit thread
             Bukkit.getScheduler().runTask(UhcCore.getPlugin(), () -> uuidCallback(uuid, name, spawnWithItems, caller));
             return;
         }
 
-        if (uuid == null){
+        if (uuid == null) {
             caller.sendMessage(ChatColor.RED + "Player not found!");
         }
 
@@ -65,9 +65,9 @@ public class ReviveCommandExecutor implements CommandExecutor{
 
         UhcPlayer uhcPlayer = pm.revivePlayer(uuid, name, spawnWithItems);
 
-        if (uhcPlayer.isOnline()){
+        if (uhcPlayer.isOnline()) {
             caller.sendMessage(ChatColor.GREEN + name + " has been revived!");
-        }else{
+        } else {
             caller.sendMessage(ChatColor.GREEN + name + " can now join the game!");
         }
     }

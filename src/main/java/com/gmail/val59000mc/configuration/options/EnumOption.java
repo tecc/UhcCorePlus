@@ -32,7 +32,7 @@ public class EnumOption<T extends Enum<T>> implements Option<T> {
         try {
             Validate.notNull(enumType, "No enum type specified!");
             return Enum.valueOf(type, enumType);
-        }catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             Bukkit.getLogger().severe("[UhcCore] Invalid enum type " + enumType);
             ex.printStackTrace();
             return def;

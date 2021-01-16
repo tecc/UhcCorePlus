@@ -13,36 +13,36 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 
-public class AnonymousListener extends ScenarioListener{
+public class AnonymousListener extends ScenarioListener {
 
     @Override
-    public void onEnable(){
-        if (!Dependencies.getProtocolLibLoaded()){
+    public void onEnable() {
+        if (!Dependencies.getProtocolLibLoaded()) {
             Bukkit.broadcastMessage(ChatColor.RED + "[UhcCore] For Anonymous ProtocolLib needs to be installed!");
             getScenarioManager().disableScenario(Scenario.ANONYMOUS);
             return;
         }
 
-        for (UhcPlayer uhcPlayer : getPlayersManager().getAllPlayingPlayers()){
+        for (UhcPlayer uhcPlayer : getPlayersManager().getAllPlayingPlayers()) {
             ProtocolUtils.setPlayerNickName(uhcPlayer, getPlayerNickName(uhcPlayer.getName()));
             getScoreboardManager().updatePlayerTab(uhcPlayer);
         }
     }
 
     @Override
-    public void onDisable(){
-        if (!Dependencies.getProtocolLibLoaded()){
+    public void onDisable() {
+        if (!Dependencies.getProtocolLibLoaded()) {
             return; // Never enabled so don't disable.
         }
 
-        for (UhcPlayer uhcPlayer : getPlayersManager().getAllPlayingPlayers()){
+        for (UhcPlayer uhcPlayer : getPlayersManager().getAllPlayingPlayers()) {
             ProtocolUtils.setPlayerNickName(uhcPlayer, null);
             getScoreboardManager().updatePlayerTab(uhcPlayer);
         }
     }
 
     @EventHandler
-    public void onGameStarted(PlayerStartsPlayingEvent e){
+    public void onGameStarted(PlayerStartsPlayingEvent e) {
         UhcPlayer uhcPlayer = e.getUhcPlayer();
 
         ProtocolUtils.setPlayerNickName(uhcPlayer, getPlayerNickName(uhcPlayer.getName()));
@@ -50,8 +50,8 @@ public class AnonymousListener extends ScenarioListener{
     }
 
     @EventHandler
-    public void onGameStateChanged(UhcGameStateChangedEvent e){
-        for (UhcPlayer uhcPlayer : getPlayersManager().getPlayersList()){
+    public void onGameStateChanged(UhcGameStateChangedEvent e) {
+        for (UhcPlayer uhcPlayer : getPlayersManager().getPlayersList()) {
             if (uhcPlayer.hasNickName()) {
                 ProtocolUtils.setPlayerNickName(uhcPlayer, null);
                 getScoreboardManager().updatePlayerTab(uhcPlayer);
@@ -60,8 +60,8 @@ public class AnonymousListener extends ScenarioListener{
     }
 
     @EventHandler
-    public void onUhcPlayerStateChange(UhcPlayerStateChangedEvent e){
-        if (e.getNewPlayerState() == PlayerState.DEAD){
+    public void onUhcPlayerStateChange(UhcPlayerStateChangedEvent e) {
+        if (e.getNewPlayerState() == PlayerState.DEAD) {
             UhcPlayer player = e.getPlayer();
 
             // clear nick
@@ -70,8 +70,8 @@ public class AnonymousListener extends ScenarioListener{
         }
     }
 
-    private String getPlayerNickName(String name){
-        if (name.length() > 12){
+    private String getPlayerNickName(String name) {
+        if (name.length() > 12) {
             name = name.substring(0, 12);
         }
 
@@ -79,7 +79,7 @@ public class AnonymousListener extends ScenarioListener{
         sb.append(ChatColor.MAGIC);
         sb.append(name);
 
-        while (sb.length() < 14){
+        while (sb.length() < 14) {
             sb.append("A");
         }
 

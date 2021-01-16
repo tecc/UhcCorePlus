@@ -20,7 +20,7 @@ import org.bukkit.inventory.EnchantingInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public class CutCleanListener extends ScenarioListener{
+public class CutCleanListener extends ScenarioListener {
 
     private final ItemStack lapis;
 
@@ -29,13 +29,13 @@ public class CutCleanListener extends ScenarioListener{
     @Option(key = "check-correct-tool")
     private boolean checkTool = false;
 
-    public CutCleanListener(){
+    public CutCleanListener() {
         lapis = UniversalMaterial.LAPIS_LAZULI.getStack(64);
     }
 
     @EventHandler
     public void onEntityDeath(EntityDeathEvent e) {
-        for(int i=0 ; i<e.getDrops().size() ; i++){
+        for (int i = 0; i < e.getDrops().size(); i++) {
             UniversalMaterial replaceBy = null;
             UniversalMaterial type = UniversalMaterial.ofType(e.getDrops().get(i).getType());
             if (type != null) {
@@ -59,7 +59,7 @@ public class CutCleanListener extends ScenarioListener{
                         break;
                 }
             }
-            if(replaceBy != null){
+            if (replaceBy != null) {
                 ItemStack cookedFood = e.getDrops().get(i).clone();
                 cookedFood.setType(replaceBy.getType());
                 e.getDrops().set(i, cookedFood);
@@ -70,76 +70,76 @@ public class CutCleanListener extends ScenarioListener{
         }
     }
 
-    @EventHandler (priority = EventPriority.HIGH)
-    public void onBlockBreak(BlockBreakEvent e){
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onBlockBreak(BlockBreakEvent e) {
 
-        if (isEnabled(Scenario.TRIPLE_ORES) || (isEnabled(Scenario.VEIN_MINER) && e.getPlayer().isSneaking())){
+        if (isEnabled(Scenario.TRIPLE_ORES) || (isEnabled(Scenario.VEIN_MINER) && e.getPlayer().isSneaking())) {
             return;
         }
 
         Block block = e.getBlock();
 
-        if (checkTool && !UniversalMaterial.isCorrectTool(block.getType(), e.getPlayer().getItemInHand().getType())){
+        if (checkTool && !UniversalMaterial.isCorrectTool(block.getType(), e.getPlayer().getItemInHand().getType())) {
             return;
         }
 
         Location loc = e.getBlock().getLocation().add(0.5, 0, 0.5);
 
-        switch (block.getType()){
+        switch (block.getType()) {
             case IRON_ORE:
                 block.setType(Material.AIR);
-                loc.getWorld().dropItem(loc,new ItemStack(Material.IRON_INGOT));
-                UhcItems.spawnExtraXp(loc,2);
+                loc.getWorld().dropItem(loc, new ItemStack(Material.IRON_INGOT));
+                UhcItems.spawnExtraXp(loc, 2);
                 break;
             case GOLD_ORE:
                 block.setType(Material.AIR);
-                loc.getWorld().dropItem(loc,new ItemStack(Material.GOLD_INGOT));
-                if (isEnabled(Scenario.DOUBLE_GOLD)){
-                    loc.getWorld().dropItem(loc,new ItemStack(Material.GOLD_INGOT));
+                loc.getWorld().dropItem(loc, new ItemStack(Material.GOLD_INGOT));
+                if (isEnabled(Scenario.DOUBLE_GOLD)) {
+                    loc.getWorld().dropItem(loc, new ItemStack(Material.GOLD_INGOT));
                 }
-                UhcItems.spawnExtraXp(loc,3);
+                UhcItems.spawnExtraXp(loc, 3);
                 break;
             case SAND:
                 block.setType(Material.AIR);
-                loc.getWorld().dropItem(loc,new ItemStack(Material.GLASS));
+                loc.getWorld().dropItem(loc, new ItemStack(Material.GLASS));
                 break;
             case GRAVEL:
                 block.setType(Material.AIR);
-                loc.getWorld().dropItem(loc,new ItemStack(Material.FLINT));
+                loc.getWorld().dropItem(loc, new ItemStack(Material.FLINT));
                 break;
         }
     }
 
     @EventHandler
-    public void openInventoryEvent(InventoryOpenEvent e){
+    public void openInventoryEvent(InventoryOpenEvent e) {
         if (!unlimitedLapis) return;
 
-        if (e.getInventory() instanceof EnchantingInventory){
+        if (e.getInventory() instanceof EnchantingInventory) {
             e.getInventory().setItem(1, lapis);
         }
     }
 
     @EventHandler
-    public void closeInventoryEvent(InventoryCloseEvent e){
+    public void closeInventoryEvent(InventoryCloseEvent e) {
         if (!unlimitedLapis) return;
 
-        if (e.getInventory() instanceof EnchantingInventory){
+        if (e.getInventory() instanceof EnchantingInventory) {
             e.getInventory().setItem(1, null);
         }
     }
 
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent e){
+    public void onInventoryClick(InventoryClickEvent e) {
         Inventory inv = e.getInventory();
         ItemStack item = e.getCurrentItem();
         if (!unlimitedLapis) return;
         if (inv == null || item == null) return;
 
-        if (inv instanceof EnchantingInventory){
+        if (inv instanceof EnchantingInventory) {
 
-            if (item.getType().equals(lapis.getType())){
+            if (item.getType().equals(lapis.getType())) {
                 e.setCancelled(true);
-            }else {
+            } else {
                 e.getInventory().setItem(1, lapis);
             }
         }

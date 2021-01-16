@@ -14,12 +14,12 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
 
-public class NineSlotsListener extends ScenarioListener{
+public class NineSlotsListener extends ScenarioListener {
 
     private ItemStack fillItem;
 
     @Override
-    public void onEnable(){
+    public void onEnable() {
         fillItem = UniversalMaterial.LIGHT_GRAY_STAINED_GLASS_PANE.getStack();
         ItemMeta meta = fillItem.getItemMeta();
         meta.setDisplayName(ChatColor.RED.toString() + ChatColor.BOLD + "BLOCKED");
@@ -27,37 +27,38 @@ public class NineSlotsListener extends ScenarioListener{
     }
 
     @EventHandler
-    public void onGameStarted(PlayerStartsPlayingEvent e){
-        try{
+    public void onGameStarted(PlayerStartsPlayingEvent e) {
+        try {
             fillInventory(e.getUhcPlayer().getPlayer());
-        }catch (UhcPlayerNotOnlineException ex){
+        } catch (UhcPlayerNotOnlineException ex) {
             ex.printStackTrace();
         }
     }
 
     @EventHandler
-    public void onInventoryClick(InventoryClickEvent e){
+    public void onInventoryClick(InventoryClickEvent e) {
         ItemStack item = e.getCurrentItem();
 
         // Only handle clicked items.
-        if (item == null){
+        if (item == null) {
             return;
         }
 
-        if (item.equals(fillItem)){
+        if (item.equals(fillItem)) {
             e.setCancelled(true);
         }
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent e){
+    public void onPlayerDeath(PlayerDeathEvent e) {
         List<ItemStack> drops = e.getDrops();
 
         // Remove all fill items.
-        while (drops.remove(fillItem)){}
+        while (drops.remove(fillItem)) {
+        }
     }
 
-    private void fillInventory(Player player){
+    private void fillInventory(Player player) {
         for (int i = 9; i <= 35; i++) {
             player.getInventory().setItem(i, fillItem);
         }

@@ -23,22 +23,22 @@ import org.bukkit.inventory.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TimebombListener extends ScenarioListener{
+public class TimebombListener extends ScenarioListener {
 
     @Option
     private long delay = 30;
 
-    @EventHandler (priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerDeath(PlayerDeathEvent e) {
         Player p = e.getEntity().getPlayer();
         List<ItemStack> drops = new ArrayList<>(e.getDrops());
         e.getDrops().removeAll(e.getDrops());
 
         TimebombThread timebombThread = new TimebombThread(drops, p.getLocation().getBlock().getLocation(), p.getName(), delay);
-        Bukkit.getScheduler().scheduleSyncDelayedTask(UhcCore.getPlugin(), timebombThread,1L);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(UhcCore.getPlugin(), timebombThread, 1L);
     }
 
-    public static class TimebombThread implements Runnable{
+    public static class TimebombThread implements Runnable {
 
         private ArmorStand armorStand;
         private Block block1, block2;
@@ -48,7 +48,7 @@ public class TimebombListener extends ScenarioListener{
         private String name;
         private boolean spawned;
 
-        public TimebombThread(List<ItemStack> drops, Location loc, String name, long delay){
+        public TimebombThread(List<ItemStack> drops, Location loc, String name, long delay) {
             this.drops = drops;
             this.loc = loc;
             this.name = name;
@@ -58,15 +58,15 @@ public class TimebombListener extends ScenarioListener{
 
         @Override
         public void run() {
-            if (!spawned){
+            if (!spawned) {
                 spawnChest();
             }
 
-            if (timeLeft > 0){
+            if (timeLeft > 0) {
                 armorStand.setCustomName(ChatColor.GOLD + "" + timeLeft);
                 timeLeft--;
-                Bukkit.getScheduler().scheduleSyncDelayedTask(UhcCore.getPlugin(),this,20L);
-            }else{
+                Bukkit.getScheduler().scheduleSyncDelayedTask(UhcCore.getPlugin(), this, 20L);
+            } else {
                 armorStand.remove();
                 block1.setType(Material.AIR);
                 block2.setType(Material.AIR);
@@ -75,7 +75,7 @@ public class TimebombListener extends ScenarioListener{
 
         }
 
-        private void spawnChest(){
+        private void spawnChest() {
             spawned = true;
 
             block1 = loc.getBlock();
@@ -98,11 +98,11 @@ public class TimebombListener extends ScenarioListener{
 
             Inventory inv = chest1.getInventory();
 
-            for (ItemStack drop : drops){
+            for (ItemStack drop : drops) {
                 inv.addItem(drop);
             }
 
-            loc.add(1,-1,.5);
+            loc.add(1, -1, .5);
 
             armorStand = (ArmorStand) loc.getWorld().spawnEntity(loc, EntityType.ARMOR_STAND);
             armorStand.setCustomNameVisible(true);

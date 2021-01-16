@@ -21,124 +21,124 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
-public class TeleportListener implements Listener{
+public class TeleportListener implements Listener {
 
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onPlayerPortalEvent (PlayerPortalEvent event){
-		GameManager gm = GameManager.getGameManager();
-		Player player = event.getPlayer();
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerPortalEvent(PlayerPortalEvent event) {
+        GameManager gm = GameManager.getGameManager();
+        Player player = event.getPlayer();
 
-		// Disable nether/end in deathmatch
-		if (gm.getGameState() == GameState.DEATHMATCH){
-			event.setCancelled(true);
-			return;
-		}
-		
-		if (event.getCause() == TeleportCause.NETHER_PORTAL) {
+        // Disable nether/end in deathmatch
+        if (gm.getGameState() == GameState.DEATHMATCH) {
+            event.setCancelled(true);
+            return;
+        }
 
-			if (!gm.getConfig().get(MainConfig.ENABLE_NETHER)){
-				player.sendMessage(Lang.PLAYERS_NETHER_OFF);
-				event.setCancelled(true);
-				return;
-			}
+        if (event.getCause() == TeleportCause.NETHER_PORTAL) {
 
-			// No Going back!
-			if (gm.getScenarioManager().isEnabled(Scenario.NO_GOING_BACK) && event.getFrom().getWorld().getEnvironment() == Environment.NETHER){
-				player.sendMessage(Lang.SCENARIO_NOGOINGBACK_ERROR);
-				event.setCancelled(true);
-				return;
-			}
+            if (!gm.getConfig().get(MainConfig.ENABLE_NETHER)) {
+                player.sendMessage(Lang.PLAYERS_NETHER_OFF);
+                event.setCancelled(true);
+                return;
+            }
 
-			// Handle event using versions utils as on 1.14+ PortalTravelAgent got removed.
-			VersionUtils.getVersionUtils().handleNetherPortalEvent(event);
+            // No Going back!
+            if (gm.getScenarioManager().isEnabled(Scenario.NO_GOING_BACK) && event.getFrom().getWorld().getEnvironment() == Environment.NETHER) {
+                player.sendMessage(Lang.SCENARIO_NOGOINGBACK_ERROR);
+                event.setCancelled(true);
+                return;
+            }
 
-		}else if (event.getCause() == TeleportCause.END_PORTAL){
+            // Handle event using versions utils as on 1.14+ PortalTravelAgent got removed.
+            VersionUtils.getVersionUtils().handleNetherPortalEvent(event);
 
-			if (gm.getConfig().get(MainConfig.ENABLE_THE_END) && event.getFrom().getWorld().getEnvironment() == Environment.NORMAL){
-				// Teleport to end
-				World endWorld = gm.getMapLoader().getUhcWorld(Environment.THE_END);
-				Location end = new Location(endWorld, -42, 48, -18);
+        } else if (event.getCause() == TeleportCause.END_PORTAL) {
 
-				createEndSpawnAir(end);
-				createEndSpawnObsidian(end);
+            if (gm.getConfig().get(MainConfig.ENABLE_THE_END) && event.getFrom().getWorld().getEnvironment() == Environment.NORMAL) {
+                // Teleport to end
+                World endWorld = gm.getMapLoader().getUhcWorld(Environment.THE_END);
+                Location end = new Location(endWorld, -42, 48, -18);
 
-				event.setTo(end);
-			}
-		}
-	}
-	
-	@EventHandler
-	public void onPlayerChangedWorld(PlayerChangedWorldEvent e){
-		GameManager gm = GameManager.getGameManager();
-		Player player = e.getPlayer();
+                createEndSpawnAir(end);
+                createEndSpawnObsidian(end);
 
-		if (gm.getConfig().get(MainConfig.ENABLE_THE_END) && e.getFrom().getName().equals(gm.getMapLoader().getUhcWorldUuid(Environment.THE_END))){
-			World world = gm.getMapLoader().getUhcWorld(Environment.NORMAL);
+                event.setTo(end);
+            }
+        }
+    }
 
-			double maxDistance = 0.9 * gm.getWorldBorder().getCurrentSize();
-			Location loc = gm.getPlayersManager().findRandomSafeLocation(world, maxDistance);
+    @EventHandler
+    public void onPlayerChangedWorld(PlayerChangedWorldEvent e) {
+        GameManager gm = GameManager.getGameManager();
+        Player player = e.getPlayer();
 
-			player.teleport(loc);
-		}
-	}
-		
-	@EventHandler
-	public void onPlayerTeleport(PlayerTeleportEvent e){
-		if (e.getCause() == TeleportCause.SPECTATE && !GameManager.getGameManager().getConfig().get(MainConfig.SPECTATING_TELEPORT)){
-			Player player = e.getPlayer();
-			if (!player.hasPermission("uhc-core.commands.teleport-admin")){
-				e.setCancelled(true);
-				player.sendMessage(Lang.COMMAND_SPECTATING_TELEPORT_ERROR);
-			}
-		}
-	}
+        if (gm.getConfig().get(MainConfig.ENABLE_THE_END) && e.getFrom().getName().equals(gm.getMapLoader().getUhcWorldUuid(Environment.THE_END))) {
+            World world = gm.getMapLoader().getUhcWorld(Environment.NORMAL);
 
-	private void createEndSpawnAir(Location loc){
-		int topBlockX = (-41);
-		int bottomBlockX = (-44);
+            double maxDistance = 0.9 * gm.getWorldBorder().getCurrentSize();
+            Location loc = gm.getPlayersManager().findRandomSafeLocation(world, maxDistance);
 
-		int topBlockY = (50);
-		int bottomBlockY = (48);
+            player.teleport(loc);
+        }
+    }
 
-		int topBlockZ = (-17);
-		int bottomBlockZ = (-20);
+    @EventHandler
+    public void onPlayerTeleport(PlayerTeleportEvent e) {
+        if (e.getCause() == TeleportCause.SPECTATE && !GameManager.getGameManager().getConfig().get(MainConfig.SPECTATING_TELEPORT)) {
+            Player player = e.getPlayer();
+            if (!player.hasPermission("uhc-core.commands.teleport-admin")) {
+                e.setCancelled(true);
+                player.sendMessage(Lang.COMMAND_SPECTATING_TELEPORT_ERROR);
+            }
+        }
+    }
 
-		for(int x = bottomBlockX; x <= topBlockX; x++) {
+    private void createEndSpawnAir(Location loc) {
+        int topBlockX = (-41);
+        int bottomBlockX = (-44);
 
-			for(int z = bottomBlockZ; z <= topBlockZ; z++) {
+        int topBlockY = (50);
+        int bottomBlockY = (48);
 
-				for(int y = bottomBlockY; y <= topBlockY; y++) {
+        int topBlockZ = (-17);
+        int bottomBlockZ = (-20);
 
-					Block block = loc.getWorld().getBlockAt(x, y, z);
+        for (int x = bottomBlockX; x <= topBlockX; x++) {
 
-					block.setType(Material.AIR);
-				}
-			}
-		}
-	}
+            for (int z = bottomBlockZ; z <= topBlockZ; z++) {
 
-	private void createEndSpawnObsidian(Location loc){
-		int topBlockX = (-41);
-		int bottomBlockX = (-44);
+                for (int y = bottomBlockY; y <= topBlockY; y++) {
 
-		int topBlockY = (47);
-		int bottomBlockY = (47);
+                    Block block = loc.getWorld().getBlockAt(x, y, z);
 
-		int topBlockZ = (-17);
-		int bottomBlockZ = (-20);
+                    block.setType(Material.AIR);
+                }
+            }
+        }
+    }
 
-		for(int x = bottomBlockX; x <= topBlockX; x++) {
+    private void createEndSpawnObsidian(Location loc) {
+        int topBlockX = (-41);
+        int bottomBlockX = (-44);
 
-			for(int z = bottomBlockZ; z <= topBlockZ; z++) {
+        int topBlockY = (47);
+        int bottomBlockY = (47);
 
-				for(int y = bottomBlockY; y <= topBlockY; y++) {
+        int topBlockZ = (-17);
+        int bottomBlockZ = (-20);
 
-					Block block = loc.getWorld().getBlockAt(x, y, z);
+        for (int x = bottomBlockX; x <= topBlockX; x++) {
 
-					block.setType(Material.OBSIDIAN);
-				}
-			}
-		}
-	}
+            for (int z = bottomBlockZ; z <= topBlockZ; z++) {
+
+                for (int y = bottomBlockY; y <= topBlockY; y++) {
+
+                    Block block = loc.getWorld().getBlockAt(x, y, z);
+
+                    block.setType(Material.OBSIDIAN);
+                }
+            }
+        }
+    }
 
 }

@@ -10,9 +10,9 @@ import org.bukkit.command.CommandSender;
 
 import java.io.*;
 
-public class UploadCommandExecutor implements CommandExecutor{
+public class UploadCommandExecutor implements CommandExecutor {
 
-    private enum FileType{
+    private enum FileType {
         LOG("logs/latest.log", false),
         CONFIG("config.yml", true),
         STORAGE("storage.yml", true),
@@ -26,13 +26,13 @@ public class UploadCommandExecutor implements CommandExecutor{
         private final String path;
         private final boolean dataFolder;
 
-        FileType(String path, boolean dataFolder){
+        FileType(String path, boolean dataFolder) {
             this.path = path;
             this.dataFolder = dataFolder;
         }
 
-        public File getFile(){
-            if (dataFolder){
+        public File getFile() {
+            if (dataFolder) {
                 return new File(UhcCore.getPlugin().getDataFolder(), path);
             }
             return new File(path);
@@ -40,8 +40,8 @@ public class UploadCommandExecutor implements CommandExecutor{
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args){
-        if (args.length != 1){
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length != 1) {
             sender.sendMessage(ChatColor.RED + "Usage: /upload <file-type>");
             return true;
         }
@@ -50,9 +50,9 @@ public class UploadCommandExecutor implements CommandExecutor{
 
         try {
             fileType = FileType.valueOf(args[0].toUpperCase());
-        }catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             sender.sendMessage(ChatColor.RED + "Invalid file type! Choose from this list:");
-            for (FileType type : FileType.values()){
+            for (FileType type : FileType.values()) {
                 sender.sendMessage(ChatColor.GREEN + " - " + type.name().toLowerCase());
             }
             return true;
@@ -63,7 +63,7 @@ public class UploadCommandExecutor implements CommandExecutor{
         String url;
         try {
             url = uploadFile(fileType);
-        }catch (IOException ex){
+        } catch (IOException ex) {
             sender.sendMessage(ChatColor.RED + "Failed to upload file, check console for more details!");
             ex.printStackTrace();
             return true;
@@ -73,7 +73,7 @@ public class UploadCommandExecutor implements CommandExecutor{
         return true;
     }
 
-    private String uploadFile(FileType fileType) throws IOException{
+    private String uploadFile(FileType fileType) throws IOException {
         File file = fileType.getFile();
 
         Bukkit.getLogger().info("[UhcCore] Uploading file: " + file);
@@ -82,10 +82,10 @@ public class UploadCommandExecutor implements CommandExecutor{
 
         StringBuilder sb = new StringBuilder();
         String line;
-        while ((line = reader.readLine()) != null){
-            if (fileType == FileType.LOG){
+        while ((line = reader.readLine()) != null) {
+            if (fileType == FileType.LOG) {
                 sb.append(line.replaceAll("([0-9]{1,3}\\.){3}[0-9]{1,3}", "**.**.**.**"));
-            }else {
+            } else {
                 sb.append(line);
             }
 

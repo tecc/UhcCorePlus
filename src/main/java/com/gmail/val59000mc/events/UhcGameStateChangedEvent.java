@@ -4,19 +4,19 @@ import com.gmail.val59000mc.game.GameState;
 
 public class UhcGameStateChangedEvent extends UhcEvent {
 
-	private final GameState oldGameState, newGameState;
+    private final GameState oldGameState, newGameState;
 
-	public UhcGameStateChangedEvent(GameState oldGameState, GameState newGameState){
-		this.oldGameState = oldGameState;
-		this.newGameState = newGameState;
-	}
+    public UhcGameStateChangedEvent(GameState oldGameState, GameState newGameState) {
+        this.oldGameState = oldGameState;
+        this.newGameState = newGameState;
+    }
 
-	public GameState getOldGameState() {
-		return oldGameState;
-	}
+    public GameState getOldGameState() {
+        return oldGameState;
+    }
 
-	public GameState getNewGameState() {
-		return newGameState;
-	}
+    public GameState getNewGameState() {
+        return newGameState;
+    }
 
 }

@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 
-public enum UniversalMaterial{
+public enum UniversalMaterial {
     WHITE_WOOL("WOOL", "WHITE_WOOL", (short) 0),
     ORANGE_WOOL("WOOL", "ORANGE_WOOL", (short) 1),
     MAGENTA_WOOL("WOOL", "MAGENTA_WOOL", (short) 2),
@@ -31,11 +31,11 @@ public enum UniversalMaterial{
     SUGAR_CANE_BLOCK("SUGAR_CANE_BLOCK", "SUGAR_CANE"),
     CAVE_AIR("CAVE_AIR", "CAVE_AIR"),
 
-    SKELETON_SKULL("SKULL_ITEM","SKELETON_SKULL", (short) 0),
-    WITHER_SKELETON_SKULL("SKULL_ITEM","WITHER_SKELETON_SKULL", (short) 1),
-    ZOMBIE_HEAD("SKULL_ITEM","ZOMBIE_HEAD", (short) 2),
-    PLAYER_HEAD("SKULL_ITEM","PLAYER_HEAD", (short) 3),
-    PLAYER_HEAD_BLOCK("SKULL","PLAYER_HEAD", (short) 3),
+    SKELETON_SKULL("SKULL_ITEM", "SKELETON_SKULL", (short) 0),
+    WITHER_SKELETON_SKULL("SKULL_ITEM", "WITHER_SKELETON_SKULL", (short) 1),
+    ZOMBIE_HEAD("SKULL_ITEM", "ZOMBIE_HEAD", (short) 2),
+    PLAYER_HEAD("SKULL_ITEM", "PLAYER_HEAD", (short) 3),
+    PLAYER_HEAD_BLOCK("SKULL", "PLAYER_HEAD", (short) 3),
     CREEPER_HEAD("SKULL_ITEM", "CREEPER_HEAD", (short) 4),
     DRAGON_HEAD("SKULL_ITEM", "DRAGON_HEAD", (short) 5),
 
@@ -155,21 +155,21 @@ public enum UniversalMaterial{
     private boolean loaded;
     private Material material;
 
-    UniversalMaterial(String name8, String name13, short id8){
+    UniversalMaterial(String name8, String name13, short id8) {
         this.name8 = name8;
         this.name13 = name13;
         this.id8 = id8;
         loaded = false;
     }
 
-    UniversalMaterial(String name8, String name13){
+    UniversalMaterial(String name8, String name13) {
         this.name8 = name8;
         this.name13 = name13;
         id8 = 0;
         loaded = false;
     }
 
-    UniversalMaterial(){
+    UniversalMaterial() {
         this.name8 = name();
         this.name13 = name();
         id8 = 0;
@@ -177,11 +177,11 @@ public enum UniversalMaterial{
     }
 
     @Nullable
-    public Material getType(){
-        if (!loaded){
+    public Material getType() {
+        if (!loaded) {
             try {
                 material = Material.valueOf(getTypeName());
-            }catch (IllegalArgumentException ex){
+            } catch (IllegalArgumentException ex) {
                 material = null;
             }
             loaded = true;
@@ -189,34 +189,34 @@ public enum UniversalMaterial{
         return material;
     }
 
-    private String getTypeName(){
+    private String getTypeName() {
         return (UhcCore.getVersion() < 13) ? name8 : name13;
     }
 
-    public short getData(){
+    public short getData() {
         return UhcCore.getVersion() < 13 ? id8 : 0;
     }
 
     @SuppressWarnings("deprecation")
-    public ItemStack getStack(int amount){
+    public ItemStack getStack(int amount) {
         Validate.notNull(getType(), getTypeName() + " could not be found on this version.");
         return new ItemStack(getType(), amount, getData());
     }
 
-    public ItemStack getStack(){
+    public ItemStack getStack() {
         return getStack(1);
     }
 
-    public static UniversalMaterial ofType(Material material){
-        for (UniversalMaterial universalMaterial : values()){
-            if (universalMaterial.getType() == material){
+    public static UniversalMaterial ofType(Material material) {
+        for (UniversalMaterial universalMaterial : values()) {
+            if (universalMaterial.getType() == material) {
                 return universalMaterial;
             }
         }
         return null;
     }
 
-    public static boolean isLog(Material material){
+    public static boolean isLog(Material material) {
         return (
                 material.equals(UniversalMaterial.ACACIA_LOG.getType()) ||
                         material.equals(UniversalMaterial.BIRCH_LOG.getType()) ||
@@ -227,7 +227,7 @@ public enum UniversalMaterial{
         );
     }
 
-    public static boolean isLeaves(Material material){
+    public static boolean isLeaves(Material material) {
         return (
                 material.equals(UniversalMaterial.ACACIA_LEAVES.getType()) ||
                         material.equals(UniversalMaterial.BIRCH_LEAVES.getType()) ||
@@ -238,8 +238,8 @@ public enum UniversalMaterial{
         );
     }
 
-    public static boolean isCorrectTool(Material block, Material tool){
-        switch (block){
+    public static boolean isCorrectTool(Material block, Material tool) {
+        switch (block) {
             case DIAMOND_ORE:
             case EMERALD_ORE:
             case GOLD_ORE:
@@ -271,7 +271,7 @@ public enum UniversalMaterial{
     }
 
     @SuppressWarnings("deprecation")
-    public boolean equals(Block block){
+    public boolean equals(Block block) {
         return block.getType() == getType() && block.getData() == id8;
     }
 

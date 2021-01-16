@@ -11,10 +11,11 @@ import java.lang.annotation.Target;
  */
 @Retention(value = RetentionPolicy.RUNTIME)
 @Target(value = ElementType.FIELD)
-public @interface Option{
+public @interface Option {
 
     /**
      * Config key for option, by default it is the same as the method name.
+     *
      * @return Custom option key
      */
     String key() default "";

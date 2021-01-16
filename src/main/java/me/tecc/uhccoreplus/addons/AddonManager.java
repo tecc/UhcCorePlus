@@ -151,12 +151,10 @@ public class AddonManager {
     /**
      * Loads an addon from a file.
      *
-     *
      * @param file The addon file to load.
      * @return The addon loaded from the file. If any error occurred it will return null.
-     *
      * @implNote If the file has previously been loaded, the class loader for that file will not be instantiated again.
-     *           This is due to the addon manager not deleting class loaders that aren't in use.
+     * This is due to the addon manager not deleting class loaders that aren't in use.
      */
     public Addon loadAddon(File file) {
         String filename = FilenameUtils.getName(file.getAbsolutePath());
@@ -167,7 +165,7 @@ public class AddonManager {
         else {
             try {
                 classLoader = new URLClassLoader(
-                        new URL[] { file.toURI().toURL() },
+                        new URL[]{file.toURI().toURL()},
                         this.getClass().getClassLoader()
                 );
             } catch (MalformedURLException e) {
@@ -225,6 +223,7 @@ public class AddonManager {
     public Addon getAddon(Class<? extends Addon> clz) {
         return this.addons.get(clz);
     }
+
     @Nullable
     public Addon getAddon(String id) {
         for (Addon addon : this.getAddons()) {
@@ -245,18 +244,21 @@ public class AddonManager {
             return;
         getAddon(id).enable();
     }
+
     @SuppressWarnings("ConstantConditions")
     public void enableAddon(Class<? extends Addon> clz) {
         if (!addonExists(clz))
             return;
         getAddon(clz).enable();
     }
+
     @SuppressWarnings("ConstantConditions")
     public void disableAddon(String id) {
         if (!addonExists(id))
             return;
         getAddon(id).disable();
     }
+
     @SuppressWarnings("ConstantConditions")
     public void disableAddon(Class<? extends Addon> clz) {
         if (!addonExists(clz))

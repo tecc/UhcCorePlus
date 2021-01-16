@@ -8,12 +8,12 @@ import org.bukkit.event.EventHandler;
 
 import java.util.List;
 
-public class DoubleDatesListener extends ScenarioListener{
+public class DoubleDatesListener extends ScenarioListener {
 
     @EventHandler
-    public void onGameStateChanged(UhcStartingEvent e){
+    public void onGameStateChanged(UhcStartingEvent e) {
         // Only 1-3 teams so don't match as this would be unfair
-        if (getTeamManager().getUhcTeams().size() < 4){
+        if (getTeamManager().getUhcTeams().size() < 4) {
             return;
         }
 
@@ -21,12 +21,12 @@ public class DoubleDatesListener extends ScenarioListener{
         List<UhcTeam> teams = getTeamManager().getUhcTeams();
 
         UhcTeam firstTeam;
-        while (teams.size() > 1){
+        while (teams.size() > 1) {
             firstTeam = teams.get(0);
             teams.remove(firstTeam);
 
             // Find random team to match with
-            int i = RandomUtils.randomInteger(0, teams.size()-1);
+            int i = RandomUtils.randomInteger(0, teams.size() - 1);
             UhcTeam matchTeam = teams.get(i);
             teams.remove(matchTeam);
 
@@ -34,7 +34,7 @@ public class DoubleDatesListener extends ScenarioListener{
         }
     }
 
-    private void matchTeams(UhcTeam team1, UhcTeam team2){
+    private void matchTeams(UhcTeam team1, UhcTeam team2) {
         team2.getMembers().forEach(member -> member.setTeam(team1));
         team1.getMembers().addAll(team2.getMembers());
     }

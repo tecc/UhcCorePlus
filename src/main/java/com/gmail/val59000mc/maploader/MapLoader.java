@@ -22,254 +22,254 @@ import java.util.*;
 
 public class MapLoader {
 
-	private final Map<Environment, String> worldUuids;
+    private final Map<Environment, String> worldUuids;
 
-	private long mapSeed;
-	private String mapName;
+    private long mapSeed;
+    private String mapName;
 
-	public MapLoader(){
-		worldUuids = new HashMap<>();
-		mapSeed = -1;
-		mapName = null;
-	}
-	
-	public void deleteLastWorld(Environment env){
-		String uuid = worldUuids.get(env);
+    public MapLoader() {
+        worldUuids = new HashMap<>();
+        mapSeed = -1;
+        mapName = null;
+    }
 
-		if(uuid == null || uuid.equals("null")){
-			Bukkit.getLogger().info("[UhcCore] No world to delete");
-		}else{
-			File worldDir = new File(uuid);
-			if(worldDir.exists()){
-				Bukkit.getLogger().info("[UhcCore] Deleting last world : "+uuid);
-				FileUtils.deleteFile(worldDir);
-			}else{
-				Bukkit.getLogger().info("[UhcCore] World "+uuid+" can't be removed, directory not found");
-			}
-		}
-	}
-	
-	public void createNewWorld(Environment env){
-		String worldName = UUID.randomUUID().toString();
-		if (UhcCore.getPlugin().getConfig().getBoolean("permanent-world-names", false)){
-			worldName = "uhc-"+env.name().toLowerCase();
-		}
+    public void deleteLastWorld(Environment env) {
+        String uuid = worldUuids.get(env);
 
-		Bukkit.getLogger().info("[UhcCore] Creating new world : "+worldName);
-		
-		GameManager gm = GameManager.getGameManager();
+        if (uuid == null || uuid.equals("null")) {
+            Bukkit.getLogger().info("[UhcCore] No world to delete");
+        } else {
+            File worldDir = new File(uuid);
+            if (worldDir.exists()) {
+                Bukkit.getLogger().info("[UhcCore] Deleting last world : " + uuid);
+                FileUtils.deleteFile(worldDir);
+            } else {
+                Bukkit.getLogger().info("[UhcCore] World " + uuid + " can't be removed, directory not found");
+            }
+        }
+    }
 
-		WorldCreator wc = new WorldCreator(worldName);
-		wc.generateStructures(true);
-		wc.environment(env);
+    public void createNewWorld(Environment env) {
+        String worldName = UUID.randomUUID().toString();
+        if (UhcCore.getPlugin().getConfig().getBoolean("permanent-world-names", false)) {
+            worldName = "uhc-" + env.name().toLowerCase();
+        }
 
-		List<Long> seeds = gm.getConfig().get(MainConfig.SEEDS);
-		List<String> worlds = gm.getConfig().get(MainConfig.WORLDS);
-		if(gm.getConfig().get(MainConfig.PICK_RANDOM_SEED_FROM_LIST) && !seeds.isEmpty()){
-			if (mapSeed == -1) {
-				Random r = new Random();
-				mapSeed = seeds.get(r.nextInt(seeds.size()));
-				Bukkit.getLogger().info("[UhcCore] Picking random seed from list : "+mapSeed);
-			}
-			wc.seed(mapSeed);
-		}else if(gm.getConfig().get(MainConfig.PICK_RANDOM_WORLD_FROM_LIST) && !worlds.isEmpty()){
-			if (mapName == null) {
-				Random r = new Random();
-				mapName = worlds.get(r.nextInt(worlds.size()));
-			}
+        Bukkit.getLogger().info("[UhcCore] Creating new world : " + worldName);
 
-			String copyWorld = mapName;
-			if (env != Environment.NORMAL){
-				copyWorld = copyWorld + "_" + env.name().toLowerCase();
-			}
+        GameManager gm = GameManager.getGameManager();
 
-			copyWorld(copyWorld, worldName);
-		}
+        WorldCreator wc = new WorldCreator(worldName);
+        wc.generateStructures(true);
+        wc.environment(env);
 
-		worldUuids.put(env, worldName);
+        List<Long> seeds = gm.getConfig().get(MainConfig.SEEDS);
+        List<String> worlds = gm.getConfig().get(MainConfig.WORLDS);
+        if (gm.getConfig().get(MainConfig.PICK_RANDOM_SEED_FROM_LIST) && !seeds.isEmpty()) {
+            if (mapSeed == -1) {
+                Random r = new Random();
+                mapSeed = seeds.get(r.nextInt(seeds.size()));
+                Bukkit.getLogger().info("[UhcCore] Picking random seed from list : " + mapSeed);
+            }
+            wc.seed(mapSeed);
+        } else if (gm.getConfig().get(MainConfig.PICK_RANDOM_WORLD_FROM_LIST) && !worlds.isEmpty()) {
+            if (mapName == null) {
+                Random r = new Random();
+                mapName = worlds.get(r.nextInt(worlds.size()));
+            }
 
-		YamlFile storage;
+            String copyWorld = mapName;
+            if (env != Environment.NORMAL) {
+                copyWorld = copyWorld + "_" + env.name().toLowerCase();
+            }
 
-		try{
-			storage = FileUtils.saveResourceIfNotAvailable("storage.yml");
-		}catch (InvalidConfigurationException ex){
-			ex.printStackTrace();
-			return;
-		}
+            copyWorld(copyWorld, worldName);
+        }
 
-		storage.set("worlds." + env.name().toLowerCase(), worldName);
-		try {
-			storage.save();
-		}catch (IOException ex){
-			ex.printStackTrace();
-		}
-		
-		wc.type(WorldType.NORMAL);
-		Bukkit.getServer().createWorld(wc);
-	}
-	
-	public void loadOldWorld(Environment env){
-		String uuid = worldUuids.get(env);
+        worldUuids.put(env, worldName);
 
-		if(uuid == null || uuid.equals("null")){
-			Bukkit.getLogger().info("[UhcCore] No world to load, defaulting to default behavior");
-			this.createNewWorld(env);
-		}else{
-			File worldDir = new File(uuid);
-			if(worldDir.exists()){
-				// Loading existing world
-				Bukkit.getServer().createWorld(new WorldCreator(uuid));
-			}else{
-				this.createNewWorld(env);
-			}
-		}
-	}
+        YamlFile storage;
 
-	public void loadWorldUuids(){
-		YamlFile storage;
+        try {
+            storage = FileUtils.saveResourceIfNotAvailable("storage.yml");
+        } catch (InvalidConfigurationException ex) {
+            ex.printStackTrace();
+            return;
+        }
 
-		try{
-			storage = FileUtils.saveResourceIfNotAvailable("storage.yml");
-		}catch (InvalidConfigurationException ex){
-			ex.printStackTrace();
-			return;
-		}
+        storage.set("worlds." + env.name().toLowerCase(), worldName);
+        try {
+            storage.save();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
 
-		worldUuids.put(Environment.NORMAL, storage.getString("worlds.normal"));
-		worldUuids.put(Environment.NETHER, storage.getString("worlds.nether"));
-		worldUuids.put(Environment.THE_END, storage.getString("worlds.the_end"));
-	}
+        wc.type(WorldType.NORMAL);
+        Bukkit.getServer().createWorld(wc);
+    }
 
-	/**
-	 * Used to obtain the UHC world uuid matching the given environment.
-	 * @param environment The environment of the world uuid you want to obtain.
-	 * @return Returns the UHC world uuid matching the environment or null if it doesn't exist.
-	 */
-	@Nullable
-	public String getUhcWorldUuid(Environment environment){
-		Validate.notNull(environment);
-		return worldUuids.get(environment);
-	}
+    public void loadOldWorld(Environment env) {
+        String uuid = worldUuids.get(env);
 
-	/**
-	 * Used to obtain the UHC world matching the given environment.
-	 * @param environment The environment of the world you want to obtain.
-	 * @return Returns the UHC world matching the environment or null if it doesn't exist.
-	 */
-	@Nullable
-	public World getUhcWorld(Environment environment){
-		Validate.notNull(environment);
+        if (uuid == null || uuid.equals("null")) {
+            Bukkit.getLogger().info("[UhcCore] No world to load, defaulting to default behavior");
+            this.createNewWorld(env);
+        } else {
+            File worldDir = new File(uuid);
+            if (worldDir.exists()) {
+                // Loading existing world
+                Bukkit.getServer().createWorld(new WorldCreator(uuid));
+            } else {
+                this.createNewWorld(env);
+            }
+        }
+    }
 
-		String worldUuid = worldUuids.get(environment);
-		if (worldUuid == null){
-			return null;
-		}
+    public void loadWorldUuids() {
+        YamlFile storage;
 
-		return Bukkit.getWorld(worldUuid);
-	}
-	
-	private void copyWorld(String randomWorldName, String worldName) {
-		Bukkit.getLogger().info("[UhcCore] Copying " + randomWorldName + " to " + worldName);
-		File worldDir = new File(randomWorldName);
-		if(worldDir.exists() && worldDir.isDirectory()){
-			recursiveCopy(worldDir,new File(worldName));
-		}
-	}
-	
-	private void recursiveCopy(File fSource, File fDest) {
-	     try {
-	          if (fSource.isDirectory()) {
-	          // A simple validation, if the destination is not exist then create it
-	               if (!fDest.exists()) {
-	                    fDest.mkdirs();
-	               }
-	 
-	               // Create list of files and directories on the current source
-	               // Note: with the recursion 'fSource' changed accordingly
-	               String[] fList = fSource.list();
+        try {
+            storage = FileUtils.saveResourceIfNotAvailable("storage.yml");
+        } catch (InvalidConfigurationException ex) {
+            ex.printStackTrace();
+            return;
+        }
 
-				  for (String s : fList) {
-					  File dest = new File(fDest, s);
-					  File source = new File(fSource, s);
+        worldUuids.put(Environment.NORMAL, storage.getString("worlds.normal"));
+        worldUuids.put(Environment.NETHER, storage.getString("worlds.nether"));
+        worldUuids.put(Environment.THE_END, storage.getString("worlds.the_end"));
+    }
 
-					  // Recursion call take place here
-					  recursiveCopy(source, dest);
-				  }
-	          }
-	          else {
-	               // Found a file. Copy it into the destination, which is already created in 'if' condition above
-	 
-	               // Open a file for read and write (copy)
-	               FileInputStream fInStream = new FileInputStream(fSource);
-	               FileOutputStream fOutStream = new FileOutputStream(fDest);
-	 
-	               // Read 2K at a time from the file
-	               byte[] buffer = new byte[2048];
-	               int iBytesReads;
-	 
-	               // In each successful read, write back to the source
-	               while ((iBytesReads = fInStream.read(buffer)) >= 0) {
-	                    fOutStream.write(buffer, 0, iBytesReads);
-	               }
-	 
-	               // Safe exit
-	               if (fInStream != null) {
-	                    fInStream.close();
-	               }
-	 
-	               if (fOutStream != null) {
-	                    fOutStream.close();
-	               }
-	          }
-	     }
-	     catch (Exception ex) {
-	          // Please handle all the relevant exceptions here
-	     }
-	}
+    /**
+     * Used to obtain the UHC world uuid matching the given environment.
+     *
+     * @param environment The environment of the world uuid you want to obtain.
+     * @return Returns the UHC world uuid matching the environment or null if it doesn't exist.
+     */
+    @Nullable
+    public String getUhcWorldUuid(Environment environment) {
+        Validate.notNull(environment);
+        return worldUuids.get(environment);
+    }
 
-	public void generateChunks(Environment env){
-		GameManager gm = GameManager.getGameManager();
-		UhcWorldBorder border = gm.getWorldBorder();
+    /**
+     * Used to obtain the UHC world matching the given environment.
+     *
+     * @param environment The environment of the world you want to obtain.
+     * @return Returns the UHC world matching the environment or null if it doesn't exist.
+     */
+    @Nullable
+    public World getUhcWorld(Environment environment) {
+        Validate.notNull(environment);
 
-		World world = getUhcWorld(env);
-		int size = border.getStartSize();
+        String worldUuid = worldUuids.get(environment);
+        if (worldUuid == null) {
+            return null;
+        }
 
-		if(env == Environment.NETHER){
-			size = size/2;
-		}
+        return Bukkit.getWorld(worldUuid);
+    }
 
-    	int restEveryNumOfChunks = gm.getConfig().get(MainConfig.REST_EVERY_NUM_OF_CHUNKS);
-    	int restDuration = gm.getConfig().get(MainConfig.REST_DURATION);
+    private void copyWorld(String randomWorldName, String worldName) {
+        Bukkit.getLogger().info("[UhcCore] Copying " + randomWorldName + " to " + worldName);
+        File worldDir = new File(randomWorldName);
+        if (worldDir.exists() && worldDir.isDirectory()) {
+            recursiveCopy(worldDir, new File(worldName));
+        }
+    }
 
-    	boolean generateVeins = gm.getConfig().get(MainConfig.ENABLE_GENERATE_VEINS);
-		VeinGenerator veinGenerator = new VeinGenerator(gm.getConfig().get(MainConfig.GENERATE_VEINS));
+    private void recursiveCopy(File fSource, File fDest) {
+        try {
+            if (fSource.isDirectory()) {
+                // A simple validation, if the destination is not exist then create it
+                if (!fDest.exists()) {
+                    fDest.mkdirs();
+                }
 
-		ChunkLoaderThread chunkLoaderThread = new ChunkLoaderThread(world, size, restEveryNumOfChunks, restDuration) {
-			@Override
-			public void onDoneLoadingWorld() {
-				Bukkit.getLogger().info("[UhcCore] Environment "+env.toString()+" 100% loaded");
-				if(env.equals(Environment.NORMAL) && gm.getConfig().get(MainConfig.ENABLE_NETHER)) {
-					generateChunks(Environment.NETHER);
-				}else {
-					GameManager.getGameManager().startWaitingPlayers();
-				}
-			}
+                // Create list of files and directories on the current source
+                // Note: with the recursion 'fSource' changed accordingly
+                String[] fList = fSource.list();
 
-			@Override
-			public void onDoneLoadingChunk(Chunk chunk) {
-				if(generateVeins && env.equals(Environment.NORMAL)){
-					veinGenerator.generateVeinsInChunk(chunk);
-				}
-			}
-		};
+                for (String s : fList) {
+                    File dest = new File(fDest, s);
+                    File source = new File(fSource, s);
 
-		chunkLoaderThread.printSettings();
+                    // Recursion call take place here
+                    recursiveCopy(source, dest);
+                }
+            } else {
+                // Found a file. Copy it into the destination, which is already created in 'if' condition above
 
-		if (PaperLib.isPaper() && PaperLib.getMinecraftVersion() >= 13){
-			Bukkit.getScheduler().runTaskAsynchronously(UhcCore.getPlugin(), chunkLoaderThread);
-		}else {
-			Bukkit.getScheduler().runTask(UhcCore.getPlugin(), chunkLoaderThread);
-		}
-	}
+                // Open a file for read and write (copy)
+                FileInputStream fInStream = new FileInputStream(fSource);
+                FileOutputStream fOutStream = new FileOutputStream(fDest);
+
+                // Read 2K at a time from the file
+                byte[] buffer = new byte[2048];
+                int iBytesReads;
+
+                // In each successful read, write back to the source
+                while ((iBytesReads = fInStream.read(buffer)) >= 0) {
+                    fOutStream.write(buffer, 0, iBytesReads);
+                }
+
+                // Safe exit
+                if (fInStream != null) {
+                    fInStream.close();
+                }
+
+                if (fOutStream != null) {
+                    fOutStream.close();
+                }
+            }
+        } catch (Exception ex) {
+            // Please handle all the relevant exceptions here
+        }
+    }
+
+    public void generateChunks(Environment env) {
+        GameManager gm = GameManager.getGameManager();
+        UhcWorldBorder border = gm.getWorldBorder();
+
+        World world = getUhcWorld(env);
+        int size = border.getStartSize();
+
+        if (env == Environment.NETHER) {
+            size = size / 2;
+        }
+
+        int restEveryNumOfChunks = gm.getConfig().get(MainConfig.REST_EVERY_NUM_OF_CHUNKS);
+        int restDuration = gm.getConfig().get(MainConfig.REST_DURATION);
+
+        boolean generateVeins = gm.getConfig().get(MainConfig.ENABLE_GENERATE_VEINS);
+        VeinGenerator veinGenerator = new VeinGenerator(gm.getConfig().get(MainConfig.GENERATE_VEINS));
+
+        ChunkLoaderThread chunkLoaderThread = new ChunkLoaderThread(world, size, restEveryNumOfChunks, restDuration) {
+            @Override
+            public void onDoneLoadingWorld() {
+                Bukkit.getLogger().info("[UhcCore] Environment " + env.toString() + " 100% loaded");
+                if (env.equals(Environment.NORMAL) && gm.getConfig().get(MainConfig.ENABLE_NETHER)) {
+                    generateChunks(Environment.NETHER);
+                } else {
+                    GameManager.getGameManager().startWaitingPlayers();
+                }
+            }
+
+            @Override
+            public void onDoneLoadingChunk(Chunk chunk) {
+                if (generateVeins && env.equals(Environment.NORMAL)) {
+                    veinGenerator.generateVeinsInChunk(chunk);
+                }
+            }
+        };
+
+        chunkLoaderThread.printSettings();
+
+        if (PaperLib.isPaper() && PaperLib.getMinecraftVersion() >= 13) {
+            Bukkit.getScheduler().runTaskAsynchronously(UhcCore.getPlugin(), chunkLoaderThread);
+        } else {
+            Bukkit.getScheduler().runTask(UhcCore.getPlugin(), chunkLoaderThread);
+        }
+    }
 
 }

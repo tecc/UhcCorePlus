@@ -25,21 +25,21 @@ public class DoubleOresListener extends ScenarioListener {
         switch (block.getType()) {
             case IRON_ORE:
                 block.setType(Material.AIR);
-                loc.getWorld().dropItem(loc, new ItemStack(Material.IRON_INGOT,2));
-                UhcItems.spawnExtraXp(loc,2);
+                loc.getWorld().dropItem(loc, new ItemStack(Material.IRON_INGOT, 2));
+                UhcItems.spawnExtraXp(loc, 2);
                 break;
             case GOLD_ORE:
                 block.setType(Material.AIR);
-                loc.getWorld().dropItem(loc, new ItemStack(Material.GOLD_INGOT,2));
-                if (isEnabled(Scenario.DOUBLE_GOLD)){
-                    loc.getWorld().dropItem(loc, new ItemStack(Material.GOLD_INGOT,2));
+                loc.getWorld().dropItem(loc, new ItemStack(Material.GOLD_INGOT, 2));
+                if (isEnabled(Scenario.DOUBLE_GOLD)) {
+                    loc.getWorld().dropItem(loc, new ItemStack(Material.GOLD_INGOT, 2));
                 }
-                UhcItems.spawnExtraXp(loc,3);
+                UhcItems.spawnExtraXp(loc, 3);
                 break;
             case DIAMOND_ORE:
                 block.setType(Material.AIR);
-                loc.getWorld().dropItem(loc, new ItemStack(Material.DIAMOND,2));
-                UhcItems.spawnExtraXp(loc,4);
+                loc.getWorld().dropItem(loc, new ItemStack(Material.DIAMOND, 2));
+                UhcItems.spawnExtraXp(loc, 4);
                 break;
             case SAND:
                 block.setType(Material.AIR);
@@ -47,7 +47,7 @@ public class DoubleOresListener extends ScenarioListener {
                 break;
             case GRAVEL:
                 block.setType(Material.AIR);
-                loc.getWorld().dropItem(loc,new ItemStack(Material.FLINT));
+                loc.getWorld().dropItem(loc, new ItemStack(Material.FLINT));
                 break;
         }
 

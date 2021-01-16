@@ -18,32 +18,32 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class FileUtils{
+public class FileUtils {
 
     private static final String API_URL = "https://paste.md-5.net/documents";
     private static final String PASTE_URL_DOMAIN = "https://paste.md-5.net/";
 
-    public static YamlFile saveResourceIfNotAvailable(String fileName) throws InvalidConfigurationException{
+    public static YamlFile saveResourceIfNotAvailable(String fileName) throws InvalidConfigurationException {
         return saveResourceIfNotAvailable(fileName, fileName, false);
     }
 
-    public static YamlFile saveResourceIfNotAvailable(String fileName, String sourceName) throws InvalidConfigurationException{
+    public static YamlFile saveResourceIfNotAvailable(String fileName, String sourceName) throws InvalidConfigurationException {
         return saveResourceIfNotAvailable(fileName, sourceName, false);
     }
 
-    public static YamlFile saveResourceIfNotAvailable(String fileName, boolean disableLogging) throws InvalidConfigurationException{
+    public static YamlFile saveResourceIfNotAvailable(String fileName, boolean disableLogging) throws InvalidConfigurationException {
         return saveResourceIfNotAvailable(fileName, fileName, disableLogging);
     }
 
-    public static YamlFile saveResourceIfNotAvailable(String fileName, String sourceName, boolean disableLogging) throws InvalidConfigurationException{
+    public static YamlFile saveResourceIfNotAvailable(String fileName, String sourceName, boolean disableLogging) throws InvalidConfigurationException {
         File file = getResourceFile(fileName, sourceName, disableLogging);
 
         YamlFile yamlFile = new YamlFile(file);
         try {
             yamlFile.load();
-        }catch (IOException | InvalidConfigurationException ex){
+        } catch (IOException | InvalidConfigurationException ex) {
             Bukkit.getLogger().severe("[UhcCore] Failed to load " + fileName + ", there might be an error in the yaml syntax.");
-            if (ex instanceof InvalidConfigurationException){
+            if (ex instanceof InvalidConfigurationException) {
                 throw (InvalidConfigurationException) ex;
             }
 
@@ -65,49 +65,49 @@ public class FileUtils{
             Bukkit.getLogger().info("[UhcCore] Loading " + file.toString());
         }
 
-        if (!file.exists()){
+        if (!file.exists()) {
             // save resource
             UhcCore.getPlugin().saveResource(sourceName, false);
         }
 
-        if (!fileName.equals(sourceName)){
+        if (!fileName.equals(sourceName)) {
             File sourceFile = new File(UhcCore.getPlugin().getDataFolder(), sourceName);
             sourceFile.renameTo(file);
         }
 
-        if (!file.exists()){
+        if (!file.exists()) {
             Bukkit.getLogger().severe("[UhcCore] Failed to save file: " + fileName);
         }
 
         return file;
     }
 
-    public static void removeScheduledDeletionFiles(){
+    public static void removeScheduledDeletionFiles() {
         YamlFile storage;
 
-        try{
+        try {
             storage = FileUtils.saveResourceIfNotAvailable("storage.yml");
-        }catch (InvalidConfigurationException ex){
+        } catch (InvalidConfigurationException ex) {
             ex.printStackTrace();
             return;
         }
 
         List<String> deleteFiles = storage.getStringList("delete");
         List<String> notDeleted = new ArrayList<>();
-        if (deleteFiles.isEmpty()){
+        if (deleteFiles.isEmpty()) {
             return;
         }
 
-        for (String path : deleteFiles){
+        for (String path : deleteFiles) {
             File file = new File(path);
 
-            if (!file.exists()){
+            if (!file.exists()) {
                 continue;
             }
 
             Bukkit.getLogger().info("[UhcCore] Deleting file: " + path);
 
-            if (!file.delete()){
+            if (!file.delete()) {
                 Bukkit.getLogger().warning("[UhcCore] Failed to delete file: " + path);
                 notDeleted.add(path);
             }
@@ -115,20 +115,20 @@ public class FileUtils{
 
         storage.set("delete", notDeleted);
 
-        try{
+        try {
             storage.save();
-        }catch (IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    public static void scheduleFileForDeletion(File file){
+    public static void scheduleFileForDeletion(File file) {
         // Clear file
-        try{
+        try {
             FileOutputStream out = new FileOutputStream(file);
             out.flush();
             out.close();
-        }catch (IOException ex){
+        } catch (IOException ex) {
             // Failed to clear file
             ex.printStackTrace();
         }
@@ -136,23 +136,23 @@ public class FileUtils{
         // Add to "delete" in storage.yml
         YamlFile storage;
 
-        try{
+        try {
             storage = FileUtils.saveResourceIfNotAvailable("storage.yml");
-        }catch (InvalidConfigurationException ex){
+        } catch (InvalidConfigurationException ex) {
             ex.printStackTrace();
             return;
         }
 
         List<String> deleteFiles = storage.getStringList("delete");
-        if (deleteFiles.contains(file.getPath())){
+        if (deleteFiles.contains(file.getPath())) {
             return;
         }
         deleteFiles.add(file.getPath());
         storage.set("delete", deleteFiles);
 
-        try{
+        try {
             storage.save();
-        }catch (IOException ex){
+        } catch (IOException ex) {
             // Failed to save storage.yml
             ex.printStackTrace();
         }
@@ -160,11 +160,12 @@ public class FileUtils{
 
     /**
      * Method used to upload text files to paste bin.
+     *
      * @param builder StringBuilder containing the text you want to be uploaded.
      * @return Returns the URL of the uploaded text.
      * @throws IOException Thrown when uploading fails.
      */
-    public static String uploadTextFile(StringBuilder builder) throws IOException{
+    public static String uploadTextFile(StringBuilder builder) throws IOException {
         String data = builder.toString();
 
         HttpsURLConnection connection = (HttpsURLConnection) new URL(API_URL).openConnection();
@@ -174,7 +175,7 @@ public class FileUtils{
         connection.addRequestProperty("Accept", "application/json");
         connection.addRequestProperty("Content-Length", String.valueOf(data.length()));
         connection.setRequestProperty("Content-Type", "text/plain");
-        connection.setRequestProperty("User-Agent", "UhcCore:"+ UhcCore.getPlugin().getDescription().getVersion());
+        connection.setRequestProperty("User-Agent", "UhcCore:" + UhcCore.getPlugin().getDescription().getVersion());
 
         // Send data
         connection.setDoOutput(true);
@@ -196,19 +197,20 @@ public class FileUtils{
 
     /**
      * Returns a list of child files
-     * @param dir Directory child files are returned for
+     *
+     * @param dir  Directory child files are returned for
      * @param deep When true files in child directories also get returned
      * @return List of files
      */
-    public static List<File> getDirFiles(File dir, boolean deep){
+    public static List<File> getDirFiles(File dir, boolean deep) {
         List<File> files = new ArrayList<>();
 
-        for (File file : dir.listFiles()){
-            if (file.isDirectory()){
-                if (deep){
+        for (File file : dir.listFiles()) {
+            if (file.isDirectory()) {
+                if (deep) {
                     files.addAll(getDirFiles(file, true));
                 }
-            }else{
+            } else {
                 files.add(file);
             }
         }
@@ -218,11 +220,12 @@ public class FileUtils{
 
     /**
      * Deletes file, in case of a directory all child files and directories are deleted
+     *
      * @param file File to delete
      * @return Returns true if file was deleted successfully
      */
     public static boolean deleteFile(File file) {
-        if(file == null){
+        if (file == null) {
             return false;
         }
 
@@ -249,11 +252,12 @@ public class FileUtils{
 
     /**
      * Downloads a file from the internet
-     * @param url Url of the file / api
+     *
+     * @param url  Url of the file / api
      * @param path Path do the destination of the file
      * @throws IOException Thrown when file fails to download
      */
-    public static void downloadFile(URL url, File path) throws IOException{
+    public static void downloadFile(URL url, File path) throws IOException {
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         connection.connect();
 
@@ -267,20 +271,21 @@ public class FileUtils{
 
     /**
      * Unzips zip file
+     *
      * @param zipFile Zip file
-     * @param dir Directory to place unzipped files
+     * @param dir     Directory to place unzipped files
      * @throws IOException Thrown when unzipping fails
      */
-    public static void unzip(ZipFile zipFile, File dir) throws IOException{
+    public static void unzip(ZipFile zipFile, File dir) throws IOException {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
-        while(entries.hasMoreElements()){
+        while (entries.hasMoreElements()) {
             ZipEntry entry = entries.nextElement();
             File zipChild = new File(dir, entry.getName());
 
-            if (entry.isDirectory()){
+            if (entry.isDirectory()) {
                 zipChild.mkdirs();
-            }else{
+            } else {
                 zipChild.getParentFile().mkdirs();
                 InputStream in = zipFile.getInputStream(entry);
                 Files.copy(in, Paths.get(zipChild.toURI()));

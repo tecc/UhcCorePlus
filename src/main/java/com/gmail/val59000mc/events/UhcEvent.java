@@ -5,16 +5,16 @@ import com.gmail.val59000mc.players.PlayersManager;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public abstract class UhcEvent extends Event{
+public abstract class UhcEvent extends Event {
 
     private static HandlerList handlers;
 
-    static{
+    static {
         handlers = new HandlerList();
     }
 
     @Override
-    public HandlerList getHandlers(){
+    public HandlerList getHandlers() {
         return handlers;
     }
 
@@ -22,11 +22,11 @@ public abstract class UhcEvent extends Event{
         return handlers;
     }
 
-    public GameManager getGameManager(){
+    public GameManager getGameManager() {
         return GameManager.getGameManager();
     }
 
-    public PlayersManager getPlayersManager(){
+    public PlayersManager getPlayersManager() {
         return getGameManager().getPlayersManager();
     }
 

@@ -9,42 +9,42 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class ChatCommandExecutor implements CommandExecutor{
+public class ChatCommandExecutor implements CommandExecutor {
 
-	private final PlayersManager playersManager;
+    private final PlayersManager playersManager;
 
-	public ChatCommandExecutor(PlayersManager playersManager){
-		this.playersManager = playersManager;
-	}
+    public ChatCommandExecutor(PlayersManager playersManager) {
+        this.playersManager = playersManager;
+    }
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
-		if (!(sender instanceof Player)){
-			sender.sendMessage("Only players can use this command!");
-			return true;
-		}
+    @Override
+    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Only players can use this command!");
+            return true;
+        }
 
-		Player player = (Player) sender;
-		UhcPlayer uhcPlayer = playersManager.getUhcPlayer(player);
+        Player player = (Player) sender;
+        UhcPlayer uhcPlayer = playersManager.getUhcPlayer(player);
 
-		if(!uhcPlayer.getState().equals(PlayerState.PLAYING)){
-			player.sendMessage(Lang.COMMAND_CHAT_ERROR);
-			return true;
-		}
+        if (!uhcPlayer.getState().equals(PlayerState.PLAYING)) {
+            player.sendMessage(Lang.COMMAND_CHAT_ERROR);
+            return true;
+        }
 
-		if(args.length == 0){
-			if(uhcPlayer.isGlobalChat()){
-				uhcPlayer.setGlobalChat(false);
-				uhcPlayer.sendMessage(Lang.COMMAND_CHAT_TEAM);
-			}else{
-				uhcPlayer.setGlobalChat(true);
-				uhcPlayer.sendMessage(Lang.COMMAND_CHAT_GLOBAL);
-			}
-			return true;
-		}else{
-			player.sendMessage(Lang.COMMAND_CHAT_HELP);
-			return true;
-		}
-	}
+        if (args.length == 0) {
+            if (uhcPlayer.isGlobalChat()) {
+                uhcPlayer.setGlobalChat(false);
+                uhcPlayer.sendMessage(Lang.COMMAND_CHAT_TEAM);
+            } else {
+                uhcPlayer.setGlobalChat(true);
+                uhcPlayer.sendMessage(Lang.COMMAND_CHAT_GLOBAL);
+            }
+            return true;
+        } else {
+            player.sendMessage(Lang.COMMAND_CHAT_HELP);
+            return true;
+        }
+    }
 
 }

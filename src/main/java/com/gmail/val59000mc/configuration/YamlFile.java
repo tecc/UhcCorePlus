@@ -25,17 +25,21 @@ import org.bukkit.configuration.file.YamlConfiguration;
  */
 public class YamlFile extends YamlConfiguration {
 
-    /** File where data will be saved for this configuration */
+    /**
+     * File where data will be saved for this configuration
+     */
     private File configFile;
-    /** Used to save is a default value gets added. */
+    /**
+     * Used to save is a default value gets added.
+     */
     private boolean addedDefaultValues;
 
     /**
      * Builds this {@link FileConfiguration} without any configuration file.
      * <p>
      * In order to save changes you will have to use one of these methods before:<br>
-     * 	- {@link #setConfigurationFile(File)}<br>
-     * 	- {@link #setConfigurationFile(String)}<br>
+     * - {@link #setConfigurationFile(File)}<br>
+     * - {@link #setConfigurationFile(String)}<br>
      * Or set the file when saving changes with {@link #save(File)}
      */
     public YamlFile() {
@@ -44,10 +48,11 @@ public class YamlFile extends YamlConfiguration {
 
     /**
      * Builds this {@link FileConfiguration} with the file specified by path.
+     *
      * @param path location for the configuration file
      * @throws IllegalArgumentException if path is null or is a directory.
-     * <br>Note that if <code>IllegalArgumentException</code> is thrown then this
-     * configuration file will be <b>null</b>.
+     *                                  <br>Note that if <code>IllegalArgumentException</code> is thrown then this
+     *                                  configuration file will be <b>null</b>.
      */
     public YamlFile(String path) throws IllegalArgumentException {
         setConfigurationFile(path);
@@ -56,10 +61,11 @@ public class YamlFile extends YamlConfiguration {
 
     /**
      * Builds this {@link FileConfiguration} with a source file.
+     *
      * @param file the configuration file
      * @throws IllegalArgumentException if file is null or is a directory.
-     * <br>Note that if <code>IllegalArgumentException</code> is thrown then this
-     * configuration file will be <b>null</b>.
+     *                                  <br>Note that if <code>IllegalArgumentException</code> is thrown then this
+     *                                  configuration file will be <b>null</b>.
      */
     public YamlFile(File file) throws IllegalArgumentException {
         setConfigurationFile(file);
@@ -78,6 +84,7 @@ public class YamlFile extends YamlConfiguration {
      * <p>
      * Note that this method will not copy the comments of original configuration file,
      * use {@link #saveWithComments()} instead.
+     *
      * @throws IOException if it hasn't been possible to save configuration file
      * @see #saveWithComments()
      */
@@ -101,6 +108,7 @@ public class YamlFile extends YamlConfiguration {
      * <p>
      * This method will save using the system default encoding, or possibly
      * using UTF8.
+     *
      * @throws IOException if it hasn't been possible to save configuration file
      * @see #save()
      */
@@ -118,6 +126,7 @@ public class YamlFile extends YamlConfiguration {
 
     /**
      * Insert all comments on <b>from</b> file to configuration file.
+     *
      * @param from source file
      * @throws IOException if I/O error occurs while copying comments
      */
@@ -144,8 +153,7 @@ public class YamlFile extends YamlConfiguration {
                 }
                 // Save Key (null for end of file) and its comment
                 comments.put(substring(line_from, ':'), comment.toString());
-            }
-            else
+            } else
                 line_from = r_from.readLine();
         }
 
@@ -185,6 +193,7 @@ public class YamlFile extends YamlConfiguration {
     /**
      * Returns the substring of s that starts at position 0 and ends at the position
      * of character c (excluded).
+     *
      * @param s the String to search
      * @param c the end character of substring (excluded)
      * @return the substring of <b>s</b> that starts at position 0 and ends at the position
@@ -209,11 +218,12 @@ public class YamlFile extends YamlConfiguration {
     /**
      * Copy this configuration file to another path, without deleting configuration file.
      * If there is already a file on the other path it will be overwritten.
+     *
      * @param path the location of the new file, including name (mustn't be a directory)
      * @return the new copied file
-     * @throws FileNotFoundException if configuration file is not found as source to copy
+     * @throws FileNotFoundException    if configuration file is not found as source to copy
      * @throws IllegalArgumentException if path is a directory or it is null
-     * @throws IOException if there I/O error occurs copying file
+     * @throws IOException              if there I/O error occurs copying file
      */
     public File copyTo(final String path) throws FileNotFoundException, IllegalArgumentException, IOException {
         Validate.notNull(path, "Path cannot be null.");
@@ -224,10 +234,11 @@ public class YamlFile extends YamlConfiguration {
 
     /**
      * Copy this configuration file to another file, without deleting configuration file.
+     *
      * @param file destination file (mustn't be a directory)
-     * @throws FileNotFoundException if configuration file is not found as source to copy
+     * @throws FileNotFoundException    if configuration file is not found as source to copy
      * @throws IllegalArgumentException if path is a directory or it is null
-     * @throws IOException if there I/O error occurs copying file
+     * @throws IOException              if there I/O error occurs copying file
      */
     public void copyTo(File file) throws FileNotFoundException, IllegalArgumentException, IOException {
         Validate.notNull(configFile, "This configuration file is null!");
@@ -243,9 +254,10 @@ public class YamlFile extends YamlConfiguration {
 
     /**
      * Loads configurations from this configuration file.
-     * @throws IOException if it hasn't been possible to load file
+     *
+     * @throws IOException                   if it hasn't been possible to load file
      * @throws InvalidConfigurationException if has been an error while parsing configuration file
-     * @throws FileNotFoundException if configuration file is not found
+     * @throws FileNotFoundException         if configuration file is not found
      */
     public void load() throws InvalidConfigurationException, IOException {
         Validate.notNull(configFile, "This configuration file is null!");
@@ -256,8 +268,9 @@ public class YamlFile extends YamlConfiguration {
 
     /**
      * Tests whether this configuration file exists.
+     *
      * @return <code>true</code> if and only if this configuration file exists;
-     * 		   <code>false</code> otherwise
+     * <code>false</code> otherwise
      */
     public boolean exists() {
         Validate.notNull(configFile, "This configuration file is null!");
@@ -270,8 +283,8 @@ public class YamlFile extends YamlConfiguration {
      * Furthermore there will be created the parent directories if there not exists.
      *
      * @param overwrite indicates if file must be overwritten if it already exists.
-     * Note that if overwrite is set to false and there is already a file with that path file
-     * will not be created and no exception is thrown.
+     *                  Note that if overwrite is set to false and there is already a file with that path file
+     *                  will not be created and no exception is thrown.
      * @throws IOException if I/O error occurs creating the configuration file
      */
     public void createNewFile(boolean overwrite) throws IOException {
@@ -290,6 +303,7 @@ public class YamlFile extends YamlConfiguration {
 
     /**
      * Deletes this configuration file from disk.
+     *
      * @throws IOException if file cannot be deleted
      */
     public void deleteFile() throws IOException {
@@ -300,6 +314,7 @@ public class YamlFile extends YamlConfiguration {
 
     /**
      * Returns the size of this configuration file.
+     *
      * @return the size, in bytes, of this configuration file.
      */
     public long getSize() {
@@ -308,6 +323,7 @@ public class YamlFile extends YamlConfiguration {
 
     /**
      * Returns the absolute pathname string of this configuration file.
+     *
      * @return the absolute path where configuration file is located.
      */
     public String getFilePath() {
@@ -317,6 +333,7 @@ public class YamlFile extends YamlConfiguration {
 
     /**
      * Returns this configuration file where data is located.
+     *
      * @return the configuration file where this {@link FileConfiguration} writes.
      */
     public File getConfigurationFile() {
@@ -325,10 +342,11 @@ public class YamlFile extends YamlConfiguration {
 
     /**
      * Rebuilds this {@link FileConfiguration} with the file specified by path.
+     *
      * @param path location for the configuration file
      * @throws IllegalArgumentException if path is null or is a directory.
-     * <br>Note that if <code>IllegalArgumentException</code> is thrown then this
-     * configuration file will be <b>null</b>.
+     *                                  <br>Note that if <code>IllegalArgumentException</code> is thrown then this
+     *                                  configuration file will be <b>null</b>.
      */
     public void setConfigurationFile(String path) throws IllegalArgumentException {
         Validate.notNull(path, "Path cannot be null.");
@@ -341,10 +359,11 @@ public class YamlFile extends YamlConfiguration {
 
     /**
      * Rebuilds this {@link FileConfiguration} with a source file.
+     *
      * @param file the configuration file
      * @throws IllegalArgumentException if file is null or is a directory.
-     * <br>Note that if <code>IllegalArgumentException</code> is thrown then this
-     * configuration file will be <b>null</b>.
+     *                                  <br>Note that if <code>IllegalArgumentException</code> is thrown then this
+     *                                  configuration file will be <b>null</b>.
      */
     public void setConfigurationFile(File file) throws IllegalArgumentException {
         Validate.notNull(file, "File cannot be null.");
@@ -365,24 +384,25 @@ public class YamlFile extends YamlConfiguration {
         set(path, null);
     }
 
-    public <T> T get(Option<T> option){
+    public <T> T get(Option<T> option) {
         return option.getValue(this);
     }
 
     /**
      * When the no result is found the default will be returned and added to the yaml file.
+     *
      * @param path The path of the setting.
-     * @param def The default value.
+     * @param def  The default value.
      * @return The value of the setting.
      * @author Mezy
      */
     @Override
     public Object get(String path, Object def) {
-        if (def == null){
+        if (def == null) {
             return super.get(path, def);
         }
         Object val = super.get(path, null);
-        if (val == null){
+        if (val == null) {
             set(path, def);
             addedDefaultValues = true;
             return def;
@@ -390,7 +410,7 @@ public class YamlFile extends YamlConfiguration {
         return val;
     }
 
-    public boolean addedDefaultValues(){
+    public boolean addedDefaultValues() {
         return addedDefaultValues;
     }
 

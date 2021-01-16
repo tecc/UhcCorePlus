@@ -21,10 +21,10 @@ public class EnumListOption<T extends Enum<T>> implements Option<List<T>> {
         List<String> stringList = config.getStringList(path);
         List<T> enumList = new ArrayList<>();
 
-        for (String s : stringList){
+        for (String s : stringList) {
             try {
                 enumList.add(Enum.valueOf(type, s));
-            }catch (IllegalArgumentException ex){
+            } catch (IllegalArgumentException ex) {
                 Bukkit.getLogger().severe("[UhcCore] Invalid enum type " + s);
                 ex.printStackTrace();
             }

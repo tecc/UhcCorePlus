@@ -21,17 +21,17 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DragonRushListener extends ScenarioListener{
+public class DragonRushListener extends ScenarioListener {
 
     private final List<Block> portalBlocks;
 
-    public DragonRushListener(){
+    public DragonRushListener() {
         portalBlocks = new ArrayList<>();
     }
 
     @Override
-    public void onEnable(){
-        if (!GameManager.getGameManager().getConfig().get(MainConfig.ENABLE_THE_END)){
+    public void onEnable() {
+        if (!GameManager.getGameManager().getConfig().get(MainConfig.ENABLE_THE_END)) {
             Bukkit.broadcastMessage(ChatColor.RED + "[UhcCore] For DragonRush the end needs to be enabled first!");
             getScenarioManager().disableScenario(Scenario.DRAGON_RUSH);
             return;
@@ -57,20 +57,20 @@ public class DragonRushListener extends ScenarioListener{
 
         int i = 0;
         BlockFace blockFace = BlockFace.NORTH;
-        for (Block block : portalBlocks){
+        for (Block block : portalBlocks) {
             block.setType(UniversalMaterial.END_PORTAL_FRAME.getType());
             VersionUtils.getVersionUtils().setEndPortalFrameOrientation(block, blockFace);
-            if (RandomUtils.randomInteger(0, 2) == 1){
+            if (RandomUtils.randomInteger(0, 2) == 1) {
                 VersionUtils.getVersionUtils().setEye(block, true);
             }
             i++;
-            if (i == 3){
+            if (i == 3) {
                 i = 0;
-                if (blockFace == BlockFace.NORTH){
+                if (blockFace == BlockFace.NORTH) {
                     blockFace = BlockFace.EAST;
-                }else if (blockFace == BlockFace.EAST){
+                } else if (blockFace == BlockFace.EAST) {
                     blockFace = BlockFace.SOUTH;
-                }else if (blockFace == BlockFace.SOUTH){
+                } else if (blockFace == BlockFace.SOUTH) {
                     blockFace = BlockFace.WEST;
                 }
             }
@@ -79,14 +79,14 @@ public class DragonRushListener extends ScenarioListener{
 
     @Override
     public void onDisable() {
-        for (Block block : portalBlocks){
+        for (Block block : portalBlocks) {
             block.setType(Material.AIR);
         }
     }
 
     @EventHandler
-    public void onEntityDeath(EntityDeathEvent e){
-        if (e.getEntityType() != EntityType.ENDER_DRAGON){
+    public void onEntityDeath(EntityDeathEvent e) {
+        if (e.getEntityType() != EntityType.ENDER_DRAGON) {
             return;
         }
 
@@ -99,21 +99,21 @@ public class DragonRushListener extends ScenarioListener{
 
         List<UhcPlayer> spectators = new ArrayList<>();
 
-        for (UhcPlayer playingPlayer : getPlayersManager().getAllPlayingPlayers()){
+        for (UhcPlayer playingPlayer : getPlayersManager().getAllPlayingPlayers()) {
 
-            if (!playingPlayer.isInTeamWith(uhcKiller)){
+            if (!playingPlayer.isInTeamWith(uhcKiller)) {
                 spectators.add(playingPlayer);
             }
         }
 
-        for (UhcPlayer spectator : spectators){
+        for (UhcPlayer spectator : spectators) {
             spectator.setState(PlayerState.DEAD);
 
             try {
                 Player all = spectator.getPlayer();
                 all.setGameMode(GameMode.SPECTATOR);
                 all.teleport(killer);
-            }catch (UhcPlayerNotOnlineException exeption){
+            } catch (UhcPlayerNotOnlineException exeption) {
                 // Nothing
             }
         }
@@ -121,25 +121,25 @@ public class DragonRushListener extends ScenarioListener{
         getPlayersManager().checkIfRemainingPlayers();
     }
 
-    private Location getPortalLocation(){
+    private Location getPortalLocation() {
         World world = getGameManager().getMapLoader().getUhcWorld(World.Environment.NORMAL);
         int portalY = 0;
 
         for (int x = -4; x < 4; x++) {
             for (int z = -4; z < 4; z++) {
                 int y = getHighestBlock(world, x, z);
-                if (y > portalY){
+                if (y > portalY) {
                     portalY = y;
                 }
             }
         }
 
-        return new Location(world, 0, portalY+1, 0);
+        return new Location(world, 0, portalY + 1, 0);
     }
 
-    private int getHighestBlock(World world, int x, int z){
+    private int getHighestBlock(World world, int x, int z) {
         int y = 150;
-        while (world.getBlockAt(x, y, z).getType() == Material.AIR){
+        while (world.getBlockAt(x, y, z).getType() == Material.AIR) {
             y--;
         }
 

@@ -11,29 +11,29 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class DeathmatchCommandExecutor implements CommandExecutor{
+public class DeathmatchCommandExecutor implements CommandExecutor {
 
     private final GameManager gameManager;
 
-    public DeathmatchCommandExecutor(GameManager gameManager){
+    public DeathmatchCommandExecutor(GameManager gameManager) {
         this.gameManager = gameManager;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length != 1 || !args[0].equalsIgnoreCase("start")){
+        if (args.length != 1 || !args[0].equalsIgnoreCase("start")) {
             sender.sendMessage(ChatColor.RED + "Usage: /deathmatch start");
             return true;
         }
 
         // Check if in game.
-        if (gameManager.getGameState() != GameState.PLAYING){
+        if (gameManager.getGameState() != GameState.PLAYING) {
             sender.sendMessage(ChatColor.RED + "You may only use this command during the game.");
             return true;
         }
 
         // Start TimeBeforeEndThread if time limit was not enabled.
-        if (gameManager.getRemainingTime() == 0 && !gameManager.getConfig().get(MainConfig.ENABLE_TIME_LIMIT)){
+        if (gameManager.getRemainingTime() == 0 && !gameManager.getConfig().get(MainConfig.ENABLE_TIME_LIMIT)) {
             gameManager.setRemainingTime(10);
             Bukkit.getScheduler().runTaskAsynchronously(UhcCore.getPlugin(), new TimeBeforeEndThread(gameManager));
             sender.sendMessage(ChatColor.GREEN + "Starting deathmatch!");
@@ -41,7 +41,7 @@ public class DeathmatchCommandExecutor implements CommandExecutor{
         }
 
         // If deathmatch is about to start don't allow the command.
-        if (gameManager.getRemainingTime() < 10){
+        if (gameManager.getRemainingTime() < 10) {
             sender.sendMessage(ChatColor.RED + "Deathmatch is already starting!");
             return true;
         }

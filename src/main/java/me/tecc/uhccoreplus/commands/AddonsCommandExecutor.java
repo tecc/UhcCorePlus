@@ -1,9 +1,5 @@
 package me.tecc.uhccoreplus.commands;
 
-import com.gmail.val59000mc.commands.UhcCommandExecutor;
-import com.gmail.val59000mc.game.GameManager;
-import com.gmail.val59000mc.scenarios.Scenario;
-import me.tecc.uhccoreplus.addons.Addon;
 import me.tecc.uhccoreplus.addons.AddonManager;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;

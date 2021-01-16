@@ -24,9 +24,9 @@ public class Schematic {
     /**
      * @param schematicName Name of the schematic that gets loaded for the UhcCore folder. (Don't include a file path or extension)
      * @param buildLocation Location to build the schematic.
-     * @param loadingArea Radius around the location in chunks that should be generated before pasting the schematic.
+     * @param loadingArea   Radius around the location in chunks that should be generated before pasting the schematic.
      */
-    public Schematic(String schematicName, Location buildLocation, int loadingArea){
+    public Schematic(String schematicName, Location buildLocation, int loadingArea) {
         this.schematicName = schematicName;
         this.location = buildLocation;
         this.loadingArea = loadingArea;
@@ -41,19 +41,20 @@ public class Schematic {
      * @param schematicName Name of the schematic that gets loaded for the UhcCore folder. (Don't include a file path or extension)
      * @param buildLocation Location to build the schematic.
      */
-    public Schematic(String schematicName, Location buildLocation){
+    public Schematic(String schematicName, Location buildLocation) {
         this(schematicName, buildLocation, 0);
     }
 
     /**
      * @param schematicName Name of the schematic that gets loaded for the UhcCore folder. (Don't include a file path or extension)
      */
-    public Schematic(String schematicName){
+    public Schematic(String schematicName) {
         this(schematicName, null, 0);
     }
 
     /**
      * Checks if the schematic can be pasted by checking if the schematic file exists and Worldedit is installed.
+     *
      * @return Returns true if the schematic can be pasted.
      */
     public boolean canBePasted() {
@@ -65,20 +66,21 @@ public class Schematic {
     /**
      * Builds the loaded schematic in the location specified in the constructor.
      */
-    public void build(){
+    public void build() {
         Validate.notNull(location, "Missing location from constructor.");
         build(location);
     }
 
     /**
      * Builds the loaded schematic in the specified location.
+     *
      * @param location Used to override the schematic location.
      */
-    public void build(Location location){
-        if (loadingArea > 0){
-            for (int x = (location.getBlockX()/16)-loadingArea; x < (location.getBlockX()/16)+loadingArea; x++) {
-                for (int z = (location.getBlockZ()/16)-loadingArea; z < (location.getBlockZ()/16)+loadingArea; z++) {
-                    Chunk chunk = location.getWorld().getChunkAt(x,z);
+    public void build(Location location) {
+        if (loadingArea > 0) {
+            for (int x = (location.getBlockX() / 16) - loadingArea; x < (location.getBlockX() / 16) + loadingArea; x++) {
+                for (int z = (location.getBlockZ() / 16) - loadingArea; z < (location.getBlockZ() / 16) + loadingArea; z++) {
+                    Chunk chunk = location.getWorld().getChunkAt(x, z);
                     chunk.load(true);
                     chunk.unload(true);
                 }
@@ -87,9 +89,9 @@ public class Schematic {
 
         ArrayList<Integer> dimensions;
         try {
-            if (UhcCore.getVersion() < 13){
+            if (UhcCore.getVersion() < 13) {
                 dimensions = SchematicHandler8.pasteSchematic(location, schematicFile.getPath());
-            }else {
+            } else {
                 dimensions = SchematicHandler13.pasteSchematic(location, schematicFile.getPath());
             }
 
@@ -131,7 +133,7 @@ public class Schematic {
     }
 
     public File getSchematicFile() {
-        if (schematicFile == null){
+        if (schematicFile == null) {
             schematicFile = getSchematicFile(schematicName);
         }
 
@@ -140,13 +142,14 @@ public class Schematic {
 
     /**
      * Used to obtain a schematic file from the UhcCore folder.
+     *
      * @param name Name of the schematic without file extension.
      * @return The schematic file matching the specified name.
      */
-    public static File getSchematicFile(String name){
-        File schematic = new File(UhcCore.getPlugin().getDataFolder(),name+".schematic");
+    public static File getSchematicFile(String name) {
+        File schematic = new File(UhcCore.getPlugin().getDataFolder(), name + ".schematic");
         if (schematic.exists()) return schematic;
-        schematic = new File(UhcCore.getPlugin().getDataFolder(),name+".schem");
+        schematic = new File(UhcCore.getPlugin().getDataFolder(), name + ".schem");
         return schematic;
     }
 

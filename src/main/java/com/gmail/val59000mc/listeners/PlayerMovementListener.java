@@ -7,26 +7,26 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerMoveEvent;
 
-public class PlayerMovementListener implements Listener{
+public class PlayerMovementListener implements Listener {
 
     private final PlayersManager playersManager;
 
-    public PlayerMovementListener(PlayersManager playersManager){
+    public PlayerMovementListener(PlayersManager playersManager) {
         this.playersManager = playersManager;
     }
 
     @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event){
+    public void onPlayerMove(PlayerMoveEvent event) {
         handleFrozenPlayers(event);
     }
 
-    private void handleFrozenPlayers(PlayerMoveEvent e){
+    private void handleFrozenPlayers(PlayerMoveEvent e) {
         UhcPlayer uhcPlayer = playersManager.getUhcPlayer(e.getPlayer());
-        if (uhcPlayer.isFrozen()){
+        if (uhcPlayer.isFrozen()) {
             Location freezeLoc = uhcPlayer.getFreezeLocation();
             Location toLoc = e.getTo();
 
-            if (toLoc.getBlockX() != freezeLoc.getBlockX() || toLoc.getBlockZ() != freezeLoc.getBlockZ()){
+            if (toLoc.getBlockX() != freezeLoc.getBlockX() || toLoc.getBlockZ() != freezeLoc.getBlockZ()) {
                 Location newLoc = toLoc.clone();
                 newLoc.setX(freezeLoc.getBlockX() + .5);
                 newLoc.setZ(freezeLoc.getBlockZ() + .5);

@@ -6,14 +6,14 @@ import com.gmail.val59000mc.scenarios.ScenarioListener;
 import com.gmail.val59000mc.utils.UniversalMaterial;
 import org.bukkit.event.EventHandler;
 
-public class FlyHighListener extends ScenarioListener{
+public class FlyHighListener extends ScenarioListener {
 
     @EventHandler
-    public void onGameStart(UhcStartedEvent e){
+    public void onGameStart(UhcStartedEvent e) {
         getPlayersManager().getOnlinePlayingPlayers().forEach(uhcPlayer -> {
-            try{
+            try {
                 uhcPlayer.getPlayer().getInventory().addItem(UniversalMaterial.ELYTRA.getStack());
-            }catch (UhcPlayerNotOnlineException ex){
+            } catch (UhcPlayerNotOnlineException ex) {
                 // No elytra for offline players.
             }
         });

@@ -14,32 +14,33 @@ import org.bukkit.event.Listener;
  */
 public abstract class ScenarioListener implements Listener {
 
-    public GameManager getGameManager(){
+    public GameManager getGameManager() {
         return GameManager.getGameManager();
     }
 
-    public PlayersManager getPlayersManager(){
+    public PlayersManager getPlayersManager() {
         return getGameManager().getPlayersManager();
     }
 
-    public TeamManager getTeamManager(){
+    public TeamManager getTeamManager() {
         return getGameManager().getTeamManager();
     }
 
-    public ScoreboardManager getScoreboardManager(){
+    public ScoreboardManager getScoreboardManager() {
         return getGameManager().getScoreboardManager();
     }
 
-    public ScenarioManager getScenarioManager(){
+    public ScenarioManager getScenarioManager() {
         return getGameManager().getScenarioManager();
     }
 
-    public MainConfig getConfiguration(){
+    public MainConfig getConfiguration() {
         return getGameManager().getConfig();
     }
 
     /**
      * Used to check if a scenario is enabled.
+     *
      * @param scenario Scenario to check.
      * @return Returns true if the scenario is enabled.
      */
@@ -50,11 +51,13 @@ public abstract class ScenarioListener implements Listener {
     /**
      * Gets called when the scenario is enabled.
      */
-    public void onEnable() {}
+    public void onEnable() {
+    }
 
     /**
      * Gets called when the scenario is disabled.
      */
-    public void onDisable() {}
+    public void onDisable() {
+    }
 
 }

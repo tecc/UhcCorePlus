@@ -8,7 +8,7 @@ import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class BowlessListener extends ScenarioListener{
+public class BowlessListener extends ScenarioListener {
 
     @EventHandler
     public void onCraftItem(CraftItemEvent e) {

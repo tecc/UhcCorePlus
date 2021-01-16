@@ -23,7 +23,7 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.URL;
 
-public class Updater extends Thread implements Listener{
+public class Updater extends Thread implements Listener {
 
     private static final String LATEST_RELEASE = "https://api.github.com/repos/Mezy/UhcCore/releases/latest";
     private final Plugin plugin;
@@ -31,19 +31,19 @@ public class Updater extends Thread implements Listener{
     private boolean hasPendingUpdate;
     private String jarDownloadUrl;
 
-    public Updater(Plugin plugin){
+    public Updater(Plugin plugin) {
         this.plugin = plugin;
         hasPendingUpdate = false;
         start();
     }
 
     @Override
-    public void run(){
-        while (!hasPendingUpdate && plugin.isEnabled()){
-            try{
+    public void run() {
+        while (!hasPendingUpdate && plugin.isEnabled()) {
+            try {
                 runVersionCheck();
                 sleep(false);
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 Bukkit.getLogger().severe("[UhcCore] Failed to check for updates!");
                 ex.printStackTrace();
                 sleep(true);
@@ -51,23 +51,23 @@ public class Updater extends Thread implements Listener{
         }
     }
 
-    private void sleep(boolean failedLastCheck){
-        if (hasPendingUpdate){
+    private void sleep(boolean failedLastCheck) {
+        if (hasPendingUpdate) {
             return;
         }
 
-        long time = (failedLastCheck?5:30) * TimeUtils.MINUTE;
+        long time = (failedLastCheck ? 5 : 30) * TimeUtils.MINUTE;
 
-        try{
+        try {
             sleep(time);
-        }catch (InterruptedException ex){
+        } catch (InterruptedException ex) {
             Bukkit.getLogger().severe("[UhcCore] Update thread stopped!");
             ex.printStackTrace();
         }
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
-    public void onPlayerJoin(PlayerJoinEvent e){
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
 
         if (player.isOp()) {
@@ -76,8 +76,8 @@ public class Updater extends Thread implements Listener{
     }
 
     @EventHandler
-    public void onCommand(PlayerCommandPreprocessEvent e){
-        if (!e.getMessage().equalsIgnoreCase("/uhccore update")){
+    public void onCommand(PlayerCommandPreprocessEvent e) {
+        if (!e.getMessage().equalsIgnoreCase("/uhccore update")) {
             return;
         }
         e.setCancelled(true);
@@ -85,28 +85,28 @@ public class Updater extends Thread implements Listener{
         Player player = e.getPlayer();
         GameManager gm = GameManager.getGameManager();
 
-        if (gm.getGameState() == GameState.PLAYING || gm.getGameState() == GameState.DEATHMATCH){
+        if (gm.getGameState() == GameState.PLAYING || gm.getGameState() == GameState.DEATHMATCH) {
             player.sendMessage(ChatColor.RED + "You can not update the plugin during games as it will restart your server.");
             return;
         }
 
         player.sendMessage(ChatColor.GREEN + "Updating plugin ...");
 
-        try{
+        try {
             updatePlugin(true);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             player.sendMessage(ChatColor.RED + "Failed to update plugin, check console for more info.");
             ex.printStackTrace();
         }
     }
 
-    private void runVersionCheck() throws Exception{
+    private void runVersionCheck() throws Exception {
         HttpsURLConnection connection = (HttpsURLConnection) new URL(LATEST_RELEASE).openConnection();
 
         // Add headers
         connection.setRequestMethod("GET");
         connection.addRequestProperty("Accept", "application/json");
-        connection.addRequestProperty("User-Agent", "UhcCore:"+ UhcCore.getPlugin().getDescription().getVersion());
+        connection.addRequestProperty("User-Agent", "UhcCore:" + UhcCore.getPlugin().getDescription().getVersion());
 
         connection.connect();
 
@@ -116,7 +116,7 @@ public class Updater extends Thread implements Listener{
         newestVersion = new Version(root.get("tag_name").getAsString());
         currentVersion = new Version(plugin.getDescription().getVersion());
 
-        if (!newestVersion.isNewerThan(currentVersion)){
+        if (!newestVersion.isNewerThan(currentVersion)) {
             return; // Already on the newest or newer version
         }
 
@@ -125,13 +125,13 @@ public class Updater extends Thread implements Listener{
         for (JsonElement jsonElement : root.get("assets").getAsJsonArray()) {
             JsonObject asset = jsonElement.getAsJsonObject();
 
-            if (asset.get("name").getAsString().endsWith(".jar")){
+            if (asset.get("name").getAsString().endsWith(".jar")) {
                 jarDownloadUrl = asset.get("browser_download_url").getAsString();
                 break;
             }
         }
 
-        if (jarDownloadUrl == null){
+        if (jarDownloadUrl == null) {
             Bukkit.getLogger().severe("Jar download URL not found!");
         }
 
@@ -140,7 +140,7 @@ public class Updater extends Thread implements Listener{
         sendUpdateMessage(Bukkit.getConsoleSender());
     }
 
-    private void sendUpdateMessage(CommandSender receiver){
+    private void sendUpdateMessage(CommandSender receiver) {
         receiver.sendMessage("");
         receiver.sendMessage(ChatColor.DARK_GREEN + "[UhcCore] " + ChatColor.GREEN + "A new version of the UhcCore plugin is available!");
         receiver.sendMessage(ChatColor.DARK_GREEN + "Current version: " + ChatColor.GREEN + currentVersion);
@@ -150,7 +150,7 @@ public class Updater extends Thread implements Listener{
         receiver.sendMessage("");
     }
 
-    private void updatePlugin(boolean restart) throws Exception{
+    private void updatePlugin(boolean restart) throws Exception {
         HttpsURLConnection connection = (HttpsURLConnection) new URL(jarDownloadUrl).openConnection();
         connection.connect();
 
@@ -175,7 +175,7 @@ public class Updater extends Thread implements Listener{
 
         Bukkit.getLogger().info("[UhcCore] New plugin version downloaded.");
 
-        if (!newPluginFile.equals(oldPluginFile)){
+        if (!newPluginFile.equals(oldPluginFile)) {
             FileUtils.scheduleFileForDeletion(oldPluginFile);
             Bukkit.getLogger().info("[UhcCore] Old plugin version will be deleted on next startup.");
         }
@@ -187,37 +187,37 @@ public class Updater extends Thread implements Listener{
         }
     }
 
-    public void runAutoUpdate(){
+    public void runAutoUpdate() {
         // Auto update is disabled.
-        if (!GameManager.getGameManager().getConfig().get(MainConfig.AUTO_UPDATE)){
+        if (!GameManager.getGameManager().getConfig().get(MainConfig.AUTO_UPDATE)) {
             return;
         }
 
         // No pending update.
-        if (!hasPendingUpdate){
+        if (!hasPendingUpdate) {
             return;
         }
 
         Bukkit.getLogger().info("[UhcCore] Running auto update.");
-        try{
+        try {
             updatePlugin(false);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             Bukkit.getLogger().warning("[UhcCore] Failed to update plugin!");
             ex.printStackTrace();
         }
     }
 
-    private static class Version{
+    private static class Version {
 
         private final String version;
         private final int[] versionNums;
 
-        private Version(String version){
-            if (version.startsWith("v")){
+        private Version(String version) {
+            if (version.startsWith("v")) {
                 version = version.substring(1);
             }
 
-            if (version.contains(" ")){
+            if (version.contains(" ")) {
                 version = version.split(" ")[0];
             }
 
@@ -226,27 +226,27 @@ public class Updater extends Thread implements Listener{
             String[] stringNums = version.split("\\.");
             versionNums = new int[stringNums.length];
 
-            for (int i = 0; i < stringNums.length; i++){
-                try{
+            for (int i = 0; i < stringNums.length; i++) {
+                try {
                     versionNums[i] = Integer.parseInt(stringNums[i]);
-                }catch (IllegalArgumentException ex){
+                } catch (IllegalArgumentException ex) {
                     Bukkit.getLogger().severe("Failed to parse plugin version: " + version);
                     ex.printStackTrace();
                 }
             }
         }
 
-        public boolean equals(Version version){
+        public boolean equals(Version version) {
             return this.version.equals(version.version);
         }
 
         @Override
-        public String toString(){
+        public String toString() {
             return version;
         }
 
-        private int getVersionNumber(int index){
-            if (versionNums.length > index){
+        private int getVersionNumber(int index) {
+            if (versionNums.length > index) {
                 return versionNums[index];
             }
 
@@ -254,23 +254,23 @@ public class Updater extends Thread implements Listener{
             return 0;
         }
 
-        private boolean isNewerThan(Version version){
-            if (equals(version)){
+        private boolean isNewerThan(Version version) {
+            if (equals(version)) {
                 return false;
             }
 
             int numCount = versionNums.length;
-            if (version.versionNums.length > numCount){
+            if (version.versionNums.length > numCount) {
                 numCount = version.versionNums.length;
             }
 
-            for (int i = 0; i < numCount; i++){
+            for (int i = 0; i < numCount; i++) {
                 // This version is smaller than arg version so this is old
-                if (getVersionNumber(i) < version.getVersionNumber(i)){
+                if (getVersionNumber(i) < version.getVersionNumber(i)) {
                     return false;
                 }
                 // This version is bigger than arg version so this is new
-                if (getVersionNumber(i) > version.getVersionNumber(i)){
+                if (getVersionNumber(i) > version.getVersionNumber(i)) {
                     return true;
                 }
 

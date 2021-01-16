@@ -16,171 +16,171 @@ import java.util.UUID;
 
 public class Craft {
 
-	private final String name;
-	private final List<ItemStack> recipe;
-	private final ItemStack displayItem, craft;
-	private final int limit;
-	private final boolean reviveItem, reviveWithInventory;
+    private final String name;
+    private final List<ItemStack> recipe;
+    private final ItemStack displayItem, craft;
+    private final int limit;
+    private final boolean reviveItem, reviveWithInventory;
 
-	public Craft(String name, List<ItemStack> recipe, ItemStack craft, int limit, boolean defaultName){
-		this(name, recipe, craft, limit, defaultName, false);
-	}
+    public Craft(String name, List<ItemStack> recipe, ItemStack craft, int limit, boolean defaultName) {
+        this(name, recipe, craft, limit, defaultName, false);
+    }
 
-	public Craft(String name, List<ItemStack> recipe, ItemStack craft, int limit, boolean defaultName, boolean reviveItem){
-		this(name, recipe, craft, limit, defaultName, reviveItem, true);
-	}
+    public Craft(String name, List<ItemStack> recipe, ItemStack craft, int limit, boolean defaultName, boolean reviveItem) {
+        this(name, recipe, craft, limit, defaultName, reviveItem, true);
+    }
 
-	public Craft(String name, List<ItemStack> recipe, ItemStack craft, int limit, boolean defaultName, boolean reviveItem, boolean reviveWithInventory){
-		this.name = name;
-		this.recipe = recipe;
-		this.craft = craft;
-		this.limit = limit;
-		this.reviveItem = reviveItem;
-		this.reviveWithInventory = reviveWithInventory;
+    public Craft(String name, List<ItemStack> recipe, ItemStack craft, int limit, boolean defaultName, boolean reviveItem, boolean reviveWithInventory) {
+        this.name = name;
+        this.recipe = recipe;
+        this.craft = craft;
+        this.limit = limit;
+        this.reviveItem = reviveItem;
+        this.reviveWithInventory = reviveWithInventory;
 
-		if (!defaultName || reviveItem){
-			ItemMeta im = craft.getItemMeta();
-			im.setDisplayName(ChatColor.GREEN + ChatColor.translateAlternateColorCodes('&', name));
-			craft.setItemMeta(im);
-		}
+        if (!defaultName || reviveItem) {
+            ItemMeta im = craft.getItemMeta();
+            im.setDisplayName(ChatColor.GREEN + ChatColor.translateAlternateColorCodes('&', name));
+            craft.setItemMeta(im);
+        }
 
-		displayItem = craft.clone();
+        displayItem = craft.clone();
 
-		ItemMeta im = displayItem.getItemMeta();
-		im.setDisplayName(ChatColor.GREEN + ChatColor.translateAlternateColorCodes('&', name));
-		displayItem.setItemMeta(im);
+        ItemMeta im = displayItem.getItemMeta();
+        im.setDisplayName(ChatColor.GREEN + ChatColor.translateAlternateColorCodes('&', name));
+        displayItem.setItemMeta(im);
 
-		register();
-	}
-	
-	public boolean isLimited(){
-		return limit != -1;
-	}
-	
-	public String getName() {
-		return name;
-	}
+        register();
+    }
 
-	public List<ItemStack> getRecipe() {
-		return recipe;
-	}
+    public boolean isLimited() {
+        return limit != -1;
+    }
 
-	public ItemStack getCraft() {
-		return craft;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public ItemStack getDisplayItem() {
-		return displayItem;
-	}
+    public List<ItemStack> getRecipe() {
+        return recipe;
+    }
 
-	public int getLimit() {
-		return limit;
-	}
+    public ItemStack getCraft() {
+        return craft;
+    }
 
-	public boolean hasLimit(){
-		return limit != -1;
-	}
+    public ItemStack getDisplayItem() {
+        return displayItem;
+    }
 
-	public boolean isReviveItem(){
-		return reviveItem;
-	}
+    public int getLimit() {
+        return limit;
+    }
 
-	public boolean reviveWithInventory(){
-		return reviveWithInventory;
-	}
+    public boolean hasLimit() {
+        return limit != -1;
+    }
 
-	@SuppressWarnings("deprecation")
-	private void register(){
-		ShapedRecipe craftRecipe = VersionUtils.getVersionUtils().createShapedRecipe(craft, UUID.randomUUID().toString());
-		
-		craftRecipe.shape("abc","def","ghi");
-		
-		List<Character> symbols = Arrays.asList('a','b','c','d','e','f','g','h','i');
-		for(int i=0 ; i<9 ; i++){
-			if(!recipe.get(i).getType().equals(Material.AIR)){
-				Material material = recipe.get(i).getType();
-				MaterialData data = recipe.get(i).getData();
-				if (data != null && data.getItemType() == material) {
-					craftRecipe.setIngredient(symbols.get(i), data);
-				}else {
-					craftRecipe.setIngredient(symbols.get(i), material);
-				}
-			}
-		}
-		
-		Bukkit.getLogger().info("[UhcCore] "+name+" custom craft registered");
-		Bukkit.getServer().addRecipe(craftRecipe);
-	}
+    public boolean isReviveItem() {
+        return reviveItem;
+    }
 
-	public static class Creator{
+    public boolean reviveWithInventory() {
+        return reviveWithInventory;
+    }
 
-		private String name;
-		private final ItemStack[] recipe;
-		private ItemStack craft;
-		private int limit;
-		private boolean defaultName;
+    @SuppressWarnings("deprecation")
+    private void register() {
+        ShapedRecipe craftRecipe = VersionUtils.getVersionUtils().createShapedRecipe(craft, UUID.randomUUID().toString());
 
-		public Creator(){
-			name = null;
-			recipe = new ItemStack[9];
-			craft = null;
-			limit = -1;
-			defaultName = false;
-		}
+        craftRecipe.shape("abc", "def", "ghi");
 
-		public Creator setCraftName(String name){
-			this.name = name;
-			return this;
-		}
+        List<Character> symbols = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i');
+        for (int i = 0; i < 9; i++) {
+            if (!recipe.get(i).getType().equals(Material.AIR)) {
+                Material material = recipe.get(i).getType();
+                MaterialData data = recipe.get(i).getData();
+                if (data != null && data.getItemType() == material) {
+                    craftRecipe.setIngredient(symbols.get(i), data);
+                } else {
+                    craftRecipe.setIngredient(symbols.get(i), material);
+                }
+            }
+        }
 
-		public Creator setRecipeItem(int i, ItemStack recipeItem){
-			recipe[i] = new ItemStack(recipeItem.getType(), 1, recipeItem.getDurability());
-			return this;
-		}
+        Bukkit.getLogger().info("[UhcCore] " + name + " custom craft registered");
+        Bukkit.getServer().addRecipe(craftRecipe);
+    }
 
-		public Creator setCraft(ItemStack craft){
-			this.craft = craft;
-			return this;
-		}
+    public static class Creator {
 
-		public Creator setCraftLimit(int limit){
-			this.limit = limit;
-			return this;
-		}
+        private String name;
+        private final ItemStack[] recipe;
+        private ItemStack craft;
+        private int limit;
+        private boolean defaultName;
 
-		public Creator useDefaultName(boolean defaultName){
-			this.defaultName = defaultName;
-			return this;
-		}
+        public Creator() {
+            name = null;
+            recipe = new ItemStack[9];
+            craft = null;
+            limit = -1;
+            defaultName = false;
+        }
 
-		public Craft create() throws IllegalArgumentException{
-			List<ItemStack> recipeList = new ArrayList<>();
+        public Creator setCraftName(String name) {
+            this.name = name;
+            return this;
+        }
 
-			boolean noneAir = false;
-			for (int i = 0; i < 9; i++){
-				if (recipe[i] == null){
-					recipeList.add(new ItemStack(Material.AIR));
-				}else {
-					recipeList.add(recipe[i]);
-					noneAir = true;
-				}
-			}
+        public Creator setRecipeItem(int i, ItemStack recipeItem) {
+            recipe[i] = new ItemStack(recipeItem.getType(), 1, recipeItem.getDurability());
+            return this;
+        }
 
-			if (!noneAir){
-				throw new IllegalArgumentException("No recipe items assigned!");
-			}
+        public Creator setCraft(ItemStack craft) {
+            this.craft = craft;
+            return this;
+        }
 
-			if (name == null){
-				throw new IllegalArgumentException("Craft name is not assigned!");
-			}
+        public Creator setCraftLimit(int limit) {
+            this.limit = limit;
+            return this;
+        }
 
-			if (craft == null){
-				throw new IllegalArgumentException("Craft item is not assigned!");
-			}
+        public Creator useDefaultName(boolean defaultName) {
+            this.defaultName = defaultName;
+            return this;
+        }
 
-			return new Craft(name, recipeList, craft, limit, defaultName);
-		}
+        public Craft create() throws IllegalArgumentException {
+            List<ItemStack> recipeList = new ArrayList<>();
 
-	}
+            boolean noneAir = false;
+            for (int i = 0; i < 9; i++) {
+                if (recipe[i] == null) {
+                    recipeList.add(new ItemStack(Material.AIR));
+                } else {
+                    recipeList.add(recipe[i]);
+                    noneAir = true;
+                }
+            }
+
+            if (!noneAir) {
+                throw new IllegalArgumentException("No recipe items assigned!");
+            }
+
+            if (name == null) {
+                throw new IllegalArgumentException("Craft name is not assigned!");
+            }
+
+            if (craft == null) {
+                throw new IllegalArgumentException("Craft item is not assigned!");
+            }
+
+            return new Craft(name, recipeList, craft, limit, defaultName);
+        }
+
+    }
 
 }

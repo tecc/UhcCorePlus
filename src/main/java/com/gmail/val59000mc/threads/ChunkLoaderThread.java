@@ -23,27 +23,28 @@ public abstract class ChunkLoaderThread implements Runnable {
         this.restEveryNumOfChunks = restEveryNumOfChunks;
         this.restDuration = restDuration;
 
-        maxChunk = Math.round(size/16f) + 1;
+        maxChunk = Math.round(size / 16f) + 1;
 
-        totalChunksToLoad = (2*maxChunk+1)*(2*maxChunk+1);
+        totalChunksToLoad = (2 * maxChunk + 1) * (2 * maxChunk + 1);
 
         x = -maxChunk;
         z = -maxChunk;
     }
 
     public abstract void onDoneLoadingWorld();
+
     public abstract void onDoneLoadingChunk(Chunk chunk);
 
     @Override
     public void run() {
         int loaded = 0;
-        while(x <= maxChunk && loaded < restEveryNumOfChunks){
+        while (x <= maxChunk && loaded < restEveryNumOfChunks) {
             try {
                 Chunk chunk = PaperLib.getChunkAtAsync(world, x, z, true).get();
 
-                if (Bukkit.isPrimaryThread()){
+                if (Bukkit.isPrimaryThread()) {
                     onDoneLoadingChunk(chunk);
-                }else {
+                } else {
                     Bukkit.getScheduler().runTask(UhcCore.getPlugin(), () -> onDoneLoadingChunk(chunk));
                 }
             } catch (InterruptedException | ExecutionException e) {
@@ -53,7 +54,7 @@ public abstract class ChunkLoaderThread implements Runnable {
             loaded++;
             z++;
 
-            if (z > maxChunk){
+            if (z > maxChunk) {
                 z = -maxChunk;
                 x++;
             }
@@ -62,31 +63,31 @@ public abstract class ChunkLoaderThread implements Runnable {
         chunksLoaded += loaded;
 
         // Not yet done loading all chunks
-        if(x <= maxChunk){
-            Bukkit.getLogger().info("[UhcCore] Loading map "+getLoadingState()+"% - "+chunksLoaded+"/"+totalChunksToLoad+" chunks loaded");
+        if (x <= maxChunk) {
+            Bukkit.getLogger().info("[UhcCore] Loading map " + getLoadingState() + "% - " + chunksLoaded + "/" + totalChunksToLoad + " chunks loaded");
 
-            if (PaperLib.isPaper() && PaperLib.getMinecraftVersion() >= 13){
+            if (PaperLib.isPaper() && PaperLib.getMinecraftVersion() >= 13) {
                 Bukkit.getScheduler().scheduleAsyncDelayedTask(UhcCore.getPlugin(), this, restDuration);
-            }else {
+            } else {
                 Bukkit.getScheduler().scheduleSyncDelayedTask(UhcCore.getPlugin(), this, restDuration);
             }
         }
         // Done loading all chunks
-        else{
+        else {
             Bukkit.getScheduler().runTask(UhcCore.getPlugin(), this::onDoneLoadingWorld);
         }
     }
 
-    public void printSettings(){
-        Bukkit.getLogger().info("[UhcCore] Generating environment "+world.getEnvironment().toString());
-        Bukkit.getLogger().info("[UhcCore] Loading a total "+Math.floor(totalChunksToLoad)+" chunks, up to chunk ( "+maxChunk+" , "+maxChunk+" )");
-        Bukkit.getLogger().info("[UhcCore] Resting "+restDuration+" ticks every "+restEveryNumOfChunks+" chunks");
-        Bukkit.getLogger().info("[UhcCore] Loading map "+getLoadingState()+"%");
+    public void printSettings() {
+        Bukkit.getLogger().info("[UhcCore] Generating environment " + world.getEnvironment().toString());
+        Bukkit.getLogger().info("[UhcCore] Loading a total " + Math.floor(totalChunksToLoad) + " chunks, up to chunk ( " + maxChunk + " , " + maxChunk + " )");
+        Bukkit.getLogger().info("[UhcCore] Resting " + restDuration + " ticks every " + restEveryNumOfChunks + " chunks");
+        Bukkit.getLogger().info("[UhcCore] Loading map " + getLoadingState() + "%");
     }
 
-    private String getLoadingState(){
-        double percentage = 100*(double)chunksLoaded/totalChunksToLoad;
-        return world.getEnvironment()+" "+(Math.floor(10*percentage)/10);
+    private String getLoadingState() {
+        double percentage = 100 * (double) chunksLoaded / totalChunksToLoad;
+        return world.getEnvironment() + " " + (Math.floor(10 * percentage) / 10);
     }
 
 }

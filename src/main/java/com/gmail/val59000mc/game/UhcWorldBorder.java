@@ -12,75 +12,75 @@ import org.bukkit.WorldBorder;
 
 public class UhcWorldBorder {
 
-	private boolean moving;
-	private int startSize;
-	private int endSize;
-	private long timeToShrink;
-	private long timeBeforeShrink;
+    private boolean moving;
+    private int startSize;
+    private int endSize;
+    private long timeToShrink;
+    private long timeBeforeShrink;
 
-	public int getStartSize() {
-		return startSize;
-	}
+    public int getStartSize() {
+        return startSize;
+    }
 
-	public void loadSettings(MainConfig configuration){
-		moving = configuration.get(MainConfig.BORDER_IS_MOVING);
-		startSize = configuration.get(MainConfig.BORDER_START_SIZE);
-		endSize = configuration.get(MainConfig.BORDER_END_SIZE);
-		timeToShrink = configuration.get(MainConfig.BORDER_TIME_TO_SHRINK);
-		timeBeforeShrink = configuration.get(MainConfig.BORDER_TIME_BEFORE_SHRINK);
+    public void loadSettings(MainConfig configuration) {
+        moving = configuration.get(MainConfig.BORDER_IS_MOVING);
+        startSize = configuration.get(MainConfig.BORDER_START_SIZE);
+        endSize = configuration.get(MainConfig.BORDER_END_SIZE);
+        timeToShrink = configuration.get(MainConfig.BORDER_TIME_TO_SHRINK);
+        timeBeforeShrink = configuration.get(MainConfig.BORDER_TIME_BEFORE_SHRINK);
 
-		Bukkit.getLogger().info("[UhcCore] Border start size is "+startSize);
-		Bukkit.getLogger().info("[UhcCore] Border end size is "+startSize);
-		Bukkit.getLogger().info("[UhcCore] Border moves : "+moving);
-		Bukkit.getLogger().info("[UhcCore] Border timeBeforeEnd : "+timeToShrink);
-	}
+        Bukkit.getLogger().info("[UhcCore] Border start size is " + startSize);
+        Bukkit.getLogger().info("[UhcCore] Border end size is " + startSize);
+        Bukkit.getLogger().info("[UhcCore] Border moves : " + moving);
+        Bukkit.getLogger().info("[UhcCore] Border timeBeforeEnd : " + timeToShrink);
+    }
 
-	public void setUpBukkitBorder(MapLoader mapLoader){
-		Bukkit.getScheduler().runTaskLater(UhcCore.getPlugin(), () -> {
-			World overworld = mapLoader.getUhcWorld(World.Environment.NORMAL);
-			setBukkitWorldBorderSize(overworld,0,0,2*startSize);
+    public void setUpBukkitBorder(MapLoader mapLoader) {
+        Bukkit.getScheduler().runTaskLater(UhcCore.getPlugin(), () -> {
+            World overworld = mapLoader.getUhcWorld(World.Environment.NORMAL);
+            setBukkitWorldBorderSize(overworld, 0, 0, 2 * startSize);
 
-			World nether = mapLoader.getUhcWorld(World.Environment.NETHER);
-			if (nether != null) {
-				setBukkitWorldBorderSize(nether, 0, 0, startSize);
-			}
+            World nether = mapLoader.getUhcWorld(World.Environment.NETHER);
+            if (nether != null) {
+                setBukkitWorldBorderSize(nether, 0, 0, startSize);
+            }
 
-			World end = mapLoader.getUhcWorld(World.Environment.THE_END);
-			if (end != null) {
-				setBukkitWorldBorderSize(end, 0, 0, 2*startSize);
-			}
-		}, 200);
-	}
-	
-	public void setBukkitWorldBorderSize(World world, int centerX, int centerZ, double edgeSize){
-		Validate.notNull(world);
+            World end = mapLoader.getUhcWorld(World.Environment.THE_END);
+            if (end != null) {
+                setBukkitWorldBorderSize(end, 0, 0, 2 * startSize);
+            }
+        }, 200);
+    }
 
-		WorldBorder worldborder = world.getWorldBorder();
-		worldborder.setCenter(centerX,centerZ);
-		worldborder.setSize(edgeSize);
-	}
+    public void setBukkitWorldBorderSize(World world, int centerX, int centerZ, double edgeSize) {
+        Validate.notNull(world);
 
-	public double getCurrentSize(){
-		World overworld = GameManager.getGameManager().getMapLoader().getUhcWorld(World.Environment.NORMAL);
-		return overworld.getWorldBorder().getSize()/2;
-	}
+        WorldBorder worldborder = world.getWorldBorder();
+        worldborder.setCenter(centerX, centerZ);
+        worldborder.setSize(edgeSize);
+    }
 
-	public void startBorderThread() {
-		if(moving){
-			Bukkit.getScheduler().runTaskAsynchronously(UhcCore.getPlugin(), new WorldBorderThread(timeBeforeShrink, endSize, timeToShrink));
-		}
-	}
+    public double getCurrentSize() {
+        World overworld = GameManager.getGameManager().getMapLoader().getUhcWorld(World.Environment.NORMAL);
+        return overworld.getWorldBorder().getSize() / 2;
+    }
 
-	public boolean isWithinBorder(Location loc){
-		int x = loc.getBlockX();
-		int z = loc.getBlockZ();
+    public void startBorderThread() {
+        if (moving) {
+            Bukkit.getScheduler().runTaskAsynchronously(UhcCore.getPlugin(), new WorldBorderThread(timeBeforeShrink, endSize, timeToShrink));
+        }
+    }
 
-		if (x < 0) x = -x;
-		if (z < 0) z = -z;
+    public boolean isWithinBorder(Location loc) {
+        int x = loc.getBlockX();
+        int z = loc.getBlockZ();
 
-		double border = getCurrentSize();
+        if (x < 0) x = -x;
+        if (z < 0) z = -z;
 
-		return x < border && z < border;
-	}
+        double border = getCurrentSize();
+
+        return x < border && z < border;
+    }
 
 }

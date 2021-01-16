@@ -16,38 +16,38 @@ import org.bukkit.potion.PotionEffect;
 
 import javax.annotation.Nullable;
 
-public class VersionUtils_1_15 extends VersionUtils_1_14{
+public class VersionUtils_1_15 extends VersionUtils_1_14 {
 
     @Override
-    public void removeRecipe(ItemStack item, Recipe recipe){
+    public void removeRecipe(ItemStack item, Recipe recipe) {
         NamespacedKey key;
 
-        if (recipe instanceof Keyed){
+        if (recipe instanceof Keyed) {
             key = ((Keyed) recipe).getKey();
-        }else{
+        } else {
             key = item.getType().getKey();
         }
 
         boolean removed = Bukkit.removeRecipe(key);
 
-        if (removed){
-            Bukkit.getLogger().info("[UhcCore] Removed recipe for "+key.toString());
-        }else {
+        if (removed) {
+            Bukkit.getLogger().info("[UhcCore] Removed recipe for " + key.toString());
+        } else {
             Bukkit.getLogger().info("[UhcCore] Failed to remove recipe for " + key.toString() + "!");
         }
     }
 
     @Nullable
     @Override
-    public JsonArray getSuspiciousStewEffects(ItemMeta meta){
-        if (!(meta instanceof SuspiciousStewMeta)){
+    public JsonArray getSuspiciousStewEffects(ItemMeta meta) {
+        if (!(meta instanceof SuspiciousStewMeta)) {
             return null;
         }
 
         SuspiciousStewMeta stewMeta = (SuspiciousStewMeta) meta;
 
         JsonArray customEffects = new JsonArray();
-        for (PotionEffect effect : stewMeta.getCustomEffects()){
+        for (PotionEffect effect : stewMeta.getCustomEffects()) {
             customEffects.add(JsonItemUtils.getPotionEffectJson(effect));
         }
 
@@ -55,10 +55,10 @@ public class VersionUtils_1_15 extends VersionUtils_1_14{
     }
 
     @Override
-    public ItemMeta applySuspiciousStewEffects(ItemMeta meta, JsonArray effects) throws ParseException{
+    public ItemMeta applySuspiciousStewEffects(ItemMeta meta, JsonArray effects) throws ParseException {
         SuspiciousStewMeta stewMeta = (SuspiciousStewMeta) meta;
 
-        for (JsonElement jsonElement : effects){
+        for (JsonElement jsonElement : effects) {
             JsonObject effect = jsonElement.getAsJsonObject();
             stewMeta.addCustomEffect(JsonItemUtils.parsePotionEffect(effect), true);
         }

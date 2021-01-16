@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-public class NoFallListener extends ScenarioListener{
+public class NoFallListener extends ScenarioListener {
 
     @EventHandler
     public void onPlayerDamage(EntityDamageEvent e) {

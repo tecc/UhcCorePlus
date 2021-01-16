@@ -21,35 +21,35 @@ public class MonstersIncListener extends ScenarioListener {
 
     private final List<Location> doorLocs;
 
-    public MonstersIncListener(){
+    public MonstersIncListener() {
         doorLocs = new ArrayList<>();
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e) {
         Block block = e.getBlock();
         Location loc = e.getBlock().getLocation();
 
-        if(isDoor(block)) {
+        if (isDoor(block)) {
             doorLocs.add(loc);
         }
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onBlockClick(PlayerInteractEvent e) {
         Block block = e.getClickedBlock();
         Player player = e.getPlayer();
         Location goToLoc;
 
-        if (e.getAction() != Action.RIGHT_CLICK_BLOCK){
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
 
-        if (block == null){
+        if (block == null) {
             return;
         }
 
-        if(isDoor(block)) {
+        if (isDoor(block)) {
             Block below = block.getRelative(BlockFace.DOWN, 1);
             if (isDoor(below)) {
                 block = below;
@@ -59,7 +59,7 @@ public class MonstersIncListener extends ScenarioListener {
                 do {
                     goToLoc = doorLocs.get((int) (Math.random() * doorLocs.size()));
                     // Door loc is no longer valid.
-                    if (!isValidDoorLocation(goToLoc)){
+                    if (!isValidDoorLocation(goToLoc)) {
                         doorLocs.remove(goToLoc);
                         goToLoc = null;
                     }
@@ -71,15 +71,15 @@ public class MonstersIncListener extends ScenarioListener {
         }
     }
 
-    private boolean isValidDoorLocation(Location loc){
+    private boolean isValidDoorLocation(Location loc) {
         return isDoor(loc.getBlock()) && GameManager.getGameManager().getWorldBorder().isWithinBorder(loc);
     }
 
-    @EventHandler (ignoreCancelled = true)
+    @EventHandler(ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent e) {
         Block block = e.getBlock();
 
-        if(isDoor(block)) {
+        if (isDoor(block)) {
             e.getPlayer().sendMessage(Lang.SCENARIO_MONSTERSINC_ERROR);
             e.setCancelled(true);
         }

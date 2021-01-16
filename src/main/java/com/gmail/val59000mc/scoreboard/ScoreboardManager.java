@@ -32,7 +32,7 @@ public class ScoreboardManager {
     private final ScoreboardLayout scoreboardLayout;
     private final List<Placeholder> placeholders;
 
-    public ScoreboardManager(){
+    public ScoreboardManager() {
         scoreboardLayout = new ScoreboardLayout();
         scoreboardLayout.loadFile();
         placeholders = new ArrayList<>();
@@ -46,7 +46,7 @@ public class ScoreboardManager {
         return scoreboardLayout;
     }
 
-    public void setUpPlayerScoreboard(UhcPlayer scoreboardPlayer){
+    public void setUpPlayerScoreboard(UhcPlayer scoreboardPlayer) {
         GameManager gm = GameManager.getGameManager();
         PlayersManager pm = gm.getPlayersManager();
         MainConfig cfg = gm.getConfig();
@@ -72,13 +72,13 @@ public class ScoreboardManager {
 
 
         // add teams for no flicker scoreboard
-        for (int i = 0; i < 15; i++){
+        for (int i = 0; i < 15; i++) {
             Team team = scoreboard.registerNewTeam(getScoreboardLine(i));
             team.addEntry(getScoreboardLine(i));
         }
 
         // setup teams
-        if (!cfg.get(MainConfig.TEAM_COLORS)){
+        if (!cfg.get(MainConfig.TEAM_COLORS)) {
 
             Objective healthTab = scoreboard.getObjective("health_tab");
             Objective healthBelowName = scoreboard.getObjective(ChatColor.RED + "\u2764");
@@ -90,7 +90,7 @@ public class ScoreboardManager {
             friends.setSuffix(ChatColor.RESET + "");
             enemies.setSuffix(ChatColor.RESET + "");
 
-            if (cfg.get(MainConfig.DISABLE_ENEMY_NAMETAGS)){
+            if (cfg.get(MainConfig.DISABLE_ENEMY_NAMETAGS)) {
                 VersionUtils.getVersionUtils().setTeamNameTagVisibility(enemies, false);
             }
 
@@ -112,11 +112,11 @@ public class ScoreboardManager {
                     // No health display for offline players.
                 }
 
-                if (uhcPlayer.getState().equals(PlayerState.DEAD) || uhcPlayer.getState().equals(PlayerState.WAITING)){
+                if (uhcPlayer.getState().equals(PlayerState.DEAD) || uhcPlayer.getState().equals(PlayerState.WAITING)) {
                     spectators.addEntry(uhcPlayer.getName());
-                }else if (uhcPlayer.isInTeamWith(scoreboardPlayer)) {
+                } else if (uhcPlayer.isInTeamWith(scoreboardPlayer)) {
                     friends.addEntry(uhcPlayer.getName());
-                }else {
+                } else {
                     enemies.addEntry(uhcPlayer.getName());
                 }
 
@@ -124,7 +124,7 @@ public class ScoreboardManager {
 
             updatePlayerTab(scoreboardPlayer);
 
-        }else {
+        } else {
 
             // Team colors
             Objective healthTab = scoreboard.getObjective("health_tab");
@@ -163,13 +163,13 @@ public class ScoreboardManager {
                         }
                     }
 
-                }else{
+                } else {
 
                     Team team = scoreboard.registerNewTeam("" + uhcTeam.getTeamNumber());
                     team.setPrefix(uhcTeam.getPrefix());
                     team.setSuffix(ChatColor.RESET + "");
 
-                    if (gm.getConfig().get(MainConfig.DISABLE_ENEMY_NAMETAGS)){
+                    if (gm.getConfig().get(MainConfig.DISABLE_ENEMY_NAMETAGS)) {
                         VersionUtils.getVersionUtils().setTeamNameTagVisibility(team, false);
                     }
 
@@ -199,17 +199,17 @@ public class ScoreboardManager {
             updatePlayerTab(scoreboardPlayer);
         }
 
-        Bukkit.getScheduler().scheduleSyncDelayedTask(UhcCore.getPlugin(),new UpdateScoreboardThread(gm, scoreboardPlayer),1L);
+        Bukkit.getScheduler().scheduleSyncDelayedTask(UhcCore.getPlugin(), new UpdateScoreboardThread(gm, scoreboardPlayer), 1L);
     }
 
-    public void updatePlayerTab(UhcPlayer uhcPlayer){
+    public void updatePlayerTab(UhcPlayer uhcPlayer) {
         GameManager gm = GameManager.getGameManager();
 
         if (!gm.getConfig().get(MainConfig.TEAM_COLORS)) {
 
             for (UhcPlayer all : gm.getPlayersManager().getPlayersList()) {
                 Scoreboard scoreboard = all.getScoreboard();
-                if (scoreboard == null){
+                if (scoreboard == null) {
                     continue;
                 }
 
@@ -228,11 +228,11 @@ public class ScoreboardManager {
 
             }
 
-        }else {
+        } else {
 
-            for (UhcPlayer all : gm.getPlayersManager().getPlayersList()){
+            for (UhcPlayer all : gm.getPlayersManager().getPlayersList()) {
                 Scoreboard scoreboard = all.getScoreboard();
-                if (scoreboard == null){
+                if (scoreboard == null) {
                     continue;
                 }
 
@@ -242,7 +242,7 @@ public class ScoreboardManager {
                         // add to there team with 0 in front
 
                         Team team = scoreboard.getTeam("0" + uhcPlayer.getTeam().getTeamNumber());
-                        if (team == null){
+                        if (team == null) {
                             team = scoreboard.registerNewTeam("0" + uhcPlayer.getTeam().getTeamNumber());
                         }
                         team.setPrefix(uhcPlayer.getTeam().getPrefix());
@@ -253,10 +253,10 @@ public class ScoreboardManager {
                         // add to normal team
 
                         Team team = scoreboard.getTeam("" + uhcPlayer.getTeam().getTeamNumber());
-                        if (team == null){
+                        if (team == null) {
                             team = scoreboard.registerNewTeam("" + uhcPlayer.getTeam().getTeamNumber());
 
-                            if (gm.getConfig().get(MainConfig.DISABLE_ENEMY_NAMETAGS)){
+                            if (gm.getConfig().get(MainConfig.DISABLE_ENEMY_NAMETAGS)) {
                                 VersionUtils.getVersionUtils().setTeamNameTagVisibility(team, false);
                             }
                         }
@@ -276,17 +276,17 @@ public class ScoreboardManager {
             }
 
             // Change player display name
-            if (gm.getConfig().get(MainConfig.CHANGE_DISPLAY_NAMES)){
+            if (gm.getConfig().get(MainConfig.CHANGE_DISPLAY_NAMES)) {
                 try {
                     uhcPlayer.getPlayer().setDisplayName(uhcPlayer.getDisplayName());
-                }catch (UhcPlayerNotOnlineException ex){
+                } catch (UhcPlayerNotOnlineException ex) {
                     // Player left while updating tab.
                 }
             }
         }
     }
 
-    public String getScoreboardLine(int line){
+    public String getScoreboardLine(int line) {
         if (line == 0) return ChatColor.UNDERLINE + "" + ChatColor.RESET;
         if (line == 1) return ChatColor.ITALIC + "" + ChatColor.RESET;
         if (line == 2) return ChatColor.BOLD + "" + ChatColor.RESET;
@@ -305,41 +305,41 @@ public class ScoreboardManager {
         return null;
     }
 
-    public String translatePlaceholders(String s, UhcPlayer uhcPlayer, Player bukkitPlayer, ScoreboardType scoreboardType){
+    public String translatePlaceholders(String s, UhcPlayer uhcPlayer, Player bukkitPlayer, ScoreboardType scoreboardType) {
 
         String returnString = s;
         GameManager gm = GameManager.getGameManager();
         MainConfig cfg = gm.getConfig();
 
-        if (scoreboardType.equals(ScoreboardType.WAITING)){
-            returnString = returnString.replace("%online%",Bukkit.getOnlinePlayers().size() + "").replace("%needed%",cfg.get(MainConfig.MIN_PLAYERS_TO_START) + "");
+        if (scoreboardType.equals(ScoreboardType.WAITING)) {
+            returnString = returnString.replace("%online%", Bukkit.getOnlinePlayers().size() + "").replace("%needed%", cfg.get(MainConfig.MIN_PLAYERS_TO_START) + "");
         }
 
-        if (returnString.contains("%kit%")){
-            if (uhcPlayer.hasKitSelected()){
+        if (returnString.contains("%kit%")) {
+            if (uhcPlayer.hasKitSelected()) {
                 returnString = returnString.replace("%kit%", uhcPlayer.getKit().getName());
-            }else{
+            } else {
                 returnString = returnString.replace("%kit%", Lang.ITEMS_KIT_SCOREBOARD_NO_KIT);
             }
         }
 
-        if (returnString.contains("%kills%")){
-            returnString = returnString.replace("%kills%",uhcPlayer.getKills() + "");
+        if (returnString.contains("%kills%")) {
+            returnString = returnString.replace("%kills%", uhcPlayer.getKills() + "");
         }
 
-        if (returnString.contains("%teamKills%")){
-            returnString = returnString.replace("%teamKills%",uhcPlayer.getTeam().getKills() + "");
+        if (returnString.contains("%teamKills%")) {
+            returnString = returnString.replace("%teamKills%", uhcPlayer.getTeam().getKills() + "");
         }
 
-        if (returnString.contains("%teamColor%")){
-            returnString = returnString.replace("%teamColor%",uhcPlayer.getTeam().getPrefix());
+        if (returnString.contains("%teamColor%")) {
+            returnString = returnString.replace("%teamColor%", uhcPlayer.getTeam().getPrefix());
         }
 
-        if (returnString.contains("%border%")){
+        if (returnString.contains("%border%")) {
 
             int size = (int) bukkitPlayer.getWorld().getWorldBorder().getSize() / 2;
 
-            if (size == 30000000){
+            if (size == 30000000) {
                 size = 0;
             }
 
@@ -354,75 +354,75 @@ public class ScoreboardManager {
             int distanceX = size - playerX;
             int distanceZ = size - playerZ;
 
-            if (distanceX <= 5 || distanceZ <= 5){
+            if (distanceX <= 5 || distanceZ <= 5) {
                 borderString = ChatColor.RED + borderString;
-            }else if (distanceX <= 50 || distanceZ <= 50){
+            } else if (distanceX <= 50 || distanceZ <= 50) {
                 borderString = ChatColor.YELLOW + borderString;
-            }else {
+            } else {
                 borderString = ChatColor.GREEN + borderString;
             }
 
-            returnString = returnString.replace("%border%",borderString);
+            returnString = returnString.replace("%border%", borderString);
         }
 
-        if (returnString.contains("%ylayer%")){
-            returnString = returnString.replace("%ylayer%",(int) bukkitPlayer.getLocation().getY() + "");
+        if (returnString.contains("%ylayer%")) {
+            returnString = returnString.replace("%ylayer%", (int) bukkitPlayer.getLocation().getY() + "");
         }
 
-        if (returnString.contains("%xCoordinate%")){
-            returnString = returnString.replace("%xCoordinate%",(int) bukkitPlayer.getLocation().getX() + "");
+        if (returnString.contains("%xCoordinate%")) {
+            returnString = returnString.replace("%xCoordinate%", (int) bukkitPlayer.getLocation().getX() + "");
         }
 
-        if (returnString.contains("%zCoordinate%")){
-            returnString = returnString.replace("%zCoordinate%",(int) bukkitPlayer.getLocation().getZ() + "");
+        if (returnString.contains("%zCoordinate%")) {
+            returnString = returnString.replace("%zCoordinate%", (int) bukkitPlayer.getLocation().getZ() + "");
         }
 
-        if (returnString.contains("%deathmatch%")){
-            returnString = returnString.replace("%deathmatch%",gm.getFormatedRemainingTime());
+        if (returnString.contains("%deathmatch%")) {
+            returnString = returnString.replace("%deathmatch%", gm.getFormatedRemainingTime());
         }
 
-        if (returnString.contains("%time%")){
+        if (returnString.contains("%time%")) {
             returnString = returnString.replace("%time%", TimeUtils.getFormattedTime(gm.getElapsedTime()));
         }
 
-        if (returnString.contains("%pvp%")){
+        if (returnString.contains("%pvp%")) {
             long pvp = cfg.get(MainConfig.TIME_BEFORE_PVP) - gm.getElapsedTime();
 
-            if (pvp < 0){
+            if (pvp < 0) {
                 returnString = returnString.replace("%pvp%", "-");
-            }else {
+            } else {
                 returnString = returnString.replace("%pvp%", TimeUtils.getFormattedTime(pvp));
             }
         }
 
-        if (returnString.contains("%alive%")){
+        if (returnString.contains("%alive%")) {
             if (
                     gm.getScenarioManager().isEnabled(Scenario.SILENT_NIGHT) &&
-                    ((SilentNightListener) gm.getScenarioManager().getScenarioListener(Scenario.SILENT_NIGHT)).isNightMode()
-            ){
-                returnString = returnString.replace("%alive%","?");
-            }else{
-                returnString = returnString.replace("%alive%",gm.getPlayersManager().getOnlinePlayingPlayers().size() + "");
+                            ((SilentNightListener) gm.getScenarioManager().getScenarioListener(Scenario.SILENT_NIGHT)).isNightMode()
+            ) {
+                returnString = returnString.replace("%alive%", "?");
+            } else {
+                returnString = returnString.replace("%alive%", gm.getPlayersManager().getOnlinePlayingPlayers().size() + "");
             }
         }
 
-        if (returnString.contains("%episode%")){
-            returnString = returnString.replace("%episode%",gm.getEpisodeNumber() + "");
+        if (returnString.contains("%episode%")) {
+            returnString = returnString.replace("%episode%", gm.getEpisodeNumber() + "");
         }
 
-        if (returnString.contains("%nextEpisode%")){
+        if (returnString.contains("%nextEpisode%")) {
             returnString = returnString.replace("%nextEpisode%", TimeUtils.getFormattedTime(gm.getTimeUntilNextEpisode()) + "");
         }
 
-        if (returnString.contains("%teamAlive%")){
+        if (returnString.contains("%teamAlive%")) {
             returnString = returnString.replace("%teamAlive%", String.valueOf(gm.getTeamManager().getPlayingUhcTeams().size()));
         }
 
-        if (returnString.contains("%playerAlive%")){
+        if (returnString.contains("%playerAlive%")) {
             returnString = returnString.replace("%playerAlive%", String.valueOf(gm.getPlayersManager().getAllPlayingPlayers().size()));
         }
 
-        if (returnString.contains("%playerSpectator%")){
+        if (returnString.contains("%playerSpectator%")) {
             long count = gm.getPlayersManager().getPlayersList()
                     .stream()
                     .filter(UhcPlayer::isDeath)
@@ -431,16 +431,16 @@ public class ScoreboardManager {
             returnString = returnString.replace("%playerSpectator%", String.valueOf(count));
         }
 
-        if (returnString.contains("%money%")){
+        if (returnString.contains("%money%")) {
             returnString = returnString.replace("%money%", String.format("%.2f", VaultManager.getPlayerMoney(bukkitPlayer)));
         }
 
         // Parse custom placeholders
-        for (Placeholder placeholder : placeholders){
+        for (Placeholder placeholder : placeholders) {
             returnString = placeholder.parseString(returnString, uhcPlayer, bukkitPlayer, scoreboardType);
         }
 
-        if (returnString.length() > 32){
+        if (returnString.length() > 32) {
             Bukkit.getLogger().warning("[UhcCore] Scoreboard line is too long: '" + returnString + "'!");
             returnString = "";
         }
@@ -450,9 +450,10 @@ public class ScoreboardManager {
 
     /**
      * Used to register custom placeholders.
+     *
      * @param placeholder The placeholder you want to register.
      */
-    public void registerPlaceholder(Placeholder placeholder){
+    public void registerPlaceholder(Placeholder placeholder) {
         placeholders.add(placeholder);
     }
 

@@ -22,8 +22,8 @@ public class PotionEffectListOption implements Option<List<PotionEffect>> {
         List<String> potionStrList = config.getStringList(path);
         List<PotionEffect> potionEffects = new ArrayList<>();
 
-        for(String potionStr : potionStrList){
-            try{
+        for (String potionStr : potionStrList) {
+            try {
                 String[] potionArr = potionStr.split("/");
                 PotionEffectType type = PotionEffectType.getByName(potionArr[0].toUpperCase());
                 int duration = Integer.parseInt(potionArr[1]);
@@ -33,8 +33,8 @@ public class PotionEffectListOption implements Option<List<PotionEffect>> {
 
                 PotionEffect effect = new PotionEffect(type, duration, amplifier);
                 potionEffects.add(effect);
-            }catch(IllegalArgumentException e){
-                Bukkit.getLogger().warning("[UhcCore] "+potionStr+" ignored, please check the syntax. It must be formated like POTION_NAME/duration/amplifier");
+            } catch (IllegalArgumentException e) {
+                Bukkit.getLogger().warning("[UhcCore] " + potionStr + " ignored, please check the syntax. It must be formated like POTION_NAME/duration/amplifier");
             }
         }
 

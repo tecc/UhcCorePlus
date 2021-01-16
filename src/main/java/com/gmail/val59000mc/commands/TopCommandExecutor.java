@@ -11,17 +11,17 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class TopCommandExecutor implements CommandExecutor{
+public class TopCommandExecutor implements CommandExecutor {
 
     private final PlayersManager playersManager;
 
-    public TopCommandExecutor(PlayersManager playersManager){
+    public TopCommandExecutor(PlayersManager playersManager) {
         this.playersManager = playersManager;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)){
+        if (!(sender instanceof Player)) {
             sender.sendMessage("Only players can use this command!");
             return true;
         }
@@ -29,12 +29,12 @@ public class TopCommandExecutor implements CommandExecutor{
         Player player = (Player) sender;
         UhcPlayer uhcPlayer = playersManager.getUhcPlayer(player);
 
-        if (uhcPlayer.getState() != PlayerState.PLAYING){
+        if (uhcPlayer.getState() != PlayerState.PLAYING) {
             player.sendMessage(Lang.COMMAND_TOP_ERROR_PLAYING);
             return true;
         }
 
-        if (player.getWorld().getEnvironment() == World.Environment.NETHER){
+        if (player.getWorld().getEnvironment() == World.Environment.NETHER) {
             player.sendMessage(Lang.COMMAND_TOP_ERROR_NETHER);
             return true;
         }

@@ -21,12 +21,12 @@ public class VeinConfigOption implements Option<Map<Material, VeinConfiguration>
         Map<Material, VeinConfiguration> generateVeins = new HashMap<>();
         ConfigurationSection allVeinsSection = config.getConfigurationSection(path);
 
-        if(allVeinsSection != null){
-            for(String veinSectionName : allVeinsSection.getKeys(false)){
+        if (allVeinsSection != null) {
+            for (String veinSectionName : allVeinsSection.getKeys(false)) {
                 ConfigurationSection veinSection = allVeinsSection.getConfigurationSection(veinSectionName);
                 VeinConfiguration veinConfig = new VeinConfiguration();
-                if(veinConfig.parseConfiguration(veinSection)){
-                    generateVeins.put(veinConfig.getMaterial(),veinConfig);
+                if (veinConfig.parseConfiguration(veinSection)) {
+                    generateVeins.put(veinConfig.getMaterial(), veinConfig);
                 }
             }
         }

@@ -2,7 +2,6 @@ package com.gmail.val59000mc.utils;
 
 import com.gmail.val59000mc.exceptions.ParseException;
 import com.google.gson.*;
-import com.google.gson.JsonArray;
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -21,42 +20,42 @@ import org.bukkit.potion.PotionType;
 
 import java.util.*;
 
-public class JsonItemUtils{
+public class JsonItemUtils {
 
-    public static String getItemJson(ItemStack item){
+    public static String getItemJson(ItemStack item) {
         JsonObject json = new JsonObject();
         json.addProperty("type", item.getType().toString());
-        if (item.getAmount() != 1){
+        if (item.getAmount() != 1) {
             json.addProperty("amount", item.getAmount());
         }
-        if (item instanceof JsonItemStack){
+        if (item instanceof JsonItemStack) {
             JsonItemStack jsonItem = (JsonItemStack) item;
 
-            if (jsonItem.getMaximum() != 1){
+            if (jsonItem.getMaximum() != 1) {
                 json.addProperty("minimum", jsonItem.getMinimum());
                 json.addProperty("maximum", jsonItem.getMaximum());
                 // Amount is random so not needed.
                 json.remove("amount");
             }
         }
-        if (item.getDurability() != 0){
+        if (item.getDurability() != 0) {
             json.addProperty("durability", item.getDurability());
         }
-        if (item.hasItemMeta()){
+        if (item.hasItemMeta()) {
             ItemMeta meta = item.getItemMeta();
 
-            if (meta.hasDisplayName()){
+            if (meta.hasDisplayName()) {
                 json.addProperty("display-name", meta.getDisplayName().replace('\u00a7', '&'));
             }
-            if (meta.hasLore()){
+            if (meta.hasLore()) {
                 JsonArray lore = new JsonArray();
                 meta.getLore().forEach(line -> lore.add(new JsonPrimitive(line.replace('\u00a7', '&'))));
                 json.add("lore", lore);
             }
-            if (meta.hasEnchants()){
+            if (meta.hasEnchants()) {
                 Map<Enchantment, Integer> enchantments = meta.getEnchants();
                 JsonArray jsonEnchants = new JsonArray();
-                for (Enchantment enchantment : enchantments.keySet()){
+                for (Enchantment enchantment : enchantments.keySet()) {
                     JsonObject jsonEnchant = new JsonObject();
                     jsonEnchant.addProperty("type", VersionUtils.getVersionUtils().getEnchantmentKey(enchantment));
                     jsonEnchant.addProperty("level", enchantments.get(enchantment));
@@ -64,7 +63,7 @@ public class JsonItemUtils{
                 }
                 json.add("enchantments", jsonEnchants);
             }
-            if (!meta.getItemFlags().isEmpty()){
+            if (!meta.getItemFlags().isEmpty()) {
                 Set<ItemFlag> flags = meta.getItemFlags();
                 JsonArray jsonFlags = new JsonArray();
 
@@ -74,11 +73,11 @@ public class JsonItemUtils{
             }
 
             JsonObject attributes = VersionUtils.getVersionUtils().getItemAttributes(meta);
-            if (attributes != null){
+            if (attributes != null) {
                 json.add("attributes", attributes);
             }
 
-            if (meta instanceof PotionMeta){
+            if (meta instanceof PotionMeta) {
                 PotionMeta potionMeta = (PotionMeta) meta;
 
                 JsonObject baseEffect = VersionUtils.getVersionUtils().getBasePotionEffect(potionMeta);
@@ -87,14 +86,14 @@ public class JsonItemUtils{
                 }
 
                 Color potionColor = VersionUtils.getVersionUtils().getPotionColor(potionMeta);
-                if (potionColor != null){
+                if (potionColor != null) {
                     json.addProperty("color", potionColor.asRGB());
                 }
 
                 if (!potionMeta.getCustomEffects().isEmpty()) {
                     JsonArray customEffects = new JsonArray();
 
-                    for (PotionEffect effect : potionMeta.getCustomEffects()){
+                    for (PotionEffect effect : potionMeta.getCustomEffects()) {
                         customEffects.add(getPotionEffectJson(effect));
                     }
 
@@ -103,14 +102,14 @@ public class JsonItemUtils{
             }
 
             JsonArray suspiciousStewEffects = VersionUtils.getVersionUtils().getSuspiciousStewEffects(meta);
-            if (suspiciousStewEffects != null){
+            if (suspiciousStewEffects != null) {
                 json.add("custom-effects", suspiciousStewEffects);
             }
 
-            if (meta instanceof EnchantmentStorageMeta){
+            if (meta instanceof EnchantmentStorageMeta) {
                 EnchantmentStorageMeta enchantmentMeta = (EnchantmentStorageMeta) meta;
                 Map<Enchantment, Integer> enchantments = enchantmentMeta.getStoredEnchants();
-                if (!enchantments.isEmpty()){
+                if (!enchantments.isEmpty()) {
                     JsonArray jsonEnchants = new JsonArray();
                     for (Enchantment enchantment : enchantments.keySet()) {
                         JsonObject jsonEnchant = new JsonObject();
@@ -122,7 +121,7 @@ public class JsonItemUtils{
                 }
             }
 
-            if (meta instanceof LeatherArmorMeta){
+            if (meta instanceof LeatherArmorMeta) {
                 LeatherArmorMeta leatherMeta = (LeatherArmorMeta) meta;
                 json.addProperty("color", leatherMeta.getColor().asRGB());
             }
@@ -130,32 +129,32 @@ public class JsonItemUtils{
         return json.toString();
     }
 
-    public static JsonItemStack getItemFromJson(String jsonString) throws ParseException{
+    public static JsonItemStack getItemFromJson(String jsonString) throws ParseException {
         JsonObject json;
-        try{
+        try {
             json = new JsonParser().parse(jsonString).getAsJsonObject();
-        }catch (JsonSyntaxException | IllegalStateException ex){
+        } catch (JsonSyntaxException | IllegalStateException ex) {
             throw new ParseException("There is an error in the json syntax of item: " + jsonString);
         }
 
-        if (!json.has("type")){
+        if (!json.has("type")) {
             throw new ParseException("Missing type tag");
         }
 
         Material material;
 
-        try{
+        try {
             material = Material.valueOf(json.get("type").getAsString());
-        }catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             throw new ParseException("Invalid item type: " + json.get("type").getAsString() + " does the item exist on this minecraft version?");
         }
 
         JsonItemStack item = new JsonItemStack(material);
         ItemMeta meta = item.getItemMeta();
 
-        try{
-            for (Map.Entry<String, JsonElement> entry : json.entrySet()){
-                switch (entry.getKey()){
+        try {
+            for (Map.Entry<String, JsonElement> entry : json.entrySet()) {
+                switch (entry.getKey()) {
                     case "type":
                         continue;
                     case "amount":
@@ -201,18 +200,18 @@ public class JsonItemUtils{
 
             item.setItemMeta(meta);
             return item;
-        }catch (Exception ex){
-            if (ex instanceof ParseException){
+        } catch (Exception ex) {
+            if (ex instanceof ParseException) {
                 throw ex;
             }
 
             ParseException exception = new ParseException(ex.getMessage());
             ex.setStackTrace(ex.getStackTrace());
             throw exception;
-       }
+        }
     }
 
-    public static JsonObject getPotionEffectJson(PotionEffect effect){
+    public static JsonObject getPotionEffectJson(PotionEffect effect) {
         JsonObject jsonEffect = new JsonObject();
         jsonEffect.addProperty("type", effect.getType().getName());
         jsonEffect.addProperty("duration", effect.getDuration());
@@ -220,10 +219,10 @@ public class JsonItemUtils{
         return jsonEffect;
     }
 
-    public static PotionEffect parsePotionEffect(JsonObject jsonEffect) throws ParseException{
+    public static PotionEffect parsePotionEffect(JsonObject jsonEffect) throws ParseException {
         PotionEffectType type = PotionEffectType.getByName(jsonEffect.get("type").getAsString());
 
-        if (type == null){
+        if (type == null) {
             throw new ParseException("Invalid potion type: " + jsonEffect.get("type").getAsString());
         }
 
@@ -233,27 +232,27 @@ public class JsonItemUtils{
         try {
             duration = jsonEffect.get("duration").getAsInt();
             amplifier = jsonEffect.get("amplifier").getAsInt();
-        }catch (NullPointerException ex){
+        } catch (NullPointerException ex) {
             throw new ParseException("Missing duration or amplifier tag for: " + jsonEffect.toString());
         }
 
         return new PotionEffect(type, duration, amplifier);
     }
 
-    private static ItemMeta parseLore(ItemMeta meta, JsonArray jsonArray){
+    private static ItemMeta parseLore(ItemMeta meta, JsonArray jsonArray) {
         Iterator<JsonElement> lines = jsonArray.iterator();
         List<String> lore = new ArrayList<>();
-        while (lines.hasNext()){
+        while (lines.hasNext()) {
             lore.add(ChatColor.translateAlternateColorCodes('&', lines.next().getAsString()));
         }
         meta.setLore(lore);
         return meta;
     }
 
-    private static ItemMeta parseEnchantments(ItemMeta meta, JsonArray jsonArray){
+    private static ItemMeta parseEnchantments(ItemMeta meta, JsonArray jsonArray) {
         EnchantmentStorageMeta enchantmentMeta = null;
 
-        if (meta instanceof EnchantmentStorageMeta){
+        if (meta instanceof EnchantmentStorageMeta) {
             enchantmentMeta = (EnchantmentStorageMeta) meta;
         }
 
@@ -264,31 +263,31 @@ public class JsonItemUtils{
             Validate.notNull(enchantment, "Unknown enchantment type: " + enchant.get("type").getAsString());
 
             int level = enchant.get("level").getAsInt();
-            if (enchantmentMeta == null){
+            if (enchantmentMeta == null) {
                 meta.addEnchant(enchantment, level, true);
-            }else{
+            } else {
                 enchantmentMeta.addStoredEnchant(enchantment, level, true);
             }
         }
         return enchantmentMeta == null ? meta : enchantmentMeta;
     }
 
-    private static ItemMeta parseFlags(ItemMeta meta, JsonArray jsonArray){
-        for (JsonElement jsonElement : jsonArray){
+    private static ItemMeta parseFlags(ItemMeta meta, JsonArray jsonArray) {
+        for (JsonElement jsonElement : jsonArray) {
             ItemFlag flag = ItemFlag.valueOf(jsonElement.getAsString());
             meta.addItemFlags(flag);
         }
         return meta;
     }
 
-    private static ItemMeta parseBasePotionEffect(ItemMeta meta, JsonObject jsonObject) throws ParseException{
+    private static ItemMeta parseBasePotionEffect(ItemMeta meta, JsonObject jsonObject) throws ParseException {
         PotionMeta potionMeta = (PotionMeta) meta;
 
         PotionType type;
 
         try {
             type = PotionType.valueOf(jsonObject.get("type").getAsString());
-        }catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             throw new ParseException(ex.getMessage());
         }
 
@@ -304,27 +303,27 @@ public class JsonItemUtils{
         return potionMeta;
     }
 
-    private static ItemMeta parseCustomPotionEffects(ItemMeta meta, JsonArray jsonArray) throws ParseException{
-        if (meta instanceof PotionMeta){
+    private static ItemMeta parseCustomPotionEffects(ItemMeta meta, JsonArray jsonArray) throws ParseException {
+        if (meta instanceof PotionMeta) {
             PotionMeta potionMeta = (PotionMeta) meta;
 
-            for (JsonElement jsonElement : jsonArray){
+            for (JsonElement jsonElement : jsonArray) {
                 JsonObject effect = jsonElement.getAsJsonObject();
                 potionMeta.addCustomEffect(parsePotionEffect(effect), true);
             }
 
             return potionMeta;
-        }else{
+        } else {
             return VersionUtils.getVersionUtils().applySuspiciousStewEffects(meta, jsonArray);
         }
     }
 
-    private static ItemMeta parseColor(ItemMeta meta, int color){
-        if (meta instanceof PotionMeta){
+    private static ItemMeta parseColor(ItemMeta meta, int color) {
+        if (meta instanceof PotionMeta) {
             PotionMeta potionMeta = (PotionMeta) meta;
             VersionUtils.getVersionUtils().setPotionColor(potionMeta, Color.fromRGB(color));
             return potionMeta;
-        }else if (meta instanceof LeatherArmorMeta){
+        } else if (meta instanceof LeatherArmorMeta) {
             LeatherArmorMeta leatherMeta = (LeatherArmorMeta) meta;
             leatherMeta.setColor(Color.fromBGR(color));
             return leatherMeta;

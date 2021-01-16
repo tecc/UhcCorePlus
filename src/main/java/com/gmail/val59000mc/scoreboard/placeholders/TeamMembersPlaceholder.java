@@ -15,30 +15,30 @@ public class TeamMembersPlaceholder extends Placeholder {
 
     private final Map<UUID, Integer> lastShownMember;
 
-    public TeamMembersPlaceholder(){
+    public TeamMembersPlaceholder() {
         super("members", "members-name", "members-health");
         lastShownMember = new HashMap<>();
     }
 
     @Override
-    public String getReplacement(UhcPlayer uhcPlayer, Player player, ScoreboardType scoreboardType, String placeholder){
+    public String getReplacement(UhcPlayer uhcPlayer, Player player, ScoreboardType scoreboardType, String placeholder) {
 
         List<UhcPlayer> teamMembers;
 
-        if (scoreboardType.equals(ScoreboardType.WAITING)){
+        if (scoreboardType.equals(ScoreboardType.WAITING)) {
             teamMembers = uhcPlayer.getTeam().getMembers();
-        }else{
+        } else {
             teamMembers = uhcPlayer.getTeam().getMembers(UhcPlayer::isPlaying);
         }
 
-        if (teamMembers.isEmpty()){
+        if (teamMembers.isEmpty()) {
             return "-";
         }
 
         boolean namePlaceholder = placeholder.equals("members") || placeholder.equals("members-name");
 
         // Name placeholder
-        if (namePlaceholder){
+        if (namePlaceholder) {
             int showPlayer = lastShownMember.getOrDefault(player.getUniqueId(), -1) + 1;
             if (showPlayer >= teamMembers.size()) {
                 showPlayer = 0;
@@ -47,12 +47,12 @@ public class TeamMembersPlaceholder extends Placeholder {
             return teamMembers.get(showPlayer).getRealName();
         }
         // Health placeholder
-        else{
+        else {
             int showPlayer = lastShownMember.getOrDefault(player.getUniqueId(), 0);
 
             try {
                 return String.valueOf((int) teamMembers.get(showPlayer).getPlayer().getHealth());
-            }catch (UhcPlayerNotOnlineException ex){
+            } catch (UhcPlayerNotOnlineException ex) {
                 return "?";
             }
         }

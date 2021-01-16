@@ -31,10 +31,13 @@ import org.bukkit.scoreboard.Team;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @SuppressWarnings("deprecation")
-public class VersionUtils_1_12 extends VersionUtils{
+public class VersionUtils_1_12 extends VersionUtils {
 
     @Override
     public ShapedRecipe createShapedRecipe(ItemStack craft, String craftKey) {
@@ -77,11 +80,11 @@ public class VersionUtils_1_12 extends VersionUtils{
     }
 
     @Override
-    public void setEye(Block block, boolean eye){
+    public void setEye(Block block, boolean eye) {
         byte data = block.getData();
-        if (eye && data < 4){
+        if (eye && data < 4) {
             data += 4;
-        }else if (!eye && data > 3){
+        } else if (!eye && data > 3) {
             data -= 4;
         }
 
@@ -89,9 +92,9 @@ public class VersionUtils_1_12 extends VersionUtils{
     }
 
     @Override
-    public void setEndPortalFrameOrientation(Block block, BlockFace blockFace){
+    public void setEndPortalFrameOrientation(Block block, BlockFace blockFace) {
         byte data = -1;
-        switch (blockFace){
+        switch (blockFace) {
             case NORTH:
                 data = 2;
                 break;
@@ -109,22 +112,22 @@ public class VersionUtils_1_12 extends VersionUtils{
         setBlockData(block, data);
     }
 
-    private void setBlockData(Block block, byte data){
+    private void setBlockData(Block block, byte data) {
         try {
-            Method setData = NMSUtils.getMethod(Block.class, "setData",1);
+            Method setData = NMSUtils.getMethod(Block.class, "setData", 1);
             setData.invoke(block, data);
-        }catch (ReflectiveOperationException ex){
+        } catch (ReflectiveOperationException ex) {
             ex.printStackTrace();
         }
     }
 
     @Override
-    public void setTeamNameTagVisibility(Team team, boolean value){
-        team.setOption(Team.Option.NAME_TAG_VISIBILITY, value?Team.OptionStatus.ALWAYS:Team.OptionStatus.NEVER);
+    public void setTeamNameTagVisibility(Team team, boolean value) {
+        team.setOption(Team.Option.NAME_TAG_VISIBILITY, value ? Team.OptionStatus.ALWAYS : Team.OptionStatus.NEVER);
     }
 
     @Override
-    public void setChestName(Chest chest, String name){
+    public void setChestName(Chest chest, String name) {
         chest.setCustomName(name);
         chest.update();
     }
@@ -152,8 +155,8 @@ public class VersionUtils_1_12 extends VersionUtils{
 
     @Nullable
     @Override
-    public Color getPotionColor(PotionMeta potionMeta){
-        if (potionMeta.hasColor()){
+    public Color getPotionColor(PotionMeta potionMeta) {
+        if (potionMeta.hasColor()) {
             return potionMeta.getColor();
         }
 
@@ -161,7 +164,7 @@ public class VersionUtils_1_12 extends VersionUtils{
     }
 
     @Override
-    public PotionMeta setPotionColor(PotionMeta potionMeta, Color color){
+    public PotionMeta setPotionColor(PotionMeta potionMeta, Color color) {
         potionMeta.setColor(color);
         return potionMeta;
     }
@@ -172,10 +175,10 @@ public class VersionUtils_1_12 extends VersionUtils{
     }
 
     @Override
-    public void removeRecipe(ItemStack item, Recipe r){
-        Bukkit.getLogger().info("[UhcCore] Removing craft for item "+JsonItemUtils.getItemJson(item));
+    public void removeRecipe(ItemStack item, Recipe r) {
+        Bukkit.getLogger().info("[UhcCore] Removing craft for item " + JsonItemUtils.getItemJson(item));
 
-        try{
+        try {
             // Minecraft classes
             Class craftingManager = NMSUtils.getNMSClass("CraftingManager");
             Class iRecipe = NMSUtils.getNMSClass("IRecipe");
@@ -197,10 +200,10 @@ public class VersionUtils_1_12 extends VersionUtils{
             // Remove from map
             Map<?, ?> map = (Map) b.get(registryMaterials);
 
-            for (Object value : map.keySet()){
+            for (Object value : map.keySet()) {
                 Recipe recipe = (Recipe) toBukkitRecipe.invoke(value);
 
-                if (recipe.getResult().isSimilar(item)){
+                if (recipe.getResult().isSimilar(item)) {
                     System.out.println("Found recipe in map! Removing ...");
                     map.remove(value);
                     break;
@@ -221,12 +224,12 @@ public class VersionUtils_1_12 extends VersionUtils{
             for (int i = 0; i < array.length; i++) {
                 mcRecipe = array[i];
 
-                if (mcRecipe == null){
+                if (mcRecipe == null) {
                     continue;
                 }
 
                 Recipe recipe = (Recipe) toBukkitRecipe.invoke(mcRecipe);
-                if (recipe.getResult().isSimilar(item)){
+                if (recipe.getResult().isSimilar(item)) {
                     System.out.println("Found recipe in array! Removing ...");
                     array[i] = null;
                     break;
@@ -235,36 +238,36 @@ public class VersionUtils_1_12 extends VersionUtils{
 
             d.set(registryId, array);
 
-            Bukkit.getLogger().info("[UhcCore] Removed recipe for item "+JsonItemUtils.getItemJson(item));
-        } catch (Exception ex){
-            Bukkit.getLogger().warning("[UhcCore] Failed to remove recipe for item "+JsonItemUtils.getItemJson(item)+"!");
+            Bukkit.getLogger().info("[UhcCore] Removed recipe for item " + JsonItemUtils.getItemJson(item));
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("[UhcCore] Failed to remove recipe for item " + JsonItemUtils.getItemJson(item) + "!");
             ex.printStackTrace();
         }
     }
 
     @Override
-    public void handleNetherPortalEvent(PlayerPortalEvent event){
-        if (event.getTo() != null){
+    public void handleNetherPortalEvent(PlayerPortalEvent event) {
+        if (event.getTo() != null) {
             return;
         }
 
         Location loc = event.getFrom();
         MapLoader mapLoader = GameManager.getGameManager().getMapLoader();
 
-        try{
+        try {
             Class<?> travelAgent = Class.forName("org.bukkit.TravelAgent");
             Method getPortalTravelAgent = NMSUtils.getMethod(event.getClass(), "getPortalTravelAgent");
             Method findOrCreate = NMSUtils.getMethod(travelAgent, "findOrCreate", Location.class);
             Object travelAgentInstance = getPortalTravelAgent.invoke(event);
 
-            if (event.getFrom().getWorld().getEnvironment() == World.Environment.NETHER){
+            if (event.getFrom().getWorld().getEnvironment() == World.Environment.NETHER) {
                 loc.setWorld(mapLoader.getUhcWorld(World.Environment.NORMAL));
                 loc.setX(loc.getX() * 2d);
                 loc.setZ(loc.getZ() * 2d);
                 Location to = (Location) findOrCreate.invoke(travelAgentInstance, loc);
                 Validate.notNull(to, "TravelAgent returned null location!");
                 event.setTo(to);
-            }else{
+            } else {
                 loc.setWorld(mapLoader.getUhcWorld(World.Environment.NETHER));
                 loc.setX(loc.getX() / 2d);
                 loc.setZ(loc.getZ() / 2d);
@@ -272,44 +275,44 @@ public class VersionUtils_1_12 extends VersionUtils{
                 Validate.notNull(to, "TravelAgent returned null location!");
                 event.setTo(to);
             }
-        }catch (ReflectiveOperationException ex){
+        } catch (ReflectiveOperationException ex) {
             ex.printStackTrace();
         }
     }
 
     @Nullable
     @Override
-    public JsonObject getItemAttributes(ItemMeta meta){
+    public JsonObject getItemAttributes(ItemMeta meta) {
         return null;
     }
 
     @Override
-    public ItemMeta applyItemAttributes(ItemMeta meta, JsonObject attributes){
+    public ItemMeta applyItemAttributes(ItemMeta meta, JsonObject attributes) {
         return meta;
     }
 
     @Override
-    public String getEnchantmentKey(Enchantment enchantment){
+    public String getEnchantmentKey(Enchantment enchantment) {
         return enchantment.getName();
     }
 
     @Nullable
     @Override
-    public Enchantment getEnchantmentFromKey(String key){
+    public Enchantment getEnchantmentFromKey(String key) {
         return Enchantment.getByName(key);
     }
 
     @Override
-    public void setEntityAI(LivingEntity entity, boolean b){
+    public void setEntityAI(LivingEntity entity, boolean b) {
         entity.setAI(b);
     }
 
     @Override
-    public List<Material> getItemList(){
+    public List<Material> getItemList() {
         List<Material> items = new ArrayList<>();
 
-        for (Material material : Material.values()){
-            if (material.isItem()){
+        for (Material material : Material.values()) {
+            if (material.isItem()) {
                 items.add(material);
             }
         }
@@ -319,17 +322,17 @@ public class VersionUtils_1_12 extends VersionUtils{
 
     @Nullable
     @Override
-    public JsonArray getSuspiciousStewEffects(ItemMeta meta){
+    public JsonArray getSuspiciousStewEffects(ItemMeta meta) {
         return null;
     }
 
     @Override
-    public ItemMeta applySuspiciousStewEffects(ItemMeta meta, JsonArray effects){
+    public ItemMeta applySuspiciousStewEffects(ItemMeta meta, JsonArray effects) {
         return meta;
     }
 
     @Override
-    public void setItemUnbreakable(ItemMeta meta, boolean b){
+    public void setItemUnbreakable(ItemMeta meta, boolean b) {
         meta.setUnbreakable(b);
     }
 

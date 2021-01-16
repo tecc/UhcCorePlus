@@ -7,19 +7,19 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerPortalEvent;
 
-public class VersionUtils_1_14 extends VersionUtils_1_13{
+public class VersionUtils_1_14 extends VersionUtils_1_13 {
 
     @Override
-    public void handleNetherPortalEvent(PlayerPortalEvent event){
+    public void handleNetherPortalEvent(PlayerPortalEvent event) {
         Location loc = event.getFrom();
         MapLoader mapLoader = GameManager.getGameManager().getMapLoader();
 
-        if (event.getFrom().getWorld().getEnvironment() == World.Environment.NETHER){
+        if (event.getFrom().getWorld().getEnvironment() == World.Environment.NETHER) {
             loc.setWorld(mapLoader.getUhcWorld(World.Environment.NORMAL));
             loc.setX(loc.getX() * 2d);
             loc.setZ(loc.getZ() * 2d);
             event.setTo(loc);
-        }else{
+        } else {
             loc.setWorld(mapLoader.getUhcWorld(World.Environment.NETHER));
             loc.setX(loc.getX() / 2d);
             loc.setZ(loc.getZ() / 2d);

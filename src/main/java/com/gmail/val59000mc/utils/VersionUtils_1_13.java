@@ -39,7 +39,7 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class VersionUtils_1_13 extends VersionUtils{
+public class VersionUtils_1_13 extends VersionUtils {
 
     @Override
     public ShapedRecipe createShapedRecipe(ItemStack craft, String craftKey) {
@@ -63,7 +63,7 @@ public class VersionUtils_1_13 extends VersionUtils{
 
     @Override
     public Objective registerObjective(Scoreboard scoreboard, String name, String criteria) {
-        if (criteria.equals("health")){
+        if (criteria.equals("health")) {
             return scoreboard.registerNewObjective(name, criteria, name, RenderType.HEARTS);
         }
         return scoreboard.registerNewObjective(name, criteria, name);
@@ -74,8 +74,9 @@ public class VersionUtils_1_13 extends VersionUtils{
         player.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(maxHealth);
     }
 
-    @Override @SuppressWarnings("unchecked")
-    public void setGameRuleValue(World world, String name, Object value){
+    @Override
+    @SuppressWarnings("unchecked")
+    public void setGameRuleValue(World world, String name, Object value) {
         GameRule gameRule = GameRule.getByName(name);
         world.setGameRule(gameRule, value);
     }
@@ -101,12 +102,12 @@ public class VersionUtils_1_13 extends VersionUtils{
     }
 
     @Override
-    public void setTeamNameTagVisibility(Team team, boolean value){
-        team.setOption(Team.Option.NAME_TAG_VISIBILITY, value?Team.OptionStatus.ALWAYS:Team.OptionStatus.NEVER);
+    public void setTeamNameTagVisibility(Team team, boolean value) {
+        team.setOption(Team.Option.NAME_TAG_VISIBILITY, value ? Team.OptionStatus.ALWAYS : Team.OptionStatus.NEVER);
     }
 
     @Override
-    public void setChestName(Chest chest, String name){
+    public void setChestName(Chest chest, String name) {
         chest.setCustomName(name);
         chest.update();
     }
@@ -134,8 +135,8 @@ public class VersionUtils_1_13 extends VersionUtils{
 
     @Nullable
     @Override
-    public Color getPotionColor(PotionMeta potionMeta){
-        if (potionMeta.hasColor()){
+    public Color getPotionColor(PotionMeta potionMeta) {
+        if (potionMeta.hasColor()) {
             return potionMeta.getColor();
         }
 
@@ -143,13 +144,13 @@ public class VersionUtils_1_13 extends VersionUtils{
     }
 
     @Override
-    public PotionMeta setPotionColor(PotionMeta potionMeta, Color color){
+    public PotionMeta setPotionColor(PotionMeta potionMeta, Color color) {
         potionMeta.setColor(color);
         return potionMeta;
     }
 
     @Override
-    public void setChestSide(Chest chest, boolean left){
+    public void setChestSide(Chest chest, boolean left) {
         org.bukkit.block.data.type.Chest chestData = (org.bukkit.block.data.type.Chest) chest.getBlockData();
 
         org.bukkit.block.data.type.Chest.Type side = left ? org.bukkit.block.data.type.Chest.Type.LEFT : org.bukkit.block.data.type.Chest.Type.RIGHT;
@@ -159,45 +160,45 @@ public class VersionUtils_1_13 extends VersionUtils{
     }
 
     @Override
-    public void removeRecipe(ItemStack item, Recipe recipe){
+    public void removeRecipe(ItemStack item, Recipe recipe) {
         Iterator<Recipe> iterator = Bukkit.recipeIterator();
 
         try {
-            while (iterator.hasNext()){
-                if (iterator.next().getResult().isSimilar(item)){
+            while (iterator.hasNext()) {
+                if (iterator.next().getResult().isSimilar(item)) {
                     iterator.remove();
-                    Bukkit.getLogger().info("[UhcCore] Removed recipe for item "+JsonItemUtils.getItemJson(item));
+                    Bukkit.getLogger().info("[UhcCore] Removed recipe for item " + JsonItemUtils.getItemJson(item));
                 }
             }
-        }catch (Exception ex){
-            Bukkit.getLogger().warning("[UhcCore] Failed to remove recipe for item "+JsonItemUtils.getItemJson(item)+"!");
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("[UhcCore] Failed to remove recipe for item " + JsonItemUtils.getItemJson(item) + "!");
             ex.printStackTrace();
         }
     }
 
     @Override
-    public void handleNetherPortalEvent(PlayerPortalEvent event){
-        if (event.getTo() != null){
+    public void handleNetherPortalEvent(PlayerPortalEvent event) {
+        if (event.getTo() != null) {
             return;
         }
 
         Location loc = event.getFrom();
         MapLoader mapLoader = GameManager.getGameManager().getMapLoader();
 
-        try{
+        try {
             Class<?> travelAgent = Class.forName("org.bukkit.TravelAgent");
             Method getPortalTravelAgent = NMSUtils.getMethod(event.getClass(), "getPortalTravelAgent");
             Method findOrCreate = NMSUtils.getMethod(travelAgent, "findOrCreate", Location.class);
             Object travelAgentInstance = getPortalTravelAgent.invoke(event);
 
-            if (event.getFrom().getWorld().getEnvironment() == World.Environment.NETHER){
+            if (event.getFrom().getWorld().getEnvironment() == World.Environment.NETHER) {
                 loc.setWorld(mapLoader.getUhcWorld(World.Environment.NORMAL));
                 loc.setX(loc.getX() * 2d);
                 loc.setZ(loc.getZ() * 2d);
                 Location to = (Location) findOrCreate.invoke(travelAgentInstance, loc);
                 Validate.notNull(to, "TravelAgent returned null location!");
                 event.setTo(to);
-            }else{
+            } else {
                 loc.setWorld(mapLoader.getUhcWorld(World.Environment.NETHER));
                 loc.setX(loc.getX() / 2d);
                 loc.setZ(loc.getZ() / 2d);
@@ -205,31 +206,31 @@ public class VersionUtils_1_13 extends VersionUtils{
                 Validate.notNull(to, "TravelAgent returned null location!");
                 event.setTo(to);
             }
-        }catch (ReflectiveOperationException ex){
+        } catch (ReflectiveOperationException ex) {
             ex.printStackTrace();
         }
     }
 
     @Nullable
     @Override
-    public JsonObject getItemAttributes(ItemMeta meta){
-        if (!meta.hasAttributeModifiers()){
+    public JsonObject getItemAttributes(ItemMeta meta) {
+        if (!meta.hasAttributeModifiers()) {
             return null;
         }
 
         JsonObject attributesJson = new JsonObject();
         Multimap<Attribute, AttributeModifier> attributeModifiers = meta.getAttributeModifiers();
 
-        for (Attribute attribute : attributeModifiers.keySet()){
+        for (Attribute attribute : attributeModifiers.keySet()) {
             JsonArray modifiersJson = new JsonArray();
             Collection<AttributeModifier> modifiers = attributeModifiers.get(attribute);
 
-            for (AttributeModifier modifier : modifiers){
+            for (AttributeModifier modifier : modifiers) {
                 JsonObject modifierObject = new JsonObject();
                 modifierObject.addProperty("name", modifier.getName());
                 modifierObject.addProperty("amount", modifier.getAmount());
                 modifierObject.addProperty("operation", modifier.getOperation().name());
-                if (modifier.getSlot() != null){
+                if (modifier.getSlot() != null) {
                     modifierObject.addProperty("slot", modifier.getSlot().name());
                 }
                 modifiersJson.add(modifierObject);
@@ -242,10 +243,10 @@ public class VersionUtils_1_13 extends VersionUtils{
     }
 
     @Override
-    public ItemMeta applyItemAttributes(ItemMeta meta, JsonObject attributes){
+    public ItemMeta applyItemAttributes(ItemMeta meta, JsonObject attributes) {
         Set<Map.Entry<String, JsonElement>> entries = attributes.entrySet();
 
-        for (Map.Entry<String, JsonElement> attributeEntry : entries){
+        for (Map.Entry<String, JsonElement> attributeEntry : entries) {
             Attribute attribute = Attribute.valueOf(attributeEntry.getKey());
 
             for (JsonElement jsonElement : attributeEntry.getValue().getAsJsonArray()) {
@@ -256,7 +257,7 @@ public class VersionUtils_1_13 extends VersionUtils{
                 String operation = modifier.get("operation").getAsString();
                 EquipmentSlot slot = null;
 
-                if (modifier.has("slot")){
+                if (modifier.has("slot")) {
                     slot = EquipmentSlot.valueOf(modifier.get("slot").getAsString());
                 }
 
@@ -274,25 +275,25 @@ public class VersionUtils_1_13 extends VersionUtils{
     }
 
     @Override
-    public String getEnchantmentKey(Enchantment enchantment){
+    public String getEnchantmentKey(Enchantment enchantment) {
         return enchantment.getKey().getKey();
     }
 
     @Nullable
     @Override
-    public Enchantment getEnchantmentFromKey(String key){
+    public Enchantment getEnchantmentFromKey(String key) {
         Enchantment enchantment = Enchantment.getByName(key);
 
-        if (enchantment != null){
+        if (enchantment != null) {
             Bukkit.getLogger().warning("[UhcCore] Using old deprecated enchantment names, replace: " + key + " with " + enchantment.getKey().getKey());
             return enchantment;
         }
 
         NamespacedKey namespace;
 
-        try{
+        try {
             namespace = NamespacedKey.minecraft(key);
-        }catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             return null;
         }
 
@@ -300,16 +301,16 @@ public class VersionUtils_1_13 extends VersionUtils{
     }
 
     @Override
-    public void setEntityAI(LivingEntity entity, boolean b){
+    public void setEntityAI(LivingEntity entity, boolean b) {
         entity.setAI(b);
     }
 
     @Override
-    public List<Material> getItemList(){
+    public List<Material> getItemList() {
         List<Material> items = new ArrayList<>();
 
-        for (Material material : Material.values()){
-            if (material.isItem()){
+        for (Material material : Material.values()) {
+            if (material.isItem()) {
                 items.add(material);
             }
         }
@@ -319,17 +320,17 @@ public class VersionUtils_1_13 extends VersionUtils{
 
     @Nullable
     @Override
-    public JsonArray getSuspiciousStewEffects(ItemMeta meta){
+    public JsonArray getSuspiciousStewEffects(ItemMeta meta) {
         return null;
     }
 
     @Override
-    public ItemMeta applySuspiciousStewEffects(ItemMeta meta, JsonArray effects) throws ParseException{
+    public ItemMeta applySuspiciousStewEffects(ItemMeta meta, JsonArray effects) throws ParseException {
         return meta;
     }
 
     @Override
-    public void setItemUnbreakable(ItemMeta meta, boolean b){
+    public void setItemUnbreakable(ItemMeta meta, boolean b) {
         meta.setUnbreakable(b);
     }
 

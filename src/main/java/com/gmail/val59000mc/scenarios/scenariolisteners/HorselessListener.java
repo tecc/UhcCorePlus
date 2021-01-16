@@ -7,7 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.spigotmc.event.entity.EntityMountEvent;
 
-public class HorselessListener extends ScenarioListener{
+public class HorselessListener extends ScenarioListener {
 
     @EventHandler
     public void onHorseRide(EntityMountEvent e) {

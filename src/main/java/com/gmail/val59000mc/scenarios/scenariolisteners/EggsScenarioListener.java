@@ -10,7 +10,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.inventory.ItemStack;
 
-public class EggsScenarioListener extends ScenarioListener{
+public class EggsScenarioListener extends ScenarioListener {
 
     private static final EntityType[] MOBS = new EntityType[]{
             EntityType.CREEPER,
@@ -47,8 +47,8 @@ public class EggsScenarioListener extends ScenarioListener{
     };
 
     @EventHandler
-    public void onProjectileHit(ProjectileHitEvent e){
-        if (e.getEntityType() != EntityType.EGG){
+    public void onProjectileHit(ProjectileHitEvent e) {
+        if (e.getEntityType() != EntityType.EGG) {
             return;
         }
 
@@ -58,19 +58,19 @@ public class EggsScenarioListener extends ScenarioListener{
     }
 
     @EventHandler
-    public void onEntityDeath(EntityDeathEvent e){
-        if (e.getEntityType() != EntityType.CHICKEN){
+    public void onEntityDeath(EntityDeathEvent e) {
+        if (e.getEntityType() != EntityType.CHICKEN) {
             return;
         }
 
         int i = RandomUtils.randomInteger(0, 99);
-        if (i < 5){
+        if (i < 5) {
             e.getDrops().add(new ItemStack(Material.EGG));
         }
     }
 
-    private EntityType getRandomEntity(){
-        return MOBS[RandomUtils.randomInteger(0, MOBS.length-1)];
+    private EntityType getRandomEntity() {
+        return MOBS[RandomUtils.randomInteger(0, MOBS.length - 1)];
     }
 
 }

@@ -15,25 +15,25 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class ChildrenLeftUnattended extends ScenarioListener{
+public class ChildrenLeftUnattended extends ScenarioListener {
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent e){
+    public void onPlayerDeath(PlayerDeathEvent e) {
         Player player = e.getEntity();
         UhcPlayer uhcPlayer = getPlayersManager().getUhcPlayer(player);
 
-        for (UhcPlayer uhcMember : uhcPlayer.getTeam().getOnlinePlayingMembers()){
+        for (UhcPlayer uhcMember : uhcPlayer.getTeam().getOnlinePlayingMembers()) {
             if (uhcMember == uhcPlayer) continue;
 
             try {
                 giveTeamReward(uhcMember.getPlayer());
-            }catch (UhcPlayerNotOnlineException ex){
+            } catch (UhcPlayerNotOnlineException ex) {
                 ex.printStackTrace();
             }
         }
     }
 
-    private void giveTeamReward(Player player){
+    private void giveTeamReward(Player player) {
         Wolf wolf = (Wolf) player.getWorld().spawnEntity(player.getLocation(), EntityType.WOLF);
         wolf.setTamed(true);
         wolf.setOwner(player);
@@ -42,7 +42,7 @@ public class ChildrenLeftUnattended extends ScenarioListener{
         ItemStack potion = new ItemStack(Material.POTION);
         PotionMeta meta = (PotionMeta) potion.getItemMeta();
         meta.setMainEffect(PotionEffectType.SPEED);
-        PotionEffect potionEffect = new PotionEffect(PotionEffectType.SPEED, 8*60*20, 0);
+        PotionEffect potionEffect = new PotionEffect(PotionEffectType.SPEED, 8 * 60 * 20, 0);
         meta.addCustomEffect(potionEffect, true);
 
         meta.setDisplayName(ChatColor.WHITE + "Potion of Swiftness");

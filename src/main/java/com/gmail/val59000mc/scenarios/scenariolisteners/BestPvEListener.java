@@ -21,64 +21,64 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BestPvEListener extends ScenarioListener implements Runnable{
+public class BestPvEListener extends ScenarioListener implements Runnable {
 
     private int taskId;
-    private final Map<UhcPlayer,Boolean> pveList;
+    private final Map<UhcPlayer, Boolean> pveList;
     private int maxHealth;
 
     @Option
     private long delay = 600;
 
-    public BestPvEListener(){
+    public BestPvEListener() {
         taskId = -1;
         pveList = new HashMap<>();
     }
 
     @Override
-    public void onEnable(){
+    public void onEnable() {
         maxHealth = 20;
         MainConfig cfg = getGameManager().getConfig();
-        if (cfg.get(MainConfig.ENABLE_EXTRA_HALF_HEARTS)){
+        if (cfg.get(MainConfig.ENABLE_EXTRA_HALF_HEARTS)) {
             maxHealth += cfg.get(MainConfig.EXTRA_HALF_HEARTS);
         }
     }
 
     @Override
-    public void onDisable(){
+    public void onDisable() {
         if (taskId != -1) {
             Bukkit.getScheduler().cancelTask(taskId);
         }
     }
 
     @EventHandler
-    public void onGameStart(UhcStartedEvent e){
-        taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(UhcCore.getPlugin(), this, delay*TimeUtils.SECOND_TICKS);
+    public void onGameStart(UhcStartedEvent e) {
+        taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(UhcCore.getPlugin(), this, delay * TimeUtils.SECOND_TICKS);
 
-        for (UhcPlayer uhcPlayer : e.getPlayersManager().getPlayersList()){
+        for (UhcPlayer uhcPlayer : e.getPlayersManager().getPlayersList()) {
             pveList.put(uhcPlayer, true);
             uhcPlayer.sendMessage(Lang.SCENARIO_BESTPVE_ADDED);
         }
     }
 
-    @EventHandler (priority = EventPriority.HIGHEST)
-    public void onPlayerDamage(EntityDamageEvent e){
-        if (e.isCancelled()){
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPlayerDamage(EntityDamageEvent e) {
+        if (e.isCancelled()) {
             return;
         }
 
-        if (e.getDamage() < 0.2){
+        if (e.getDamage() < 0.2) {
             return;
         }
 
-        if (!(e.getEntity() instanceof Player)){
+        if (!(e.getEntity() instanceof Player)) {
             return;
         }
 
         Player p = (Player) e.getEntity();
         UhcPlayer uhcPlayer = GameManager.getGameManager().getPlayersManager().getUhcPlayer(p);
 
-        if (!pveList.containsKey(uhcPlayer)){
+        if (!pveList.containsKey(uhcPlayer)) {
             return; // Only playing players on list
         }
 
@@ -87,52 +87,52 @@ public class BestPvEListener extends ScenarioListener implements Runnable{
             uhcPlayer.sendMessage(Lang.SCENARIO_BESTPVE_REMOVED);
         }
 
-        if (p.getMaxHealth() > maxHealth){
+        if (p.getMaxHealth() > maxHealth) {
             double hp = p.getHealth();
 
-            if (hp < maxHealth){
+            if (hp < maxHealth) {
                 p.setMaxHealth(maxHealth);
-            }else{
+            } else {
                 p.setMaxHealth(hp + 1);
             }
         }
     }
 
     @EventHandler
-    public void onPlayerDeath(PlayerDeathEvent e){
-        if (e.getEntity().getKiller() != null){
+    public void onPlayerDeath(PlayerDeathEvent e) {
+        if (e.getEntity().getKiller() != null) {
             UhcPlayer uhcPlayer = GameManager.getGameManager().getPlayersManager().getUhcPlayer(e.getEntity().getKiller());
 
-            if (!pveList.containsKey(uhcPlayer)){
+            if (!pveList.containsKey(uhcPlayer)) {
                 return; // Only playing players on list
             }
 
-            if (!pveList.get(uhcPlayer)){
-                pveList.put(uhcPlayer,true);
+            if (!pveList.get(uhcPlayer)) {
+                pveList.put(uhcPlayer, true);
                 uhcPlayer.sendMessage(Lang.SCENARIO_BESTPVE_BACK);
             }
         }
     }
 
     @Override
-    public void run(){
-        for (UhcPlayer uhcPlayer : GameManager.getGameManager().getPlayersManager().getOnlinePlayingPlayers()){
+    public void run() {
+        for (UhcPlayer uhcPlayer : GameManager.getGameManager().getPlayersManager().getOnlinePlayingPlayers()) {
             Player player;
 
-            try{
+            try {
                 player = uhcPlayer.getPlayer();
-            }catch (UhcPlayerNotOnlineException ex){
+            } catch (UhcPlayerNotOnlineException ex) {
                 continue; // No hp for offline players
             }
 
-            if (!pveList.containsKey(uhcPlayer)){
-                pveList.put(uhcPlayer,true); // Should never occur, playing players are always on list.
+            if (!pveList.containsKey(uhcPlayer)) {
+                pveList.put(uhcPlayer, true); // Should never occur, playing players are always on list.
                 Bukkit.getLogger().warning("[UhcCore] " + player.getName() + " was not on best PvE list yet! Please contact a server administrator.");
             }
 
-            if (player.getGameMode().equals(GameMode.SURVIVAL) && pveList.get(uhcPlayer)){
+            if (player.getGameMode().equals(GameMode.SURVIVAL) && pveList.get(uhcPlayer)) {
                 // heal player
-                if (player.getHealth() + 2 > player.getMaxHealth()){
+                if (player.getHealth() + 2 > player.getMaxHealth()) {
                     player.setMaxHealth(player.getMaxHealth() + 2);
                 }
 
@@ -140,7 +140,7 @@ public class BestPvEListener extends ScenarioListener implements Runnable{
             }
         }
 
-        taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(UhcCore.getPlugin(),this,delay*TimeUtils.SECOND_TICKS);
+        taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(UhcCore.getPlugin(), this, delay * TimeUtils.SECOND_TICKS);
     }
 
 }

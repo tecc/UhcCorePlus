@@ -33,7 +33,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 @SuppressWarnings("deprecation")
-public class VersionUtils_1_8 extends VersionUtils{
+public class VersionUtils_1_8 extends VersionUtils {
 
     @Override
     public ShapedRecipe createShapedRecipe(ItemStack craft, String craftKey) {
@@ -75,11 +75,11 @@ public class VersionUtils_1_8 extends VersionUtils{
     }
 
     @Override
-    public void setEye(Block block, boolean eye){
+    public void setEye(Block block, boolean eye) {
         byte data = block.getData();
-        if (eye && data < 4){
+        if (eye && data < 4) {
             data += 4;
-        }else if (!eye && data > 3){
+        } else if (!eye && data > 3) {
             data -= 4;
         }
 
@@ -87,9 +87,9 @@ public class VersionUtils_1_8 extends VersionUtils{
     }
 
     @Override
-    public void setEndPortalFrameOrientation(Block block, BlockFace blockFace){
+    public void setEndPortalFrameOrientation(Block block, BlockFace blockFace) {
         byte data = -1;
-        switch (blockFace){
+        switch (blockFace) {
             case NORTH:
                 data = 2;
                 break;
@@ -107,52 +107,52 @@ public class VersionUtils_1_8 extends VersionUtils{
         setBlockData(block, data);
     }
 
-    private void setBlockData(Block block, byte data){
+    private void setBlockData(Block block, byte data) {
         try {
-            Method setData = NMSUtils.getMethod(Block.class, "setData",1);
+            Method setData = NMSUtils.getMethod(Block.class, "setData", 1);
             setData.invoke(block, data);
-        }catch (ReflectiveOperationException ex){
+        } catch (ReflectiveOperationException ex) {
             ex.printStackTrace();
         }
     }
 
     @Override
-    public void setTeamNameTagVisibility(Team team, boolean value){
-        team.setNameTagVisibility(value?NameTagVisibility.ALWAYS:NameTagVisibility.NEVER);
+    public void setTeamNameTagVisibility(Team team, boolean value) {
+        team.setNameTagVisibility(value ? NameTagVisibility.ALWAYS : NameTagVisibility.NEVER);
     }
 
     @Override
-    public void setChestName(Chest chest, String name){
+    public void setChestName(Chest chest, String name) {
         try {
             Class craftChest = NMSUtils.getNMSClass("block.CraftChest");
             Method getTileEntity = NMSUtils.getMethod(craftChest, "getTileEntity");
             Object tileChest = getTileEntity.invoke(chest);
             Method a = NMSUtils.getMethod(tileChest.getClass(), "a", String.class);
             a.invoke(tileChest, name);
-        }catch (Exception ex){ // todo find a way to change the chest name on other versions up to 1.11
+        } catch (Exception ex) { // todo find a way to change the chest name on other versions up to 1.11
             Bukkit.getLogger().severe("[UhcCore] Failed to rename chest! Are you on 1.9-1.11?");
             ex.printStackTrace();
         }
     }
 
     @Override
-    public JsonObject getBasePotionEffect(PotionMeta potionMeta){
+    public JsonObject getBasePotionEffect(PotionMeta potionMeta) {
         return null;
     }
 
     @Override
-    public PotionMeta setBasePotionEffect(PotionMeta potionMeta, PotionData potionData){
+    public PotionMeta setBasePotionEffect(PotionMeta potionMeta, PotionData potionData) {
         return potionMeta;
     }
 
     @Nullable
     @Override
-    public Color getPotionColor(PotionMeta potionMeta){
+    public Color getPotionColor(PotionMeta potionMeta) {
         return null;
     }
 
     @Override
-    public PotionMeta setPotionColor(PotionMeta potionMeta, Color color){
+    public PotionMeta setPotionColor(PotionMeta potionMeta, Color color) {
         return potionMeta;
     }
 
@@ -162,45 +162,45 @@ public class VersionUtils_1_8 extends VersionUtils{
     }
 
     @Override
-    public void removeRecipe(ItemStack item, Recipe recipe){
+    public void removeRecipe(ItemStack item, Recipe recipe) {
         Iterator<Recipe> iterator = Bukkit.recipeIterator();
 
         try {
-            while (iterator.hasNext()){
-                if (iterator.next().getResult().isSimilar(item)){
+            while (iterator.hasNext()) {
+                if (iterator.next().getResult().isSimilar(item)) {
                     iterator.remove();
-                    Bukkit.getLogger().info("[UhcCore] Removed recipe for item "+JsonItemUtils.getItemJson(item));
+                    Bukkit.getLogger().info("[UhcCore] Removed recipe for item " + JsonItemUtils.getItemJson(item));
                 }
             }
-        }catch (Exception ex){
-            Bukkit.getLogger().warning("[UhcCore] Failed to remove recipe for item "+JsonItemUtils.getItemJson(item)+"!");
+        } catch (Exception ex) {
+            Bukkit.getLogger().warning("[UhcCore] Failed to remove recipe for item " + JsonItemUtils.getItemJson(item) + "!");
             ex.printStackTrace();
         }
     }
 
     @Override
-    public void handleNetherPortalEvent(PlayerPortalEvent event){
-        if (event.getTo() != null){
+    public void handleNetherPortalEvent(PlayerPortalEvent event) {
+        if (event.getTo() != null) {
             return;
         }
 
         Location loc = event.getFrom();
         MapLoader mapLoader = GameManager.getGameManager().getMapLoader();
 
-        try{
+        try {
             Class<?> travelAgent = Class.forName("org.bukkit.TravelAgent");
             Method getPortalTravelAgent = NMSUtils.getMethod(event.getClass(), "getPortalTravelAgent");
             Method findOrCreate = NMSUtils.getMethod(travelAgent, "findOrCreate", Location.class);
             Object travelAgentInstance = getPortalTravelAgent.invoke(event);
 
-            if (event.getFrom().getWorld().getEnvironment() == World.Environment.NETHER){
+            if (event.getFrom().getWorld().getEnvironment() == World.Environment.NETHER) {
                 loc.setWorld(mapLoader.getUhcWorld(World.Environment.NORMAL));
                 loc.setX(loc.getX() * 2d);
                 loc.setZ(loc.getZ() * 2d);
                 Location to = (Location) findOrCreate.invoke(travelAgentInstance, loc);
                 Validate.notNull(to, "TravelAgent returned null location!");
                 event.setTo(to);
-            }else{
+            } else {
                 loc.setWorld(mapLoader.getUhcWorld(World.Environment.NETHER));
                 loc.setX(loc.getX() / 2d);
                 loc.setZ(loc.getZ() / 2d);
@@ -208,36 +208,36 @@ public class VersionUtils_1_8 extends VersionUtils{
                 Validate.notNull(to, "TravelAgent returned null location!");
                 event.setTo(to);
             }
-        }catch (ReflectiveOperationException ex){
+        } catch (ReflectiveOperationException ex) {
             ex.printStackTrace();
         }
     }
 
     @Nullable
     @Override
-    public JsonObject getItemAttributes(ItemMeta meta){
+    public JsonObject getItemAttributes(ItemMeta meta) {
         return null;
     }
 
     @Override
-    public ItemMeta applyItemAttributes(ItemMeta meta, JsonObject attributes){
+    public ItemMeta applyItemAttributes(ItemMeta meta, JsonObject attributes) {
         return meta;
     }
 
     @Override
-    public String getEnchantmentKey(Enchantment enchantment){
+    public String getEnchantmentKey(Enchantment enchantment) {
         return enchantment.getName();
     }
 
     @Nullable
     @Override
-    public Enchantment getEnchantmentFromKey(String key){
+    public Enchantment getEnchantmentFromKey(String key) {
         return Enchantment.getByName(key);
     }
 
     @Override
-    public void setEntityAI(LivingEntity entity, boolean b){
-        try{
+    public void setEntityAI(LivingEntity entity, boolean b) {
+        try {
             // Get Minecraft entity class
             Object mcEntity = NMSUtils.getHandle(entity);
             Method getNBTTag = NMSUtils.getMethod(mcEntity.getClass(), "getNBTTag");
@@ -245,7 +245,7 @@ public class VersionUtils_1_8 extends VersionUtils{
             // Get NBT tag of zombie
             Object tag = getNBTTag.invoke(mcEntity);
 
-            if (tag == null){
+            if (tag == null) {
                 tag = NBTTagCompound.newInstance();
             }
 
@@ -257,9 +257,9 @@ public class VersionUtils_1_8 extends VersionUtils{
             Method setInt = NMSUtils.getMethod(NBTTagCompound, "setInt", String.class, int.class);
 
             c.invoke(mcEntity, tag);
-            setInt.invoke(tag, "NoAI", b?0:1);
+            setInt.invoke(tag, "NoAI", b ? 0 : 1);
             f.invoke(mcEntity, tag);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             // This will only work on 1.8 (Not 1.9-1.11, 0.5% of servers)
             ex.printStackTrace();
         }
@@ -273,18 +273,18 @@ public class VersionUtils_1_8 extends VersionUtils{
 
     @Nullable
     @Override
-    public JsonArray getSuspiciousStewEffects(ItemMeta meta){
+    public JsonArray getSuspiciousStewEffects(ItemMeta meta) {
         return null;
     }
 
     @Override
-    public ItemMeta applySuspiciousStewEffects(ItemMeta meta, JsonArray effects){
+    public ItemMeta applySuspiciousStewEffects(ItemMeta meta, JsonArray effects) {
         return meta;
     }
 
     @Override
-    public void setItemUnbreakable(ItemMeta meta, boolean b){
-        if (!PaperLib.isSpigot()){
+    public void setItemUnbreakable(ItemMeta meta, boolean b) {
+        if (!PaperLib.isSpigot()) {
             return; // Unable to set item as unbreakable on a none spigot server.
         }
 
@@ -293,7 +293,7 @@ public class VersionUtils_1_8 extends VersionUtils{
             Object spigotInstance = spigot.invoke(meta);
             Method setUnbreakable = NMSUtils.getMethod(spigotInstance.getClass(), "setUnbreakable", boolean.class);
             setUnbreakable.invoke(spigotInstance, b);
-        }catch (ReflectiveOperationException ex){
+        } catch (ReflectiveOperationException ex) {
             ex.printStackTrace();
         }
     }

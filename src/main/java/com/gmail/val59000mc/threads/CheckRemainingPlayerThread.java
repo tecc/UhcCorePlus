@@ -6,22 +6,22 @@ import com.gmail.val59000mc.game.GameState;
 import org.bukkit.Bukkit;
 
 
-public class CheckRemainingPlayerThread implements Runnable{
+public class CheckRemainingPlayerThread implements Runnable {
 
-	private final GameManager gameManager;
+    private final GameManager gameManager;
 
-	public CheckRemainingPlayerThread(GameManager gameManager){
-		this.gameManager = gameManager;
-	}
+    public CheckRemainingPlayerThread(GameManager gameManager) {
+        this.gameManager = gameManager;
+    }
 
-	@Override
-	public void run() {
-		gameManager.getPlayersManager().checkIfRemainingPlayers();
-		GameState state = gameManager.getGameState();
+    @Override
+    public void run() {
+        gameManager.getPlayersManager().checkIfRemainingPlayers();
+        GameState state = gameManager.getGameState();
 
-		if(state.equals(GameState.PLAYING) || state.equals(GameState.DEATHMATCH)) {
-			Bukkit.getScheduler().runTaskLater(UhcCore.getPlugin(), this, 40);
-		}
-	}
+        if (state.equals(GameState.PLAYING) || state.equals(GameState.DEATHMATCH)) {
+            Bukkit.getScheduler().runTaskLater(UhcCore.getPlugin(), this, 40);
+        }
+    }
 
 }

@@ -10,61 +10,61 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class VaultManager {
-	
+
     private static Economy economy;
 
-    static{
-    	economy = null;
-	}
-    
-    public static void setupEconomy(){
-    	if(!Dependencies.getVaultLoaded()){
-    		return;
-		}
-
-    	RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
-	    if (economyProvider != null) {
-	        economy = economyProvider.getProvider();
-	    }else{
-	    	Bukkit.getLogger().severe("[UhcCore] Error trying to load economy provider. Check that you have a economy plugin installed");
-	    }
+    static {
+        economy = null;
     }
 
-    public static double getPlayerMoney(Player player){
-		Validate.notNull(player);
-    	return economy == null ? 0 : economy.getBalance(player);
-	}
+    public static void setupEconomy() {
+        if (!Dependencies.getVaultLoaded()) {
+            return;
+        }
 
-	public static void addMoney(final Player player, final double amount){
-		Validate.notNull(player);
+        RegisteredServiceProvider<Economy> economyProvider = Bukkit.getServer().getServicesManager().getRegistration(Economy.class);
+        if (economyProvider != null) {
+            economy = economyProvider.getProvider();
+        } else {
+            Bukkit.getLogger().severe("[UhcCore] Error trying to load economy provider. Check that you have a economy plugin installed");
+        }
+    }
 
-		if(!Dependencies.getVaultLoaded()){
-			return;
-		}
+    public static double getPlayerMoney(Player player) {
+        Validate.notNull(player);
+        return economy == null ? 0 : economy.getBalance(player);
+    }
 
-		if(economy == null){
-			Bukkit.getLogger().warning("[UhcCore] Vault is not loaded! Couldn't pay "+amount+" to "+player.getName()+"!");
-			return;
-		}
+    public static void addMoney(final Player player, final double amount) {
+        Validate.notNull(player);
 
-		final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
+        if (!Dependencies.getVaultLoaded()) {
+            return;
+        }
 
-		Bukkit.getScheduler().runTaskAsynchronously(UhcCore.getPlugin(), () -> economy.depositPlayer(offlinePlayer, amount));
-	}
+        if (economy == null) {
+            Bukkit.getLogger().warning("[UhcCore] Vault is not loaded! Couldn't pay " + amount + " to " + player.getName() + "!");
+            return;
+        }
 
-	public static void removeMoney(final Player player, final double amount){
-		Validate.notNull(player);
+        final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
 
-		if(!Dependencies.getVaultLoaded()){
-			return;
-		}
+        Bukkit.getScheduler().runTaskAsynchronously(UhcCore.getPlugin(), () -> economy.depositPlayer(offlinePlayer, amount));
+    }
 
-		if(economy == null){
-			Bukkit.getLogger().warning("[UhcCore] Vault is not loaded! Couldn't withdraw "+amount+" to "+player.getName()+"!");
-			return;
-		}
+    public static void removeMoney(final Player player, final double amount) {
+        Validate.notNull(player);
 
-		Bukkit.getScheduler().runTaskAsynchronously(UhcCore.getPlugin(), () -> economy.withdrawPlayer(player, amount));
-	}
+        if (!Dependencies.getVaultLoaded()) {
+            return;
+        }
+
+        if (economy == null) {
+            Bukkit.getLogger().warning("[UhcCore] Vault is not loaded! Couldn't withdraw " + amount + " to " + player.getName() + "!");
+            return;
+        }
+
+        Bukkit.getScheduler().runTaskAsynchronously(UhcCore.getPlugin(), () -> economy.withdrawPlayer(player, amount));
+    }
 
 }

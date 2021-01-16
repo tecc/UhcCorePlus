@@ -12,7 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.Arrays;
 import java.util.Collections;
 
-public enum GameItem{
+public enum GameItem {
     // Lobby Items
     TEAM_LIST(UniversalMaterial.PLAYER_HEAD),
     TEAM_SELECTION(UniversalMaterial.IRON_SWORD),
@@ -54,11 +54,11 @@ public enum GameItem{
 
     private final UniversalMaterial type;
 
-    GameItem(UniversalMaterial type){
+    GameItem(UniversalMaterial type) {
         this.type = type;
     }
 
-    public ItemStack getItem(){
+    public ItemStack getItem() {
         ItemStack item = type.getStack();
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(getItemName());
@@ -67,7 +67,7 @@ public enum GameItem{
         return item;
     }
 
-    public ItemStack getItem(String addedLore){
+    public ItemStack getItem(String addedLore) {
         ItemStack item = type.getStack();
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(getItemName());
@@ -76,9 +76,9 @@ public enum GameItem{
         return item;
     }
 
-    public boolean equals(ItemStack item){
+    public boolean equals(ItemStack item) {
         Validate.notNull(item);
-        if (item.getType() != type.getType()){
+        if (item.getType() != type.getType()) {
             return false;
         }
         ItemMeta meta = item.getItemMeta();
@@ -86,10 +86,10 @@ public enum GameItem{
         return meta.getDisplayName().equals(getItemName());
     }
 
-    public boolean meetsUsageRequirements(){
+    public boolean meetsUsageRequirements() {
         GameManager gm = GameManager.getGameManager();
         MainConfig cfg = gm.getConfig();
-        switch (this){
+        switch (this) {
             case TEAM_SELECTION:
                 return cfg.get(MainConfig.MAX_PLAYERS_PER_TEAM) > 1 || !cfg.get(MainConfig.TEAM_ALWAYS_READY);
             case TEAM_LIST:
@@ -112,8 +112,8 @@ public enum GameItem{
         return true;
     }
 
-    private String getItemName(){
-        switch (this){
+    private String getItemName() {
+        switch (this) {
             case TEAM_SELECTION:
                 return Lang.ITEMS_SWORD;
             case KIT_SELECTION:
@@ -156,20 +156,20 @@ public enum GameItem{
         return "Unknown item!";
     }
 
-    public static boolean isGameItem(ItemStack item){
-        if (!item.hasItemMeta()){
+    public static boolean isGameItem(ItemStack item) {
+        if (!item.hasItemMeta()) {
             return false;
         }
         ItemMeta meta = item.getItemMeta();
-        if (!meta.hasDisplayName() || !meta.hasLore()){
+        if (!meta.hasDisplayName() || !meta.hasLore()) {
             return false;
         }
         return meta.getLore().contains(LORE_PREFIX);
     }
 
-    public static GameItem getGameItem(ItemStack item){
-        for (GameItem lobbyItem : GameItem.values()){
-            if (lobbyItem.equals(item)){
+    public static GameItem getGameItem(ItemStack item) {
+        for (GameItem lobbyItem : GameItem.values()) {
+            if (lobbyItem.equals(item)) {
                 return lobbyItem;
             }
         }

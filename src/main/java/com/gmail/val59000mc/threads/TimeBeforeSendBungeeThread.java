@@ -10,42 +10,42 @@ import com.gmail.val59000mc.utils.UniversalSound;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-public class TimeBeforeSendBungeeThread implements Runnable{
+public class TimeBeforeSendBungeeThread implements Runnable {
 
-	private final PlayersManager playersManager;
-	private final UhcPlayer uhcPlayer;
-	private int remainingTime;
-	
-	public TimeBeforeSendBungeeThread(PlayersManager playersManager, UhcPlayer uhcPlayer, int remainingTime){
-		this.playersManager = playersManager;
-		this.uhcPlayer = uhcPlayer;
-		this.remainingTime = remainingTime;
-	}
+    private final PlayersManager playersManager;
+    private final UhcPlayer uhcPlayer;
+    private int remainingTime;
 
-	@Override
-	public void run() {
-		remainingTime--;
+    public TimeBeforeSendBungeeThread(PlayersManager playersManager, UhcPlayer uhcPlayer, int remainingTime) {
+        this.playersManager = playersManager;
+        this.uhcPlayer = uhcPlayer;
+        this.remainingTime = remainingTime;
+    }
 
-		Player player;
-		try {
-			player = uhcPlayer.getPlayer();
+    @Override
+    public void run() {
+        remainingTime--;
 
-			if(remainingTime <=10 || remainingTime%10 == 0){
-				player.sendMessage(Lang.PLAYERS_SEND_BUNGEE.replace("%time%",TimeUtils.getFormattedTime(remainingTime)));
-				playersManager.playsoundTo(uhcPlayer, UniversalSound.CLICK);
-			}
+        Player player;
+        try {
+            player = uhcPlayer.getPlayer();
 
-			if(remainingTime <= 0){
-				playersManager.sendPlayerToBungeeServer(player);
-			}
+            if (remainingTime <= 10 || remainingTime % 10 == 0) {
+                player.sendMessage(Lang.PLAYERS_SEND_BUNGEE.replace("%time%", TimeUtils.getFormattedTime(remainingTime)));
+                playersManager.playsoundTo(uhcPlayer, UniversalSound.CLICK);
+            }
 
-		} catch (UhcPlayerNotOnlineException e) {
-			// nothing to do for offline players
-		}
+            if (remainingTime <= 0) {
+                playersManager.sendPlayerToBungeeServer(player);
+            }
 
-		if(remainingTime > 0){
-			Bukkit.getScheduler().runTaskLater(UhcCore.getPlugin(), this, 20);
-		}
-	}
+        } catch (UhcPlayerNotOnlineException e) {
+            // nothing to do for offline players
+        }
+
+        if (remainingTime > 0) {
+            Bukkit.getScheduler().runTaskLater(UhcCore.getPlugin(), this, 20);
+        }
+    }
 
 }

@@ -14,7 +14,7 @@ public class ShieldlessListener extends ScenarioListener {
     public void onCraftItem(CraftItemEvent e) {
         ItemStack item = e.getCurrentItem();
 
-        if (item.getType() != Material.AIR && item.getType() == UniversalMaterial.SHIELD.getType()){
+        if (item.getType() != Material.AIR && item.getType() == UniversalMaterial.SHIELD.getType()) {
             e.getWhoClicked().sendMessage(Lang.SCENARIO_SHIELDLESS_ERROR);
             e.setCancelled(true);
         }

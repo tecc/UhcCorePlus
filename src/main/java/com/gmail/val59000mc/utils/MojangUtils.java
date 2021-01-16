@@ -13,10 +13,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.UUID;
 
-public class MojangUtils{
+public class MojangUtils {
 
-    public static UUID getPlayerUuid(String name){
-        if (Bukkit.isPrimaryThread()){
+    public static UUID getPlayerUuid(String name) {
+        if (Bukkit.isPrimaryThread()) {
             throw new RuntimeException("Requesting player UUID is not allowed on the primary thread!");
         }
 
@@ -30,20 +30,20 @@ public class MojangUtils{
 
             connection.disconnect();
 
-            if (!json.isJsonObject()){
+            if (!json.isJsonObject()) {
                 return null;
             }
 
             String stringUuid = json.getAsJsonObject().get("id").getAsString();
             return insertDashUUID(stringUuid);
-        }catch (IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
             return null;
         }
     }
 
-    public static String getPlayerName(String name){
-        if (Bukkit.isPrimaryThread()){
+    public static String getPlayerName(String name) {
+        if (Bukkit.isPrimaryThread()) {
             throw new RuntimeException("Requesting player UUID is not allowed on the primary thread!");
         }
 
@@ -57,24 +57,24 @@ public class MojangUtils{
 
             connection.disconnect();
 
-            if (!json.isJsonObject()){
+            if (!json.isJsonObject()) {
                 return name;
             }
 
             return json.getAsJsonObject().get("name").getAsString();
-        }catch (IOException ex){
+        } catch (IOException ex) {
             ex.printStackTrace();
             return name;
         }
     }
 
-    public static String getPlayerName(UUID uuid){
-        if (Bukkit.isPrimaryThread()){
+    public static String getPlayerName(UUID uuid) {
+        if (Bukkit.isPrimaryThread()) {
             throw new RuntimeException("Requesting player UUID is not allowed on the primary thread!");
         }
 
         try {
-            URL url = new URL("https://api.mojang.com/user/profiles/"+uuid.toString().replace("-", "")+"/names");
+            URL url = new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names");
 
             URLConnection request = url.openConnection();
             request.connect();
@@ -84,8 +84,8 @@ public class MojangUtils{
 
             JsonArray names = root.getAsJsonArray();
 
-            return names.get(names.size()-1).getAsJsonObject().get("name").getAsString();
-        }catch (IOException ex){
+            return names.get(names.size() - 1).getAsJsonObject().get("name").getAsString();
+        } catch (IOException ex) {
             ex.printStackTrace();
             return null;
         }

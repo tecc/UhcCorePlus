@@ -27,125 +27,124 @@ import org.bukkit.inventory.ItemStack;
 import com.gmail.val59000mc.scenarios.ScenarioListener;
 import com.gmail.val59000mc.utils.RandomUtils;
 
-public class RandomizedDropsListener extends ScenarioListener{
+public class RandomizedDropsListener extends ScenarioListener {
 
-	private static final String LOOT_TABLES_URL = "https://raw.githubusercontent.com/Mezy/UhcCore/master/resources/loot_tables.zip";
-	private File datapack;
-	
-	private List<Material> items;
-	private final Map<Material, ItemStack> dropList;
-	
-	public RandomizedDropsListener(){
-		datapack = null;
-		dropList = new HashMap<>();
-	}
+    private static final String LOOT_TABLES_URL = "https://raw.githubusercontent.com/Mezy/UhcCore/master/resources/loot_tables.zip";
+    private File datapack;
 
-	@Override
-	public void onEnable(){
-		if (UhcCore.getVersion() == 15){
-			try{
-				generateDataPack();
-			}catch (IOException ex){
-				ex.printStackTrace();
-			}
-		}else {
-			items = VersionUtils.getVersionUtils().getItemList();
-		}
-	}
+    private List<Material> items;
+    private final Map<Material, ItemStack> dropList;
 
-	@Override
-	public void onDisable() {
-		if (datapack != null){
-			disableDataPack();
-		}
-	}
+    public RandomizedDropsListener() {
+        datapack = null;
+        dropList = new HashMap<>();
+    }
 
-	@EventHandler(ignoreCancelled = true)
-	public void onBlockBreak(BlockBreakEvent event){
-		// Using datapack
-		if (datapack != null){
-			return;
-		}
+    @Override
+    public void onEnable() {
+        if (UhcCore.getVersion() == 15) {
+            try {
+                generateDataPack();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            items = VersionUtils.getVersionUtils().getItemList();
+        }
+    }
 
-		//Create new HashMap so each each type of broken block drops the same random item every time it is broken (configurable
-		Block block = event.getBlock();
-		
-		ItemStack blockDrop;
-		if(dropList.containsKey(block.getType())){
-			 blockDrop = dropList.get(block.getType());
-		}
-		else{
-			int itemindex  = RandomUtils.randomInteger(1, items.size())-1;
-			Material material = items.get(itemindex);
+    @Override
+    public void onDisable() {
+        if (datapack != null) {
+            disableDataPack();
+        }
+    }
 
-			 blockDrop = new ItemStack(material);
-			dropList.put(block.getType(), blockDrop);
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockBreak(BlockBreakEvent event) {
+        // Using datapack
+        if (datapack != null) {
+            return;
+        }
 
-			items.remove(material);
-		}
+        //Create new HashMap so each each type of broken block drops the same random item every time it is broken (configurable
+        Block block = event.getBlock();
 
-		event.setCancelled(true);
-		block.setType(Material.AIR);
-		Location dropLocation = block.getLocation().add(.5, 0, .5);
-		dropLocation.getWorld().dropItemNaturally(dropLocation, blockDrop);
+        ItemStack blockDrop;
+        if (dropList.containsKey(block.getType())) {
+            blockDrop = dropList.get(block.getType());
+        } else {
+            int itemindex = RandomUtils.randomInteger(1, items.size()) - 1;
+            Material material = items.get(itemindex);
 
-		Player player = event.getPlayer();
-		ItemStack tool = player.getItemInHand();
+            blockDrop = new ItemStack(material);
+            dropList.put(block.getType(), blockDrop);
 
-		if (tool != null && tool.hasItemMeta() && tool.getDurability() > 1){
+            items.remove(material);
+        }
 
-			tool.setDurability((short) (tool.getDurability()-1));
-			player.setItemInHand(tool);
-		}
-	}
+        event.setCancelled(true);
+        block.setType(Material.AIR);
+        Location dropLocation = block.getLocation().add(.5, 0, .5);
+        dropLocation.getWorld().dropItemNaturally(dropLocation, blockDrop);
 
-	private void generateDataPack() throws IOException {
-		File temp = new File(UhcCore.getPlugin().getDataFolder() + File.separator + "temp");
-		FileUtils.deleteFile(temp);
-		temp.mkdirs();
-		File lootTableZip = new File(temp, "loot_tables.zip");
+        Player player = event.getPlayer();
+        ItemStack tool = player.getItemInHand();
 
-		FileUtils.downloadFile(new URL(LOOT_TABLES_URL), lootTableZip);
-		FileUtils.unzip(new ZipFile(lootTableZip), temp);
+        if (tool != null && tool.hasItemMeta() && tool.getDurability() > 1) {
 
-		File lootTables = new File(temp, "loot_tables");
+            tool.setDurability((short) (tool.getDurability() - 1));
+            player.setItemInHand(tool);
+        }
+    }
 
-		List<File> fileList = FileUtils.getDirFiles(lootTables, true);
-		List<File> remaining = FileUtils.getDirFiles(lootTables, true);
+    private void generateDataPack() throws IOException {
+        File temp = new File(UhcCore.getPlugin().getDataFolder() + File.separator + "temp");
+        FileUtils.deleteFile(temp);
+        temp.mkdirs();
+        File lootTableZip = new File(temp, "loot_tables.zip");
 
-		Map<String, File> mappedTables = new HashMap<>();
+        FileUtils.downloadFile(new URL(LOOT_TABLES_URL), lootTableZip);
+        FileUtils.unzip(new ZipFile(lootTableZip), temp);
 
-		for (File file : fileList){
-			int i = RandomUtils.randomInteger(0, remaining.size()-1);
-			String path = file.getPath().replace(lootTables.getPath(), "");
-			mappedTables.put(path, remaining.get(i));
-			remaining.remove(i);
-		}
+        File lootTables = new File(temp, "loot_tables");
 
-		World mainWorld = Bukkit.getWorlds().get(0);
-		datapack = new File(Bukkit.getWorldContainer() + File.separator + mainWorld.getName() + File.separator + "datapacks/randomized_drops");
-		FileUtils.deleteFile(datapack);
-		File lootTableDestination = new File(datapack, "data/minecraft/loot_tables");
+        List<File> fileList = FileUtils.getDirFiles(lootTables, true);
+        List<File> remaining = FileUtils.getDirFiles(lootTables, true);
 
-		for (String name : mappedTables.keySet()){
-			File file = new File(lootTableDestination + name);
-			file.getParentFile().mkdirs();
-			Files.copy(Paths.get(mappedTables.get(name).toURI()), Paths.get(file.toURI()));
-		}
+        Map<String, File> mappedTables = new HashMap<>();
 
-		FileWriter fw = new FileWriter(new File(datapack, "pack.mcmeta"));
-		fw.write("{\"pack\":{\"pack_format\":1,\"description\":\"Randomized Drops\"}}");
-		fw.flush();
-		fw.close();
+        for (File file : fileList) {
+            int i = RandomUtils.randomInteger(0, remaining.size() - 1);
+            String path = file.getPath().replace(lootTables.getPath(), "");
+            mappedTables.put(path, remaining.get(i));
+            remaining.remove(i);
+        }
 
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:reload");
+        World mainWorld = Bukkit.getWorlds().get(0);
+        datapack = new File(Bukkit.getWorldContainer() + File.separator + mainWorld.getName() + File.separator + "datapacks/randomized_drops");
+        FileUtils.deleteFile(datapack);
+        File lootTableDestination = new File(datapack, "data/minecraft/loot_tables");
 
-		FileUtils.deleteFile(temp);
-	}
+        for (String name : mappedTables.keySet()) {
+            File file = new File(lootTableDestination + name);
+            file.getParentFile().mkdirs();
+            Files.copy(Paths.get(mappedTables.get(name).toURI()), Paths.get(file.toURI()));
+        }
 
-	private void disableDataPack(){
-		FileUtils.deleteFile(datapack);
-		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:reload");
-	}
+        FileWriter fw = new FileWriter(new File(datapack, "pack.mcmeta"));
+        fw.write("{\"pack\":{\"pack_format\":1,\"description\":\"Randomized Drops\"}}");
+        fw.flush();
+        fw.close();
+
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:reload");
+
+        FileUtils.deleteFile(temp);
+    }
+
+    private void disableDataPack() {
+        FileUtils.deleteFile(datapack);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "minecraft:reload");
+    }
 
 }

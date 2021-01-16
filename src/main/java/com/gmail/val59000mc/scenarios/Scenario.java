@@ -125,27 +125,27 @@ public class Scenario {
 
     private Info info;
 
-    public Scenario(String key, UniversalMaterial material){
+    public Scenario(String key, UniversalMaterial material) {
         this(key, material.getType());
     }
 
-    public Scenario(String key, Material material){
+    public Scenario(String key, Material material) {
         this(key, material, null);
     }
 
-    public Scenario(String key, UniversalMaterial material, Class<? extends ScenarioListener> listener){
+    public Scenario(String key, UniversalMaterial material, Class<? extends ScenarioListener> listener) {
         this(key, material.getType(), listener);
     }
 
-    public Scenario(String key, Material material, Class<? extends ScenarioListener> listener){
+    public Scenario(String key, Material material, Class<? extends ScenarioListener> listener) {
         this(key, material, listener, 8);
     }
 
-    public Scenario(String key, UniversalMaterial material, Class<? extends ScenarioListener> listener, int fromVersion){
+    public Scenario(String key, UniversalMaterial material, Class<? extends ScenarioListener> listener, int fromVersion) {
         this(key, material.getType(), listener, fromVersion);
     }
 
-    public Scenario(String key, Material material, Class<? extends ScenarioListener> listener, int fromVersion){
+    public Scenario(String key, Material material, Class<? extends ScenarioListener> listener, int fromVersion) {
         this.key = key;
         this.material = material;
         this.listener = listener;
@@ -173,13 +173,13 @@ public class Scenario {
         return listener;
     }
 
-    public boolean equals(String name){
+    public boolean equals(String name) {
         return name.contains(info.getName()) ||
                 name.replace(" ", "").toLowerCase().equals(key) ||
                 name.replace(" ", "").toLowerCase().equals(key.replace("_", ""));
     }
 
-    public ItemStack getScenarioItem(){
+    public ItemStack getScenarioItem() {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
 
@@ -191,7 +191,7 @@ public class Scenario {
         return item;
     }
 
-    public boolean isCompatibleWithVersion(){
+    public boolean isCompatibleWithVersion() {
         return fromVersion <= UhcCore.getVersion();
     }
 

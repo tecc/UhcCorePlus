@@ -18,12 +18,12 @@ public class ScoreboardLayout {
     private List<String> spectating;
     private String title;
 
-    public void loadFile(){
+    public void loadFile() {
         YamlFile cfg;
 
-        try{
+        try {
             cfg = FileUtils.saveResourceIfNotAvailable("scoreboard.yml");
-        }catch (InvalidConfigurationException ex){
+        } catch (InvalidConfigurationException ex) {
             ex.printStackTrace();
 
             // Set default values.
@@ -42,17 +42,17 @@ public class ScoreboardLayout {
         title = ChatColor.translateAlternateColorCodes('&', cfg.getString("title", ""));
     }
 
-    public List<String> getLines(ScoreboardType scoreboardType){
-        if (scoreboardType.equals(ScoreboardType.WAITING)){
+    public List<String> getLines(ScoreboardType scoreboardType) {
+        if (scoreboardType.equals(ScoreboardType.WAITING)) {
             return waiting;
         }
-        if (scoreboardType.equals(ScoreboardType.PLAYING)){
+        if (scoreboardType.equals(ScoreboardType.PLAYING)) {
             return playing;
         }
-        if (scoreboardType.equals(ScoreboardType.DEATHMATCH)){
+        if (scoreboardType.equals(ScoreboardType.DEATHMATCH)) {
             return deathmatch;
         }
-        if (scoreboardType.equals(ScoreboardType.SPECTATING)){
+        if (scoreboardType.equals(ScoreboardType.SPECTATING)) {
             return spectating;
         }
         return null;
@@ -60,13 +60,14 @@ public class ScoreboardLayout {
 
     /**
      * This method can be used by third party plugins to edit the scoreboard lines.
+     *
      * @param scoreboardType The type the lines should be edited for.
-     * @param lines A list with strings that should be displayed on the scoreboard, can't be more than 15 lines!
+     * @param lines          A list with strings that should be displayed on the scoreboard, can't be more than 15 lines!
      */
-    public void setLines(ScoreboardType scoreboardType, List<String> lines){
+    public void setLines(ScoreboardType scoreboardType, List<String> lines) {
         Validate.isTrue(lines.size() <= 15, "Scoreboards can't have more than 15 lines!");
 
-        switch (scoreboardType){
+        switch (scoreboardType) {
             case WAITING:
                 waiting = getOpsideDownLines(lines);
                 break;
@@ -82,19 +83,19 @@ public class ScoreboardLayout {
         }
     }
 
-    public String getTitle(){
+    public String getTitle() {
         return title;
     }
 
-    private List<String> getOpsideDownLines(List<String> list){
+    private List<String> getOpsideDownLines(List<String> list) {
         List<String> newList = new ArrayList<>();
 
-        for (int i = list.size()-1; i >= 0; i--){
-            if (newList.size() == 15){
+        for (int i = list.size() - 1; i >= 0; i--) {
+            if (newList.size() == 15) {
                 Bukkit.getLogger().warning("[UhcCore] Scoreboard lines can't have more than 15 lines!");
                 break;
             }
-            newList.add(ChatColor.translateAlternateColorCodes('&',list.get(i)));
+            newList.add(ChatColor.translateAlternateColorCodes('&', list.get(i)));
         }
 
         return newList;

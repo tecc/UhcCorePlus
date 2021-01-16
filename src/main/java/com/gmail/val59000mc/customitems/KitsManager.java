@@ -21,140 +21,140 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class KitsManager{
+public class KitsManager {
 
-	private final static List<Kit> kits;
+    private final static List<Kit> kits;
 
-	static{
-		kits = new ArrayList<>();
-	}
-	
-	public static boolean isAtLeastOneKit(){
-		return (kits != null && kits.size() > 0); 
-	}
+    static {
+        kits = new ArrayList<>();
+    }
 
-	public static Kit getFirstKitFor(Player player){
-		for (Kit kit : kits){
-			if (kit.canBeUsedBy(player, GameManager.getGameManager().getConfig())){
-				return kit;
-			}
-		}
-		return null;
-	}
-	
-	public static void loadKits(){
-		Bukkit.getLogger().info("[UhcCore] Start loading kits");
+    public static boolean isAtLeastOneKit() {
+        return (kits != null && kits.size() > 0);
+    }
 
-		YamlFile cfg;
+    public static Kit getFirstKitFor(Player player) {
+        for (Kit kit : kits) {
+            if (kit.canBeUsedBy(player, GameManager.getGameManager().getConfig())) {
+                return kit;
+            }
+        }
+        return null;
+    }
 
-		try{
-			cfg = FileUtils.saveResourceIfNotAvailable("kits.yml");
-		}catch (InvalidConfigurationException ex){
-			ex.printStackTrace();
-			return;
-		}
+    public static void loadKits() {
+        Bukkit.getLogger().info("[UhcCore] Start loading kits");
 
-		ConfigurationSection kitsSection = cfg.getConfigurationSection("kits");
+        YamlFile cfg;
 
-		kits.clear();
+        try {
+            cfg = FileUtils.saveResourceIfNotAvailable("kits.yml");
+        } catch (InvalidConfigurationException ex) {
+            ex.printStackTrace();
+            return;
+        }
 
-		if (kitsSection == null){
-			Bukkit.getLogger().info("[UhcCore] Loaded 0 kits");
-			return;
-		}
+        ConfigurationSection kitsSection = cfg.getConfigurationSection("kits");
 
-		Set<String> kitsKeys = kitsSection.getKeys(false);
-		for(String kitKey : kitsKeys){
+        kits.clear();
 
-			try{
-				Bukkit.getLogger().info("[UhcCore] Loading kit " + kitKey);
-				Kit.Builder builder = new Kit.Builder(kitKey);
+        if (kitsSection == null) {
+            Bukkit.getLogger().info("[UhcCore] Loaded 0 kits");
+            return;
+        }
 
-				String name = cfg.getString("kits." + kitKey + ".symbol.name");
+        Set<String> kitsKeys = kitsSection.getKeys(false);
+        for (String kitKey : kitsKeys) {
 
-				String symbolItem = cfg.getString("kits." + kitKey + ".symbol.item", "");
-				ItemStack symbol = JsonItemUtils.getItemFromJson(symbolItem);
+            try {
+                Bukkit.getLogger().info("[UhcCore] Loading kit " + kitKey);
+                Kit.Builder builder = new Kit.Builder(kitKey);
 
-				ItemMeta im = symbol.getItemMeta();
+                String name = cfg.getString("kits." + kitKey + ".symbol.name");
 
-				if (!im.hasDisplayName()) {
-					im.setDisplayName(ChatColor.GREEN + name);
-				}
+                String symbolItem = cfg.getString("kits." + kitKey + ".symbol.item", "");
+                ItemStack symbol = JsonItemUtils.getItemFromJson(symbolItem);
 
-				List<String> lore = new ArrayList<>();
+                ItemMeta im = symbol.getItemMeta();
 
-				for (String itemStr : cfg.getStringList("kits." + kitKey + ".items")){
-					ItemStack item = JsonItemUtils.getItemFromJson(itemStr);
-					builder.addItem(item);
-					lore.add(ChatColor.WHITE + "" + item.getAmount() + " x " + item.getType().toString().toLowerCase());
-				}
+                if (!im.hasDisplayName()) {
+                    im.setDisplayName(ChatColor.GREEN + name);
+                }
 
-				if (!im.hasLore()) {
-					im.setLore(lore);
-				}
+                List<String> lore = new ArrayList<>();
 
-				symbol.setItemMeta(im);
+                for (String itemStr : cfg.getStringList("kits." + kitKey + ".items")) {
+                    ItemStack item = JsonItemUtils.getItemFromJson(itemStr);
+                    builder.addItem(item);
+                    lore.add(ChatColor.WHITE + "" + item.getAmount() + " x " + item.getType().toString().toLowerCase());
+                }
 
-				builder.setName(name)
-						.setSymbol(symbol);
+                if (!im.hasLore()) {
+                    im.setLore(lore);
+                }
 
-				kits.add(builder.build());
+                symbol.setItemMeta(im);
 
-				Bukkit.getLogger().info("[UhcCore] Added kit " + kitKey);
+                builder.setName(name)
+                        .setSymbol(symbol);
 
-			// IllegalArgumentException, Thrown by builder.build() when kit has no items.
-			}catch(ParseException | IllegalArgumentException ex){
-				Bukkit.getLogger().severe("[UhcCore] Kit "+kitKey+" was disabled because of an error of syntax.");
-				System.out.println(ex.getMessage());
-				ex.printStackTrace();
-			}
-		}
+                kits.add(builder.build());
 
-		Bukkit.getLogger().info("[UhcCore] Loaded " + kits.size() + " kits");
-	}
+                Bukkit.getLogger().info("[UhcCore] Added kit " + kitKey);
 
-	public static void openKitSelectionInventory(Player player){
-		int maxSlots = 6*9;
-		Inventory inv = Bukkit.createInventory(null, maxSlots, Lang.ITEMS_KIT_INVENTORY);
-		int slot = 0;
-		for(Kit kit : kits){
-			if(slot < maxSlots){
-				inv.setItem(slot, kit.getSymbol());
-				slot++;
-			}
-		}
-		
-		player.openInventory(inv);
-	}
-	
-	public static void giveKitTo(Player player){
-		UhcPlayer uhcPlayer = GameManager.getGameManager().getPlayersManager().getUhcPlayer(player);
-		if(!uhcPlayer.hasKitSelected()){
-			uhcPlayer.setKit(KitsManager.getFirstKitFor(player));
-		}
+                // IllegalArgumentException, Thrown by builder.build() when kit has no items.
+            } catch (ParseException | IllegalArgumentException ex) {
+                Bukkit.getLogger().severe("[UhcCore] Kit " + kitKey + " was disabled because of an error of syntax.");
+                System.out.println(ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
 
-		if(uhcPlayer.hasKitSelected() && isAtLeastOneKit()){
-			player.getInventory().addItem(uhcPlayer.getKit().getItems());
-		}
-	}
+        Bukkit.getLogger().info("[UhcCore] Loaded " + kits.size() + " kits");
+    }
 
-	public static boolean isKitItem(ItemStack item){
-		if(item == null || item.getType().equals(Material.AIR))
-			return false;
-		
-		for(Kit kit : kits){
-			if(item.getItemMeta().getDisplayName().equals(ChatColor.GREEN+kit.getName()))
-				return true;
-		}
-		return false;
-	}
+    public static void openKitSelectionInventory(Player player) {
+        int maxSlots = 6 * 9;
+        Inventory inv = Bukkit.createInventory(null, maxSlots, Lang.ITEMS_KIT_INVENTORY);
+        int slot = 0;
+        for (Kit kit : kits) {
+            if (slot < maxSlots) {
+                inv.setItem(slot, kit.getSymbol());
+                slot++;
+            }
+        }
 
-	public static Kit getKitByName(String displayName){
-		for(Kit kit : kits){
-			if(kit.getSymbol().getItemMeta().getDisplayName().equals(displayName))
-				return kit;
-		}
-		return null;
-	}
+        player.openInventory(inv);
+    }
+
+    public static void giveKitTo(Player player) {
+        UhcPlayer uhcPlayer = GameManager.getGameManager().getPlayersManager().getUhcPlayer(player);
+        if (!uhcPlayer.hasKitSelected()) {
+            uhcPlayer.setKit(KitsManager.getFirstKitFor(player));
+        }
+
+        if (uhcPlayer.hasKitSelected() && isAtLeastOneKit()) {
+            player.getInventory().addItem(uhcPlayer.getKit().getItems());
+        }
+    }
+
+    public static boolean isKitItem(ItemStack item) {
+        if (item == null || item.getType().equals(Material.AIR))
+            return false;
+
+        for (Kit kit : kits) {
+            if (item.getItemMeta().getDisplayName().equals(ChatColor.GREEN + kit.getName()))
+                return true;
+        }
+        return false;
+    }
+
+    public static Kit getKitByName(String displayName) {
+        for (Kit kit : kits) {
+            if (kit.getSymbol().getItemMeta().getDisplayName().equals(displayName))
+                return kit;
+        }
+        return null;
+    }
 
 }

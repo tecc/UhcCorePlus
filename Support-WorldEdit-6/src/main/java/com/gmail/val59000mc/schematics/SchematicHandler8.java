@@ -18,34 +18,34 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 
-public class SchematicHandler8{
-	
-	public static ArrayList<Integer> pasteSchematic(Location loc, String path) throws Exception{
-		Bukkit.getLogger().info("[UhcCore] Pasting "+path);
-		File schematic = new File(path);
-		World world = new BukkitWorld(loc.getWorld());
+public class SchematicHandler8 {
 
-		ClipboardFormat format = ClipboardFormat.findByFile(schematic);
-		ClipboardReader reader = format.getReader(new FileInputStream(schematic));
-		Clipboard clipboard = reader.read(world.getWorldData());
+    public static ArrayList<Integer> pasteSchematic(Location loc, String path) throws Exception {
+        Bukkit.getLogger().info("[UhcCore] Pasting " + path);
+        File schematic = new File(path);
+        World world = new BukkitWorld(loc.getWorld());
 
-		EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
+        ClipboardFormat format = ClipboardFormat.findByFile(schematic);
+        ClipboardReader reader = format.getReader(new FileInputStream(schematic));
+        Clipboard clipboard = reader.read(world.getWorldData());
 
-		Operation operation = new ClipboardHolder(clipboard, world.getWorldData())
-				.createPaste(editSession, world.getWorldData())
-				.to(new Vector(loc.getX(), loc.getY(), loc.getZ()))
-				.ignoreAirBlocks(false)
-				.build();
+        EditSession editSession = WorldEdit.getInstance().getEditSessionFactory().getEditSession(world, -1);
 
-		Operations.complete(operation);
+        Operation operation = new ClipboardHolder(clipboard, world.getWorldData())
+                .createPaste(editSession, world.getWorldData())
+                .to(new Vector(loc.getX(), loc.getY(), loc.getZ()))
+                .ignoreAirBlocks(false)
+                .build();
 
-		ArrayList<Integer> dimensions = new ArrayList<>();
-		dimensions.add(clipboard.getDimensions().getBlockY());
-		dimensions.add(clipboard.getDimensions().getBlockX());
-		dimensions.add(clipboard.getDimensions().getBlockZ());
-		
-		Bukkit.getLogger().info("[UhcCore] Successfully pasted '"+path+"' at "+loc.getBlockX()+" "+loc.getBlockY()+" "+loc.getBlockZ());
-		return dimensions;
-	}
+        Operations.complete(operation);
+
+        ArrayList<Integer> dimensions = new ArrayList<>();
+        dimensions.add(clipboard.getDimensions().getBlockY());
+        dimensions.add(clipboard.getDimensions().getBlockX());
+        dimensions.add(clipboard.getDimensions().getBlockZ());
+
+        Bukkit.getLogger().info("[UhcCore] Successfully pasted '" + path + "' at " + loc.getBlockX() + " " + loc.getBlockY() + " " + loc.getBlockZ());
+        return dimensions;
+    }
 
 }

@@ -8,42 +8,42 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
 
-public class PingListener implements Listener{
-	
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onPing(ServerListPingEvent event){
-		GameManager gm = GameManager.getGameManager();
+public class PingListener implements Listener {
 
-		if (gm == null){
-			return; // Still loading
-		}
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onPing(ServerListPingEvent event) {
+        GameManager gm = GameManager.getGameManager();
 
-		if (gm.getConfig().get(MainConfig.DISABLE_MOTD)){
-			return; // No motd support
-		}
+        if (gm == null) {
+            return; // Still loading
+        }
 
-		// Display motd
-		switch(gm.getGameState()){
-			case ENDED:
-				event.setMotd(Lang.DISPLAY_MOTD_ENDED);
-				break;
-			case LOADING:
-				event.setMotd(Lang.DISPLAY_MOTD_LOADING);
-				break;
-			case DEATHMATCH:
-			case PLAYING:
-				event.setMotd(Lang.DISPLAY_MOTD_PLAYING);
-				break;
-			case STARTING:
-				event.setMotd(Lang.DISPLAY_MOTD_STARTING);
-				break;
-			case WAITING:
-				event.setMotd(Lang.DISPLAY_MOTD_WAITING);
-				break;
-			default:
-				event.setMotd(Lang.DISPLAY_MESSAGE_PREFIX);
-				break;
-		}
-	}
+        if (gm.getConfig().get(MainConfig.DISABLE_MOTD)) {
+            return; // No motd support
+        }
+
+        // Display motd
+        switch (gm.getGameState()) {
+            case ENDED:
+                event.setMotd(Lang.DISPLAY_MOTD_ENDED);
+                break;
+            case LOADING:
+                event.setMotd(Lang.DISPLAY_MOTD_LOADING);
+                break;
+            case DEATHMATCH:
+            case PLAYING:
+                event.setMotd(Lang.DISPLAY_MOTD_PLAYING);
+                break;
+            case STARTING:
+                event.setMotd(Lang.DISPLAY_MOTD_STARTING);
+                break;
+            case WAITING:
+                event.setMotd(Lang.DISPLAY_MOTD_WAITING);
+                break;
+            default:
+                event.setMotd(Lang.DISPLAY_MESSAGE_PREFIX);
+                break;
+        }
+    }
 
 }

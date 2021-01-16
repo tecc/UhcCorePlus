@@ -6,11 +6,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.BlockBreakEvent;
 
-public class GoldLessListener extends ScenarioListener{
+public class GoldLessListener extends ScenarioListener {
 
-    @EventHandler (priority = EventPriority.LOW)
-    public void onBlockBreak(BlockBreakEvent e){
-        if (e.getBlock().getType() == Material.GOLD_ORE){
+    @EventHandler(priority = EventPriority.LOW)
+    public void onBlockBreak(BlockBreakEvent e) {
+        if (e.getBlock().getType() == Material.GOLD_ORE) {
             e.getBlock().setType(Material.AIR);
         }
 

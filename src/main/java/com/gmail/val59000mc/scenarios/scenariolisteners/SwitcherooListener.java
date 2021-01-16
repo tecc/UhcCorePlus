@@ -8,29 +8,29 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 
-public class SwitcherooListener extends ScenarioListener{
+public class SwitcherooListener extends ScenarioListener {
 
     @EventHandler
-    public void onPlayerDamage(EntityDamageByEntityEvent e){
-        if (!(e.getEntity() instanceof Player)){
+    public void onPlayerDamage(EntityDamageByEntityEvent e) {
+        if (!(e.getEntity() instanceof Player)) {
             return;
         }
 
         Player player = ((Player) e.getEntity()).getPlayer();
 
-        if (!(e.getDamager() instanceof Arrow)){
+        if (!(e.getDamager() instanceof Arrow)) {
             return;
         }
 
         Arrow arrow = (Arrow) e.getDamager();
 
-        if (!(arrow.getShooter() instanceof  Player)){
+        if (!(arrow.getShooter() instanceof Player)) {
             return;
         }
 
         Player shooter = ((Player) arrow.getShooter()).getPlayer();
 
-        if (player.equals(shooter)){
+        if (player.equals(shooter)) {
             return;
         }
 

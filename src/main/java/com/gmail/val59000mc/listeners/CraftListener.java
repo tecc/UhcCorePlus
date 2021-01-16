@@ -19,68 +19,68 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class CraftListener implements Listener{
-	
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onCrafting(CraftItemEvent event){
-		ItemStack item = event.getRecipe().getResult();
-		if (!item.hasItemMeta() || !item.getItemMeta().hasDisplayName()){
-			return;
-		}
+public class CraftListener implements Listener {
 
-		if (!(event.getWhoClicked() instanceof Player)){
-			return;
-		}
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onCrafting(CraftItemEvent event) {
+        ItemStack item = event.getRecipe().getResult();
+        if (!item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
+            return;
+        }
 
-		Craft craft = CraftsManager.getCraft(item);
-		if (craft == null){
-			return;
-		}
+        if (!(event.getWhoClicked() instanceof Player)) {
+            return;
+        }
 
-		Player player = (Player) event.getWhoClicked();
-		GameManager gm = GameManager.getGameManager();
-		UhcPlayer uhcPlayer = gm.getPlayersManager().getUhcPlayer(player);
+        Craft craft = CraftsManager.getCraft(item);
+        if (craft == null) {
+            return;
+        }
 
-		String permission = "uhc-core.craft." + craft.getName().toLowerCase().replaceAll(" ", "-");
-		if(gm.getConfig().get(MainConfig.ENABLE_CRAFTS_PERMISSIONS) && !player.hasPermission(permission)){
-			uhcPlayer.sendMessage(Lang.ITEMS_CRAFT_NO_PERMISSION.replace("%craft%", ChatColor.translateAlternateColorCodes('&', craft.getName())));
-			event.setCancelled(true);
-			return;
-		}
+        Player player = (Player) event.getWhoClicked();
+        GameManager gm = GameManager.getGameManager();
+        UhcPlayer uhcPlayer = gm.getPlayersManager().getUhcPlayer(player);
 
-		if(craft.getLimit() != -1 && (event.isShiftClick() || event.isRightClick())){
-			uhcPlayer.sendMessage(Lang.ITEMS_CRAFT_LEFT_CLICK.replace("%craft%", ChatColor.translateAlternateColorCodes('&', craft.getName())));
-			event.setCancelled(true);
-			return;
-		}
+        String permission = "uhc-core.craft." + craft.getName().toLowerCase().replaceAll(" ", "-");
+        if (gm.getConfig().get(MainConfig.ENABLE_CRAFTS_PERMISSIONS) && !player.hasPermission(permission)) {
+            uhcPlayer.sendMessage(Lang.ITEMS_CRAFT_NO_PERMISSION.replace("%craft%", ChatColor.translateAlternateColorCodes('&', craft.getName())));
+            event.setCancelled(true);
+            return;
+        }
 
-		if (craft.isReviveItem()){
-			List<UhcPlayer> deadMembers = uhcPlayer.getTeam().getMembers(UhcPlayer::isDeath);
+        if (craft.getLimit() != -1 && (event.isShiftClick() || event.isRightClick())) {
+            uhcPlayer.sendMessage(Lang.ITEMS_CRAFT_LEFT_CLICK.replace("%craft%", ChatColor.translateAlternateColorCodes('&', craft.getName())));
+            event.setCancelled(true);
+            return;
+        }
 
-			if (deadMembers.isEmpty()){
-				event.setCancelled(true);
-				uhcPlayer.sendMessage(Lang.ITEMS_REVIVE_ERROR);
-				return;
-			}
+        if (craft.isReviveItem()) {
+            List<UhcPlayer> deadMembers = uhcPlayer.getTeam().getMembers(UhcPlayer::isDeath);
 
-			UhcPlayer revivePlayer = deadMembers.get(0);
-			gm.getPlayersManager().revivePlayer(revivePlayer, craft.reviveWithInventory());
+            if (deadMembers.isEmpty()) {
+                event.setCancelled(true);
+                uhcPlayer.sendMessage(Lang.ITEMS_REVIVE_ERROR);
+                return;
+            }
 
-			uhcPlayer.sendMessage(Lang.ITEMS_REVIVE_SUCCESS.replace("%player%", revivePlayer.getName()));
+            UhcPlayer revivePlayer = deadMembers.get(0);
+            gm.getPlayersManager().revivePlayer(revivePlayer, craft.reviveWithInventory());
 
-			Bukkit.getScheduler().runTask(UhcCore.getPlugin(), () -> {
-				player.setItemOnCursor(null);
-				player.closeInventory();
-			});
-			return;
-		}
+            uhcPlayer.sendMessage(Lang.ITEMS_REVIVE_SUCCESS.replace("%player%", revivePlayer.getName()));
 
-		if(craft.hasLimit() && !uhcPlayer.addCraftedItem(craft.getName(), craft.getLimit())){
-			uhcPlayer.sendMessage(Lang.ITEMS_CRAFT_LIMIT.replace("%craft%", craft.getName()).replace("%limit%",""+craft.getLimit()));
-			event.setCancelled(true);
-		}else{
-			uhcPlayer.sendMessage(Lang.ITEMS_CRAFT_CRAFTED.replace("%craft%", craft.getName()));
-		}
-	}
+            Bukkit.getScheduler().runTask(UhcCore.getPlugin(), () -> {
+                player.setItemOnCursor(null);
+                player.closeInventory();
+            });
+            return;
+        }
+
+        if (craft.hasLimit() && !uhcPlayer.addCraftedItem(craft.getName(), craft.getLimit())) {
+            uhcPlayer.sendMessage(Lang.ITEMS_CRAFT_LIMIT.replace("%craft%", craft.getName()).replace("%limit%", "" + craft.getLimit()));
+            event.setCancelled(true);
+        } else {
+            uhcPlayer.sendMessage(Lang.ITEMS_CRAFT_CRAFTED.replace("%craft%", craft.getName()));
+        }
+    }
 
 }

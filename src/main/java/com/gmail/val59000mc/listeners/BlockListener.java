@@ -25,122 +25,122 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BlockListener implements Listener{
+public class BlockListener implements Listener {
 
-	private final PlayersManager playersManager;
-	private final MainConfig configuration;
-	private final Map<Material, LootConfiguration<Material>> blockLoots;
-	private final int maxBuildingHeight;
-	
-	public BlockListener(GameManager gameManager){
-		playersManager = gameManager.getPlayersManager();
-		configuration = gameManager.getConfig();
-		blockLoots = configuration.get(MainConfig.ENABLE_BLOCK_LOOT) ? configuration.get(MainConfig.BLOCK_LOOT) : new HashMap<>();
-		maxBuildingHeight = configuration.get(MainConfig.MAX_BUILDING_HEIGHT);
-	}
+    private final PlayersManager playersManager;
+    private final MainConfig configuration;
+    private final Map<Material, LootConfiguration<Material>> blockLoots;
+    private final int maxBuildingHeight;
 
-	@EventHandler
-	public void onBlockBreak(BlockBreakEvent event){
-		handleBlockLoot(event);
-		handleShearedLeaves(event);
-		handleFrozenPlayers(event);
-	}
+    public BlockListener(GameManager gameManager) {
+        playersManager = gameManager.getPlayersManager();
+        configuration = gameManager.getConfig();
+        blockLoots = configuration.get(MainConfig.ENABLE_BLOCK_LOOT) ? configuration.get(MainConfig.BLOCK_LOOT) : new HashMap<>();
+        maxBuildingHeight = configuration.get(MainConfig.MAX_BUILDING_HEIGHT);
+    }
 
-	@EventHandler
-	public void onBlockPlace(BlockPlaceEvent event){
-		handleMaxBuildingHeight(event);
-		handleFrozenPlayers(event);
-	}
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        handleBlockLoot(event);
+        handleShearedLeaves(event);
+        handleFrozenPlayers(event);
+    }
 
-	@EventHandler
-	public void onLeavesDecay(LeavesDecayEvent event){
-		handleAppleDrops(event);
-	}
+    @EventHandler
+    public void onBlockPlace(BlockPlaceEvent event) {
+        handleMaxBuildingHeight(event);
+        handleFrozenPlayers(event);
+    }
 
-	private void handleMaxBuildingHeight(BlockPlaceEvent e){
-		if (maxBuildingHeight < 0 || e.getPlayer().getGameMode() != GameMode.SURVIVAL) return;
+    @EventHandler
+    public void onLeavesDecay(LeavesDecayEvent event) {
+        handleAppleDrops(event);
+    }
 
-		if (e.getBlock().getY() > maxBuildingHeight){
-			e.setCancelled(true);
-			e.getPlayer().sendMessage(Lang.PLAYERS_BUILD_HEIGHT);
-		}
-	}
+    private void handleMaxBuildingHeight(BlockPlaceEvent e) {
+        if (maxBuildingHeight < 0 || e.getPlayer().getGameMode() != GameMode.SURVIVAL) return;
 
-	private void handleBlockLoot(BlockBreakEvent event){
-		Material material = event.getBlock().getType();
-		if(blockLoots.containsKey(material)){
-			LootConfiguration<Material> lootConfig = blockLoots.get(material);
-			Location loc = event.getBlock().getLocation().add(.5,.5,.5);
-			event.getBlock().setType(Material.AIR);
-			event.setExpToDrop(lootConfig.getAddXp());
-			loc.getWorld().dropItem(loc, lootConfig.getLoot().clone());
-			if (lootConfig.getAddXp() > 0) {
-				UhcItems.spawnExtraXp(loc, lootConfig.getAddXp());
-			}
-		}
-	}
+        if (e.getBlock().getY() > maxBuildingHeight) {
+            e.setCancelled(true);
+            e.getPlayer().sendMessage(Lang.PLAYERS_BUILD_HEIGHT);
+        }
+    }
 
-	private void handleShearedLeaves(BlockBreakEvent e){
-		if (!configuration.get(MainConfig.APPLE_DROPS_FROM_SHEARING)){
-			return;
-		}
+    private void handleBlockLoot(BlockBreakEvent event) {
+        Material material = event.getBlock().getType();
+        if (blockLoots.containsKey(material)) {
+            LootConfiguration<Material> lootConfig = blockLoots.get(material);
+            Location loc = event.getBlock().getLocation().add(.5, .5, .5);
+            event.getBlock().setType(Material.AIR);
+            event.setExpToDrop(lootConfig.getAddXp());
+            loc.getWorld().dropItem(loc, lootConfig.getLoot().clone());
+            if (lootConfig.getAddXp() > 0) {
+                UhcItems.spawnExtraXp(loc, lootConfig.getAddXp());
+            }
+        }
+    }
 
-		if (!UniversalMaterial.isLeaves(e.getBlock().getType())){
-			return;
-		}
+    private void handleShearedLeaves(BlockBreakEvent e) {
+        if (!configuration.get(MainConfig.APPLE_DROPS_FROM_SHEARING)) {
+            return;
+        }
 
-		if (e.getPlayer().getItemInHand().getType() == Material.SHEARS){
-			Bukkit.getPluginManager().callEvent(new LeavesDecayEvent(e.getBlock()));
-		}
-	}
+        if (!UniversalMaterial.isLeaves(e.getBlock().getType())) {
+            return;
+        }
 
-	private void handleFrozenPlayers(BlockBreakEvent e){
-		UhcPlayer uhcPlayer = playersManager.getUhcPlayer(e.getPlayer());
-		if (uhcPlayer.isFrozen()){
-			e.setCancelled(true);
-		}
-	}
+        if (e.getPlayer().getItemInHand().getType() == Material.SHEARS) {
+            Bukkit.getPluginManager().callEvent(new LeavesDecayEvent(e.getBlock()));
+        }
+    }
 
-	private void handleFrozenPlayers(BlockPlaceEvent e){
-		UhcPlayer uhcPlayer = playersManager.getUhcPlayer(e.getPlayer());
-		if (uhcPlayer.isFrozen()){
-			e.setCancelled(true);
-		}
-	}
+    private void handleFrozenPlayers(BlockBreakEvent e) {
+        UhcPlayer uhcPlayer = playersManager.getUhcPlayer(e.getPlayer());
+        if (uhcPlayer.isFrozen()) {
+            e.setCancelled(true);
+        }
+    }
 
-	private void handleAppleDrops(LeavesDecayEvent e){
-		Block block = e.getBlock();
-		Material type = block.getType();
-		boolean isOak;
+    private void handleFrozenPlayers(BlockPlaceEvent e) {
+        UhcPlayer uhcPlayer = playersManager.getUhcPlayer(e.getPlayer());
+        if (uhcPlayer.isFrozen()) {
+            e.setCancelled(true);
+        }
+    }
 
-		if (configuration.get(MainConfig.APPLE_DROPS_FROM_ALL_TREES)){
-			if (type != UniversalMaterial.OAK_LEAVES.getType()) {
-				e.getBlock().setType(UniversalMaterial.OAK_LEAVES.getType());
-			}
-			isOak = true;
-		}else {
-			isOak = type == UniversalMaterial.OAK_LEAVES.getType() || type == UniversalMaterial.DARK_OAK_LEAVES.getType();
-		}
+    private void handleAppleDrops(LeavesDecayEvent e) {
+        Block block = e.getBlock();
+        Material type = block.getType();
+        boolean isOak;
 
-		if (!isOak){
-			return; // Will never drop apples so drops don't need to increase
-		}
+        if (configuration.get(MainConfig.APPLE_DROPS_FROM_ALL_TREES)) {
+            if (type != UniversalMaterial.OAK_LEAVES.getType()) {
+                e.getBlock().setType(UniversalMaterial.OAK_LEAVES.getType());
+            }
+            isOak = true;
+        } else {
+            isOak = type == UniversalMaterial.OAK_LEAVES.getType() || type == UniversalMaterial.DARK_OAK_LEAVES.getType();
+        }
 
-		double percentage = configuration.get(MainConfig.APPLE_DROP_PERCENTAGE)-0.5;
+        if (!isOak) {
+            return; // Will never drop apples so drops don't need to increase
+        }
 
-		if (percentage <= 0){
-			return; // No added drops
-		}
+        double percentage = configuration.get(MainConfig.APPLE_DROP_PERCENTAGE) - 0.5;
 
-		// Number 0-100
-		double random = RandomUtils.randomInteger(0, 200)/2D;
+        if (percentage <= 0) {
+            return; // No added drops
+        }
 
-		if (random > percentage){
-			return; // Number above percentage so no extra apples.
-		}
+        // Number 0-100
+        double random = RandomUtils.randomInteger(0, 200) / 2D;
 
-		// Add apple to drops
-		Bukkit.getScheduler().runTask(UhcCore.getPlugin(), () -> block.getWorld().dropItem(block.getLocation().add(.5, .5, .5), new ItemStack(Material.APPLE)));
-	}
+        if (random > percentage) {
+            return; // Number above percentage so no extra apples.
+        }
+
+        // Add apple to drops
+        Bukkit.getScheduler().runTask(UhcCore.getPlugin(), () -> block.getWorld().dropItem(block.getLocation().add(.5, .5, .5), new ItemStack(Material.APPLE)));
+    }
 
 }

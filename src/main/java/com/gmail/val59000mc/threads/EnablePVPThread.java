@@ -8,47 +8,47 @@ import com.gmail.val59000mc.languages.Lang;
 import com.gmail.val59000mc.utils.UniversalSound;
 import org.bukkit.Bukkit;
 
-public class EnablePVPThread implements Runnable{
+public class EnablePVPThread implements Runnable {
 
-	private final GameManager gameManager;
-	private int timeBeforePvp;
-	
-	public EnablePVPThread(GameManager gameManager){
-		this.gameManager = gameManager;
-		timeBeforePvp = gameManager.getConfig().get(MainConfig.TIME_BEFORE_PVP);
-	}
-	
-	@Override
-	public void run() {
-		if(!gameManager.getGameState().equals(GameState.PLAYING)) {
-			return; // Stop thread
-		}
+    private final GameManager gameManager;
+    private int timeBeforePvp;
 
-		if(timeBeforePvp == 0){
-			GameManager.getGameManager().setPvp(true);
-			GameManager.getGameManager().broadcastInfoMessage(Lang.PVP_ENABLED);
-			GameManager.getGameManager().getPlayersManager().playSoundToAll(UniversalSound.WITHER_SPAWN);
-			return; // Stop thread
-		}
+    public EnablePVPThread(GameManager gameManager) {
+        this.gameManager = gameManager;
+        timeBeforePvp = gameManager.getConfig().get(MainConfig.TIME_BEFORE_PVP);
+    }
 
-		if(timeBeforePvp <= 10 || (timeBeforePvp < 60*5 && timeBeforePvp%60 == 0) || timeBeforePvp%(60*5) == 0){
-			if(timeBeforePvp%60 == 0) {
-				gameManager.broadcastInfoMessage(Lang.PVP_START_IN + " " + (timeBeforePvp / 60) + "m");
-			}else{
-				gameManager.broadcastInfoMessage(Lang.PVP_START_IN + " " + timeBeforePvp + "s");
-			}
+    @Override
+    public void run() {
+        if (!gameManager.getGameState().equals(GameState.PLAYING)) {
+            return; // Stop thread
+        }
 
-			gameManager.getPlayersManager().playSoundToAll(UniversalSound.CLICK);
-		}
+        if (timeBeforePvp == 0) {
+            GameManager.getGameManager().setPvp(true);
+            GameManager.getGameManager().broadcastInfoMessage(Lang.PVP_ENABLED);
+            GameManager.getGameManager().getPlayersManager().playSoundToAll(UniversalSound.WITHER_SPAWN);
+            return; // Stop thread
+        }
 
-		if(timeBeforePvp >= 20){
-			timeBeforePvp -= 10;
-			Bukkit.getScheduler().runTaskLater(UhcCore.getPlugin(), this,200);
-		}else{
-			timeBeforePvp --;
-			Bukkit.getScheduler().runTaskLater(UhcCore.getPlugin(), this,20);
-		}
+        if (timeBeforePvp <= 10 || (timeBeforePvp < 60 * 5 && timeBeforePvp % 60 == 0) || timeBeforePvp % (60 * 5) == 0) {
+            if (timeBeforePvp % 60 == 0) {
+                gameManager.broadcastInfoMessage(Lang.PVP_START_IN + " " + (timeBeforePvp / 60) + "m");
+            } else {
+                gameManager.broadcastInfoMessage(Lang.PVP_START_IN + " " + timeBeforePvp + "s");
+            }
 
-	}
+            gameManager.getPlayersManager().playSoundToAll(UniversalSound.CLICK);
+        }
+
+        if (timeBeforePvp >= 20) {
+            timeBeforePvp -= 10;
+            Bukkit.getScheduler().runTaskLater(UhcCore.getPlugin(), this, 200);
+        } else {
+            timeBeforePvp--;
+            Bukkit.getScheduler().runTaskLater(UhcCore.getPlugin(), this, 20);
+        }
+
+    }
 
 }

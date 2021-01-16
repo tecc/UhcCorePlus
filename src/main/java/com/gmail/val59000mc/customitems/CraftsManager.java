@@ -25,316 +25,316 @@ import java.io.IOException;
 import java.util.*;
 
 public class CraftsManager {
-	
-	private final static List<Craft> crafts;
 
-	static{
-		crafts = new ArrayList<>();
-	}
-	
-	public static List<Craft> getCrafts(){
-		return crafts;
-	}
+    private final static List<Craft> crafts;
 
-	public static boolean isAtLeastOneCraft() {
-		return getCrafts().size() >= 1;
-	}
+    static {
+        crafts = new ArrayList<>();
+    }
 
-	public static void loadBannedCrafts(){
-		Bukkit.getLogger().info("[UhcCore] Loading banned crafts list");
+    public static List<Craft> getCrafts() {
+        return crafts;
+    }
 
-		YamlFile cfg;
+    public static boolean isAtLeastOneCraft() {
+        return getCrafts().size() >= 1;
+    }
 
-		try{
-			cfg = FileUtils.saveResourceIfNotAvailable("crafts.yml");
-		}catch (InvalidConfigurationException ex){
-			ex.printStackTrace();
-			return;
-		}
+    public static void loadBannedCrafts() {
+        Bukkit.getLogger().info("[UhcCore] Loading banned crafts list");
 
-		Set<ItemStack> bannedItems = new HashSet<>();
-		for(String itemLine : cfg.getStringList("ban-items-crafts")){
+        YamlFile cfg;
 
-			try {
-				bannedItems.add(JsonItemUtils.getItemFromJson(itemLine));
-			}catch (ParseException ex){
-				Bukkit.getLogger().warning("[UhcCore] Failed to register "+itemLine+" banned craft");
-				ex.printStackTrace();
-			}
-		}
+        try {
+            cfg = FileUtils.saveResourceIfNotAvailable("crafts.yml");
+        } catch (InvalidConfigurationException ex) {
+            ex.printStackTrace();
+            return;
+        }
 
-		for (ItemStack item : bannedItems){
-			VersionUtils.getVersionUtils().removeRecipe(item, null);
-		}
-	}
+        Set<ItemStack> bannedItems = new HashSet<>();
+        for (String itemLine : cfg.getStringList("ban-items-crafts")) {
 
-	public static void loadCrafts(){
-		Bukkit.getLogger().info("[UhcCore] Loading custom crafts");
-		YamlFile cfg;
+            try {
+                bannedItems.add(JsonItemUtils.getItemFromJson(itemLine));
+            } catch (ParseException ex) {
+                Bukkit.getLogger().warning("[UhcCore] Failed to register " + itemLine + " banned craft");
+                ex.printStackTrace();
+            }
+        }
 
-		try{
-			cfg = FileUtils.saveResourceIfNotAvailable("crafts.yml");
-		}catch (InvalidConfigurationException ex){
-			ex.printStackTrace();
-			return;
-		}
+        for (ItemStack item : bannedItems) {
+            VersionUtils.getVersionUtils().removeRecipe(item, null);
+        }
+    }
 
-		crafts.clear();
+    public static void loadCrafts() {
+        Bukkit.getLogger().info("[UhcCore] Loading custom crafts");
+        YamlFile cfg;
 
-		ConfigurationSection customCraftSection = cfg.getConfigurationSection("custom-crafts");
-		if (customCraftSection == null){
-			Bukkit.getLogger().info("[UhcCore] Done loading custom crafts");
-			return;
-		}
+        try {
+            cfg = FileUtils.saveResourceIfNotAvailable("crafts.yml");
+        } catch (InvalidConfigurationException ex) {
+            ex.printStackTrace();
+            return;
+        }
 
-		Set<String> craftsKeys = customCraftSection.getKeys(false);
-		for(String name : craftsKeys){
-			ConfigurationSection section = cfg.getConfigurationSection("custom-crafts."+name);
-			if (section == null){
-				Bukkit.getLogger().severe("[UhcCore] custom-crafts."+name + " section does not exist!");
-				continue;
-			}
-			
-			List<ItemStack> recipe = new ArrayList<>();
-			ItemStack craftItem;
-			int limit;
-			boolean defaultName, reviveItem, reviveWithInventory;
-			
-			try{
-				Bukkit.getLogger().info("[UhcCore] Loading custom craft "+name);
-				
-				// Recipe
-				String[] lines = new String[3];
-				lines[0] = section.getString("1", "");
-				lines[1] = section.getString("2", "");
-				lines[2] = section.getString("3", "");
-				
-				for(int i=0 ; i<3; i++){
-					String[] itemsInLine = lines[i].split(" ");
-					if(itemsInLine.length != 3)
-						throw new IllegalArgumentException("Each line should be formatted like {item} {item} {item}");
-					for(int j=0 ; j<3 ;j++){
-						if (itemsInLine[j].startsWith("{") && itemsInLine[j].endsWith("}")){
-							recipe.add(JsonItemUtils.getItemFromJson(itemsInLine[j]));
-						}else{
-							throw new IllegalArgumentException("The craft result must be formatted according to the json item format (Use /iteminfo).");
-						}
-					}
-				}
-				
-				// Craft
-				String craftString = section.getString("craft","");
+        crafts.clear();
 
-				if (craftString.startsWith("{") && craftString.endsWith("}")){
-					craftItem = JsonItemUtils.getItemFromJson(craftString);
-				}else {
-					throw new IllegalArgumentException("The craft result must be formatted according to the json item format (Use /iteminfo).");
-				}
-				
-				// Limit
-				limit = section.getInt("limit",-1);
-				defaultName = section.getBoolean("default-name", false);
-				reviveItem = section.getBoolean("revive-item", false);
-				reviveWithInventory = section.getBoolean("revive-with-inventory", true);
-				Craft craft = new Craft(name, recipe, craftItem, limit, defaultName, reviveItem, reviveWithInventory);
-				crafts.add(craft);
-			}catch(IllegalArgumentException | ParseException e){
-				//ignore craft if bad formatting
-				Bukkit.getLogger().warning("[UhcCore] Failed to register "+name+" custom craft : syntax error");
-				Bukkit.getLogger().warning(e.getMessage());
-			}
-			
-		}
-	}
+        ConfigurationSection customCraftSection = cfg.getConfigurationSection("custom-crafts");
+        if (customCraftSection == null) {
+            Bukkit.getLogger().info("[UhcCore] Done loading custom crafts");
+            return;
+        }
 
-	public static void saveCraft(Craft craft){
-		YamlFile cfg;
+        Set<String> craftsKeys = customCraftSection.getKeys(false);
+        for (String name : craftsKeys) {
+            ConfigurationSection section = cfg.getConfigurationSection("custom-crafts." + name);
+            if (section == null) {
+                Bukkit.getLogger().severe("[UhcCore] custom-crafts." + name + " section does not exist!");
+                continue;
+            }
 
-		try{
-			cfg = FileUtils.saveResourceIfNotAvailable("crafts.yml");
-		}catch (InvalidConfigurationException ex){
-			ex.printStackTrace();
-			return;
-		}
+            List<ItemStack> recipe = new ArrayList<>();
+            ItemStack craftItem;
+            int limit;
+            boolean defaultName, reviveItem, reviveWithInventory;
 
-		List<ItemStack> recipe = craft.getRecipe();
+            try {
+                Bukkit.getLogger().info("[UhcCore] Loading custom craft " + name);
 
-		cfg.set(
-				"custom-crafts." + craft.getName() + ".1",
-				JsonItemUtils.getItemJson(recipe.get(0)) + " " +
-				JsonItemUtils.getItemJson(recipe.get(1)) + " " +
-				JsonItemUtils.getItemJson(recipe.get(2))
-		);
+                // Recipe
+                String[] lines = new String[3];
+                lines[0] = section.getString("1", "");
+                lines[1] = section.getString("2", "");
+                lines[2] = section.getString("3", "");
 
-		cfg.set(
-				"custom-crafts." + craft.getName() + ".2",
-				JsonItemUtils.getItemJson(recipe.get(3)) + " " +
-				JsonItemUtils.getItemJson(recipe.get(4)) + " " +
-				JsonItemUtils.getItemJson(recipe.get(5))
-		);
+                for (int i = 0; i < 3; i++) {
+                    String[] itemsInLine = lines[i].split(" ");
+                    if (itemsInLine.length != 3)
+                        throw new IllegalArgumentException("Each line should be formatted like {item} {item} {item}");
+                    for (int j = 0; j < 3; j++) {
+                        if (itemsInLine[j].startsWith("{") && itemsInLine[j].endsWith("}")) {
+                            recipe.add(JsonItemUtils.getItemFromJson(itemsInLine[j]));
+                        } else {
+                            throw new IllegalArgumentException("The craft result must be formatted according to the json item format (Use /iteminfo).");
+                        }
+                    }
+                }
 
-		cfg.set(
-				"custom-crafts." + craft.getName() + ".3",
-				JsonItemUtils.getItemJson(recipe.get(6)) + " " +
-				JsonItemUtils.getItemJson(recipe.get(7)) + " " +
-				JsonItemUtils.getItemJson(recipe.get(8))
-		);
+                // Craft
+                String craftString = section.getString("craft", "");
 
-		cfg.set(
-				"custom-crafts." + craft.getName() + ".craft",
-				JsonItemUtils.getItemJson(craft.getCraft())
-		);
+                if (craftString.startsWith("{") && craftString.endsWith("}")) {
+                    craftItem = JsonItemUtils.getItemFromJson(craftString);
+                } else {
+                    throw new IllegalArgumentException("The craft result must be formatted according to the json item format (Use /iteminfo).");
+                }
 
-		cfg.set(
-				"custom-crafts." + craft.getName() + ".default-name",
-				!craft.getCraft().hasItemMeta() && craft.getCraft().getItemMeta().hasDisplayName()
-		);
+                // Limit
+                limit = section.getInt("limit", -1);
+                defaultName = section.getBoolean("default-name", false);
+                reviveItem = section.getBoolean("revive-item", false);
+                reviveWithInventory = section.getBoolean("revive-with-inventory", true);
+                Craft craft = new Craft(name, recipe, craftItem, limit, defaultName, reviveItem, reviveWithInventory);
+                crafts.add(craft);
+            } catch (IllegalArgumentException | ParseException e) {
+                //ignore craft if bad formatting
+                Bukkit.getLogger().warning("[UhcCore] Failed to register " + name + " custom craft : syntax error");
+                Bukkit.getLogger().warning(e.getMessage());
+            }
 
-		// limit
-		cfg.set(
-				"custom-crafts." + craft.getName() + ".limit",
-				craft.getLimit()
-		);
+        }
+    }
 
-		try {
-			cfg.saveWithComments();
-		}catch (IOException ex){
-			ex.printStackTrace();
-		}
-	}
+    public static void saveCraft(Craft craft) {
+        YamlFile cfg;
 
-	@Nullable
-	public static Craft getCraft(ItemStack result) {
-		if(result.hasItemMeta() && result.getItemMeta().hasDisplayName()){
-			String displayName = result.getItemMeta().getDisplayName();
-			for(Craft craft : getCrafts()){
-				if(displayName.equals(craft.getCraft().getItemMeta().getDisplayName())){
-					return craft;
-				}
-			}
-		}
-		return null;
-	}
+        try {
+            cfg = FileUtils.saveResourceIfNotAvailable("crafts.yml");
+        } catch (InvalidConfigurationException ex) {
+            ex.printStackTrace();
+            return;
+        }
 
-	@Nullable
-	public static Craft getCraftByName(String craftName) {
-		for(Craft craft : getCrafts()){
-			if(craft.getName().equals(craftName)){
-				return craft;
-			}
-		}
-		return null;
-	}
+        List<ItemStack> recipe = craft.getRecipe();
 
-	@Nullable
-	public static Craft getCraftByDisplayName(String craftName){
-		for(Craft craft : getCrafts()){
-			if(craft.getDisplayItem().getItemMeta().getDisplayName().equals(craftName)){
-				return craft;
-			}
-		}
-		return null;
-	}
-	
-	public static void openCraftBookInventory(Player player){
-		Validate.notNull(player);
+        cfg.set(
+                "custom-crafts." + craft.getName() + ".1",
+                JsonItemUtils.getItemJson(recipe.get(0)) + " " +
+                        JsonItemUtils.getItemJson(recipe.get(1)) + " " +
+                        JsonItemUtils.getItemJson(recipe.get(2))
+        );
 
-		int maxSlots = 6*9;
-		Inventory inv = Bukkit.createInventory(null, maxSlots, Lang.ITEMS_CRAFT_BOOK_INVENTORY);
-		int slot = 0;
-		for(Craft craft : getCrafts()){
-			if(slot < maxSlots){
-				inv.setItem(slot, craft.getDisplayItem());
-				slot++;
-			}
-		}
-		
-		player.openInventory(inv);
-	}
+        cfg.set(
+                "custom-crafts." + craft.getName() + ".2",
+                JsonItemUtils.getItemJson(recipe.get(3)) + " " +
+                        JsonItemUtils.getItemJson(recipe.get(4)) + " " +
+                        JsonItemUtils.getItemJson(recipe.get(5))
+        );
 
-	public static boolean isCraftItem(ItemStack item) {
-		if(item == null || item.getType().equals(Material.AIR)) {
-			return false;
-		}
+        cfg.set(
+                "custom-crafts." + craft.getName() + ".3",
+                JsonItemUtils.getItemJson(recipe.get(6)) + " " +
+                        JsonItemUtils.getItemJson(recipe.get(7)) + " " +
+                        JsonItemUtils.getItemJson(recipe.get(8))
+        );
 
-		if(item.hasItemMeta() && item.getItemMeta().hasDisplayName()){
-			String name = item.getItemMeta().getDisplayName();
+        cfg.set(
+                "custom-crafts." + craft.getName() + ".craft",
+                JsonItemUtils.getItemJson(craft.getCraft())
+        );
 
-			for(Craft craft : getCrafts()){
-				 if(name.equals(craft.getDisplayItem().getItemMeta().getDisplayName())
-				   && item.getType().equals(craft.getCraft().getType()))
-					return true;
-			}
-		}
-		return false;
-	}
+        cfg.set(
+                "custom-crafts." + craft.getName() + ".default-name",
+                !craft.getCraft().hasItemMeta() && craft.getCraft().getItemMeta().hasDisplayName()
+        );
 
-	public static boolean isCraftBookBackItem(ItemStack item) {
-		if(item == null || item.getType().equals(Material.AIR)) {
-			return false;
-		}
+        // limit
+        cfg.set(
+                "custom-crafts." + craft.getName() + ".limit",
+                craft.getLimit()
+        );
 
-		return item.getType().equals(UniversalMaterial.PUFFERFISH.getType()) && item.getItemMeta().getDisplayName().equals(Lang.ITEMS_CRAFT_BOOK_BACK);
-	}
+        try {
+            cfg.saveWithComments();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 
-	public static void openCraftInventory(Player player, Craft craft) {
-		int maxSlots = 6*9;
-		Inventory inv = Bukkit.createInventory(null, maxSlots, Lang.ITEMS_CRAFT_BOOK_INVENTORY);
+    @Nullable
+    public static Craft getCraft(ItemStack result) {
+        if (result.hasItemMeta() && result.getItemMeta().hasDisplayName()) {
+            String displayName = result.getItemMeta().getDisplayName();
+            for (Craft craft : getCrafts()) {
+                if (displayName.equals(craft.getCraft().getItemMeta().getDisplayName())) {
+                    return craft;
+                }
+            }
+        }
+        return null;
+    }
 
-		for(int i = 0 ; i < maxSlots-9 ; i++){
-			inv.setItem(i, UniversalMaterial.BLACK_STAINED_GLASS_PANE.getStack());
-		}
-		
-		for(int i = maxSlots-9 ; i < maxSlots ; i++){
-			inv.setItem(i, UniversalMaterial.WHITE_STAINED_GLASS_PANE.getStack());
-		}
-		
-		// Recipe
-		inv.setItem(11, craft.getRecipe().get(0));
-		inv.setItem(12, craft.getRecipe().get(1));
-		inv.setItem(13, craft.getRecipe().get(2));
-		inv.setItem(20, craft.getRecipe().get(3));
-		inv.setItem(21, craft.getRecipe().get(4));
-		inv.setItem(22, craft.getRecipe().get(5));
-		inv.setItem(29, craft.getRecipe().get(6));
-		inv.setItem(30, craft.getRecipe().get(7));
-		inv.setItem(31, craft.getRecipe().get(8));
-		
-		// Craft
-		inv.setItem(24, craft.getCraft());		
+    @Nullable
+    public static Craft getCraftByName(String craftName) {
+        for (Craft craft : getCrafts()) {
+            if (craft.getName().equals(craftName)) {
+                return craft;
+            }
+        }
+        return null;
+    }
 
-		// Back
-		ItemStack back = UniversalMaterial.PUFFERFISH.getStack();
-		ItemMeta im = back.getItemMeta();
-		im.setDisplayName(Lang.ITEMS_CRAFT_BOOK_BACK);
-		back.setItemMeta(im);
-		inv.setItem(49, back);
-		
-		player.openInventory(inv);
-		
-	}
+    @Nullable
+    public static Craft getCraftByDisplayName(String craftName) {
+        for (Craft craft : getCrafts()) {
+            if (craft.getDisplayItem().getItemMeta().getDisplayName().equals(craftName)) {
+                return craft;
+            }
+        }
+        return null;
+    }
 
-	@SuppressWarnings("deprecation")
-	public static void registerGoldenHeadCraft(){
-		Bukkit.getLogger().info("[UhcCore] Loading custom craft for golden heads");
+    public static void openCraftBookInventory(Player player) {
+        Validate.notNull(player);
 
-		ItemStack goldenHead = UhcItems.createGoldenHead();
-		ShapedRecipe headRecipe = VersionUtils.getVersionUtils().createShapedRecipe(goldenHead, "golden_head");
+        int maxSlots = 6 * 9;
+        Inventory inv = Bukkit.createInventory(null, maxSlots, Lang.ITEMS_CRAFT_BOOK_INVENTORY);
+        int slot = 0;
+        for (Craft craft : getCrafts()) {
+            if (slot < maxSlots) {
+                inv.setItem(slot, craft.getDisplayItem());
+                slot++;
+            }
+        }
 
-		headRecipe.shape("GGG", "GHG", "GGG");
+        player.openInventory(inv);
+    }
 
-		Material material = UniversalMaterial.PLAYER_HEAD.getType();
-		MaterialData data = UniversalMaterial.PLAYER_HEAD.getStack().getData();
+    public static boolean isCraftItem(ItemStack item) {
+        if (item == null || item.getType().equals(Material.AIR)) {
+            return false;
+        }
 
-		headRecipe.setIngredient('G', Material.GOLD_INGOT);
+        if (item.hasItemMeta() && item.getItemMeta().hasDisplayName()) {
+            String name = item.getItemMeta().getDisplayName();
 
-		if (data != null && data.getItemType() == material) {
-			headRecipe.setIngredient('H', data);
-		}else {
-			headRecipe.setIngredient('H', material);
-		}
+            for (Craft craft : getCrafts()) {
+                if (name.equals(craft.getDisplayItem().getItemMeta().getDisplayName())
+                        && item.getType().equals(craft.getCraft().getType()))
+                    return true;
+            }
+        }
+        return false;
+    }
 
-		Bukkit.getServer().addRecipe(headRecipe);
-	}
+    public static boolean isCraftBookBackItem(ItemStack item) {
+        if (item == null || item.getType().equals(Material.AIR)) {
+            return false;
+        }
+
+        return item.getType().equals(UniversalMaterial.PUFFERFISH.getType()) && item.getItemMeta().getDisplayName().equals(Lang.ITEMS_CRAFT_BOOK_BACK);
+    }
+
+    public static void openCraftInventory(Player player, Craft craft) {
+        int maxSlots = 6 * 9;
+        Inventory inv = Bukkit.createInventory(null, maxSlots, Lang.ITEMS_CRAFT_BOOK_INVENTORY);
+
+        for (int i = 0; i < maxSlots - 9; i++) {
+            inv.setItem(i, UniversalMaterial.BLACK_STAINED_GLASS_PANE.getStack());
+        }
+
+        for (int i = maxSlots - 9; i < maxSlots; i++) {
+            inv.setItem(i, UniversalMaterial.WHITE_STAINED_GLASS_PANE.getStack());
+        }
+
+        // Recipe
+        inv.setItem(11, craft.getRecipe().get(0));
+        inv.setItem(12, craft.getRecipe().get(1));
+        inv.setItem(13, craft.getRecipe().get(2));
+        inv.setItem(20, craft.getRecipe().get(3));
+        inv.setItem(21, craft.getRecipe().get(4));
+        inv.setItem(22, craft.getRecipe().get(5));
+        inv.setItem(29, craft.getRecipe().get(6));
+        inv.setItem(30, craft.getRecipe().get(7));
+        inv.setItem(31, craft.getRecipe().get(8));
+
+        // Craft
+        inv.setItem(24, craft.getCraft());
+
+        // Back
+        ItemStack back = UniversalMaterial.PUFFERFISH.getStack();
+        ItemMeta im = back.getItemMeta();
+        im.setDisplayName(Lang.ITEMS_CRAFT_BOOK_BACK);
+        back.setItemMeta(im);
+        inv.setItem(49, back);
+
+        player.openInventory(inv);
+
+    }
+
+    @SuppressWarnings("deprecation")
+    public static void registerGoldenHeadCraft() {
+        Bukkit.getLogger().info("[UhcCore] Loading custom craft for golden heads");
+
+        ItemStack goldenHead = UhcItems.createGoldenHead();
+        ShapedRecipe headRecipe = VersionUtils.getVersionUtils().createShapedRecipe(goldenHead, "golden_head");
+
+        headRecipe.shape("GGG", "GHG", "GGG");
+
+        Material material = UniversalMaterial.PLAYER_HEAD.getType();
+        MaterialData data = UniversalMaterial.PLAYER_HEAD.getStack().getData();
+
+        headRecipe.setIngredient('G', Material.GOLD_INGOT);
+
+        if (data != null && data.getItemType() == material) {
+            headRecipe.setIngredient('H', data);
+        } else {
+            headRecipe.setIngredient('H', material);
+        }
+
+        Bukkit.getServer().addRecipe(headRecipe);
+    }
 
 }
