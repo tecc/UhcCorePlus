@@ -1,6 +1,6 @@
 # Directories #
-/build/
-/bin/
+build/
+bin/
 target/
  
 # OS Files #
@@ -76,7 +76,7 @@ todolist.txt
 .idea/*
 
 #Gradle
-/.gradle/
+.gradle/
 .gradle/*
 !gradle-wrapper.jar
 

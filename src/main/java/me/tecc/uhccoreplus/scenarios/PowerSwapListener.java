@@ -1,4 +1,4 @@
-package com.gmail.val59000mc.scenarios.scenariolisteners;
+package me.tecc.uhccoreplus.scenarios;
 
 import com.gmail.val59000mc.UhcCore;
 import com.gmail.val59000mc.events.UhcGameStateChangedEvent;
@@ -6,6 +6,7 @@ import com.gmail.val59000mc.events.UhcTimeEvent;
 import com.gmail.val59000mc.exceptions.UhcPlayerNotOnlineException;
 import com.gmail.val59000mc.game.GameState;
 import com.gmail.val59000mc.players.UhcPlayer;
+import com.gmail.val59000mc.scenarios.Option;
 import com.gmail.val59000mc.scenarios.ScenarioListener;
 import org.apache.commons.lang.math.RandomUtils;
 import org.bukkit.Bukkit;
@@ -14,14 +15,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.scheduler.BukkitScheduler;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class PowerSwapListener extends ScenarioListener {
-    private long duration = 2 * 60;
-    private long timeUntilNextSwap = duration;
+    @Option
+    private long duration = 5 * 60;
+
+    private long timeUntilNextSwap;
+
+    public void onEnable() {
+        timeUntilNextSwap = duration;
+    }
 
     @EventHandler
     public void onUhcTime(UhcTimeEvent event) {
@@ -49,7 +53,9 @@ public class PowerSwapListener extends ScenarioListener {
             return;
         }
         if (timeUntilNextSwap % 60 == 0) {
-            broadcast("&fSwapping health in &e&l" + (timeUntilNextSwap / 60) + "&f minutes");
+            if (timeUntilNextSwap / 60 == 1)
+                broadcast("&fSwapping health in &e&l1&f minute.");
+            else broadcast("&fSwapping health in &e&l" + (timeUntilNextSwap / 60) + "&f minutes.");
         }
     }
     private void broadcast(String message) {
@@ -68,12 +74,13 @@ public class PowerSwapListener extends ScenarioListener {
             if (!p.isOnline()) continue; // safeguard
 
             if (lowest == null) {
-                lowest = Arrays.asList(p);
+                lowest = mutableList(p);
                 lowestHealth = p.getPlayer().getHealth();
             }
             if (highest == null) {
-                highest = Arrays.asList(p);
+                highest = mutableList(p);
                 highestHealth = p.getPlayer().getHealth();
+                continue;
             }
 
             if (p.getPlayer().getHealth() == lowestHealth) {
@@ -95,6 +102,8 @@ public class PowerSwapListener extends ScenarioListener {
             }
         }
 
+        assert lowest != null : "Lowest is null";
+        // intellij is scary smart, and knows that if lowest is not null then highest cannot be null
         if (highest.size() > 1) return "More than 2 players have the greatest health, " + highestHealth + ".";
         UhcPlayer highestPlayer = highest.get(0);
         UhcPlayer lowestPlayer = lowest.get(RandomUtils.nextInt(lowest.size()));
@@ -105,5 +114,9 @@ public class PowerSwapListener extends ScenarioListener {
         lowestPlayer.getPlayer().setHealth(highestHealth);
 
         return "&fSwapped " + highestPlayer.getDisplayName() + "&f's health with " + lowestPlayer.getDisplayName() + "&f's.";
+    }
+    @SafeVarargs
+    private final <T> List<T> mutableList(T... ts) {
+        return new ArrayList<>(Arrays.asList(ts));
     }
 }

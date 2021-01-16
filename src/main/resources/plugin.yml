@@ -2,9 +2,13 @@ name: UhcCore
 main: com.gmail.val59000mc.UhcCore
 version: @version@
 description: Automates UHC games on a dedicated server
-author: val59000mc, Mezy
+author: val59000mc, Mezy, tecc
 softdepend: [WorldEdit,Vault,ProtocolLib]
 api-version: 1.13
+permissions:
+  uhc.addons:
+    default: op
+    description: "Addons permissions."
 commands:
   uhccore:
     description: "Type '/uhccore help' to see a list of commands"
@@ -68,3 +72,11 @@ commands:
   team:
     description: "Used to manage teams."
     usage: /<command> <sub-command>
+  addons:
+    description: "Manage addons."
+    usage: /<command> <sub-command> [argument]
+    aliases:
+      - uhcaddons
+      - uhca # UHC Addons
+      - ua # Uhc Addons
+      - ma # Manage Addons

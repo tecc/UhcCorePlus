@@ -52,8 +52,18 @@ public class ScenarioManager {
      */
     public void registerScenario(Scenario scenario) {
         Validate.notNull(scenario.getInfo(), "Scenario info cannot be null!");
-        Validate.isTrue(getScenario(scenario.getKey()) == null, "An scenario with the key " + scenario.getKey() + " is already registered!");
+        Validate.isTrue(getScenario(scenario.getKey()) == null, "A scenario with the key " + scenario.getKey() + " is already registered!");
         registeredScenarios.add(scenario);
+    }
+
+    /**
+     * Removes a scenarios registration.
+     * @param scenario The scenario to unregister.
+     */
+    public void unregisterScenario(Scenario scenario) {
+        Validate.notNull(scenario, "Scenario cannot be null!");
+        if (this.isEnabled(scenario)) this.disableScenario(scenario);
+        registeredScenarios.remove(scenario);
     }
 
     /**

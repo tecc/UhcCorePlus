@@ -1,5 +1,6 @@
 package com.gmail.val59000mc;
 
+import me.tecc.uhccoreplus.addons.AddonManager;
 import com.gmail.val59000mc.configuration.MainConfig;
 import com.gmail.val59000mc.game.GameManager;
 import com.gmail.val59000mc.scenarios.Scenario;
@@ -161,8 +162,9 @@ public class UhcCore extends JavaPlugin{
 
 	@Override
 	public void onDisable(){
+		AddonManager.getAddonManager().disableAddons();
 		gameManager.getScenarioManager().disableAllScenarios();
-		
+
 		updater.runAutoUpdate();
 		Bukkit.getLogger().info("[UhcCore] Plugin disabled");
 	}

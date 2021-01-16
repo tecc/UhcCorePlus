@@ -1,10 +1,10 @@
 package com.gmail.val59000mc.game;
 
 import com.gmail.val59000mc.UhcCore;
+import me.tecc.uhccoreplus.addons.AddonManager;
 import com.gmail.val59000mc.commands.*;
 import com.gmail.val59000mc.configuration.Dependencies;
 import com.gmail.val59000mc.configuration.MainConfig;
-import com.gmail.val59000mc.configuration.YamlFile;
 import com.gmail.val59000mc.customitems.CraftsManager;
 import com.gmail.val59000mc.customitems.KitsManager;
 import com.gmail.val59000mc.events.UhcGameStateChangedEvent;
@@ -25,6 +25,7 @@ import com.gmail.val59000mc.threads.*;
 import com.gmail.val59000mc.utils.*;
 import com.pieterdebot.biomemapping.Biome;
 import com.pieterdebot.biomemapping.BiomeMappingAPI;
+import me.tecc.uhccoreplus.commands.AddonsCommandExecutor;
 import org.apache.commons.lang.Validate;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
@@ -322,10 +323,22 @@ public class GameManager{
 
 	public void startWaitingPlayers(){
 		loadWorlds();
+		enableAddons();
 		registerCommands();
 		setGameState(GameState.WAITING);
 		Bukkit.getLogger().info(Lang.DISPLAY_MESSAGE_PREFIX+" Players are now allowed to join");
 		Bukkit.getScheduler().scheduleSyncDelayedTask(UhcCore.getPlugin(), new PreStartThread(this),0);
+	}
+
+	public void enableAddons() {
+		AddonManager am = new AddonManager();
+		try {
+			am.loadAddons();
+			am.enableAddons();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		registerCommand("addons", new AddonsCommandExecutor());
 	}
 
 	public void startGame(){
