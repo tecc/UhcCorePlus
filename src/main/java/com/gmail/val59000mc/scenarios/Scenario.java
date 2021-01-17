@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -211,6 +212,10 @@ public class Scenario {
     public static class Info {
         private final String name;
         private final List<String> description;
+
+        public Info(String name, String... description) {
+            this(name, Arrays.asList(description));
+        }
 
         public Info(String name, List<String> description) {
             this.name = name;
