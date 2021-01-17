@@ -1,13 +1,4 @@
 {
-    "power_swap": {
-        "name": "Power Swap",
-        "description": [
-            "Every 5 minutes, the player with the least health gets their health swapped with the player with the most health.",
-            "If more than 1 player has the most health, nothing happens.",
-            "If more than 1 player has the least health, the player will be picked at random.",
-            "This event does not have any effect before PVP enables nor after Meetup."
-        ]
-    },
     "cutclean": {
         "name": "CutClean",
         "description": [
@@ -305,6 +296,42 @@
         "name": "Nether Start",
         "description": [
             "You start the game in the nether."
+        ]
+    },
+
+    "health_swap": {
+        "name": "Health Swap",
+        "description": [
+            "Every 5 minutes, the player with the least health gets their health swapped with the player with the most health.",
+            "If more than 1 player has the most health, nothing happens.",
+            "If more than 1 player has the least health, the player will be picked at random.",
+            "This event does not have any effect before PVP enables nor after Meetup."
+        ]
+    },
+    "dog_lover": {
+        "name": "Dog Lover",
+        "description": [
+            "To tame a dog you only need 1 bone."
+        ]
+    },
+    "mine_the_most": {
+        "name": "Mine the Most",
+        "description": [
+            "Every 10 minutes, the player that has mined the least amount of blocks dies."
+        ]
+    },
+
+    "deadweight": {
+        "name": "Deadweight",
+        "description": [
+            "After you've hit a certain amount of items, you start becoming slower for every item you carry."
+        ]
+    },
+    "dead_weight": {
+        "name": "Dead Weight",
+        "description": [
+            "Each time you kill a player, you become slower.",
+            "By default, every time you kill it removes less speed from you."
         ]
     }
 }

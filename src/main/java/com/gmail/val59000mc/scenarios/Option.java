@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
  * This annotation is meant to be added to values in {@link ScenarioListener} classes on fields.
  * The options get added to the scenarios.yml for customisation.
  */
-@Retention(value = RetentionPolicy.RUNTIME)
-@Target(value = ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.FIELD)
 public @interface Option {
 
     /**

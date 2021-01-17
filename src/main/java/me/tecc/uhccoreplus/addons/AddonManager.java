@@ -3,6 +3,7 @@ package me.tecc.uhccoreplus.addons;
 import com.gmail.val59000mc.UhcCore;
 import org.apache.commons.io.FilenameUtils;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,14 +24,16 @@ public class AddonManager {
     private static AddonManager instance;
 
     private final Map<Class<? extends Addon>, Addon> addons;
+    private final Map<Class<? extends Addon>, File> addonFiles;
     private final Map<Class<? extends Addon>, AddonDescription> addonConfigurations;
     private final Map<File, ClassLoader> classLoaders;
 
 
     public AddonManager() {
         instance = this;
-        addonConfigurations = new HashMap<>();
         addons = new HashMap<>();
+        addonFiles = new HashMap<>();
+        addonConfigurations = new HashMap<>();
         classLoaders = new HashMap<>();
     }
 
@@ -88,7 +91,7 @@ public class AddonManager {
         disableAddon(addon);
 
         if (clearCachedClassLoader)
-            classLoaders.remove(getAddonConfig(addon).getFile());
+            classLoaders.remove(getAddonDescription(addon).getFile());
         addons.remove(addon);
         addonConfigurations.remove(addon);
     }
@@ -117,6 +120,7 @@ public class AddonManager {
             log.severe("Addon " + filename + " has a duplicate ID (" + id + "). Skipping.");
             return null;
         }
+
         Class<?> clz;
         try {
             clz = Class.forName(config.getString("mainClass"), true, classLoader);
@@ -128,6 +132,7 @@ public class AddonManager {
             log.severe("Addon " + id + " has duplicate main class (" + clz.getCanonicalName() + "). Skipping");
             return null;
         }
+
         if (!Addon.class.isAssignableFrom(clz)) return null;
         Class<? extends Addon> addonClass = clz.asSubclass(Addon.class);
         this.addonConfigurations.put(addonClass, config);
@@ -144,7 +149,9 @@ public class AddonManager {
             this.addonConfigurations.remove(addonClass);
             return null;
         }
+
         this.addons.put(addonClass, addon);
+        this.addonFiles.put(addonClass, file);
         return addon;
     }
 
@@ -194,16 +201,9 @@ public class AddonManager {
         UhcCore core = UhcCore.getPlugin();
 
         // makes sure the directory is proper
-        File addonsDirectory = new File(core.getDataFolder(), "addons");
-        if (!addonsDirectory.isDirectory()) {
-            if (!addonsDirectory.delete())
-                throw new IOException("Couldn't delete invalid addons directory.");
-        }
-        if (!addonsDirectory.exists()) {
-            if (!addonsDirectory.mkdir())
-                throw new IOException("Couldn't create new addons directory");
-            else return Collections.emptyList(); // because there isn't any files in the directory
-        }
+        File addonsDirectory = getAddonDirectory();
+        if (addonsDirectory.list().length == 0)
+            return Collections.emptyList();
 
         File[] filteredFiles = addonsDirectory.listFiles((file) -> {
             if (!file.isFile())
@@ -234,8 +234,18 @@ public class AddonManager {
     }
 
     @NotNull
-    public AddonDescription getAddonConfig(Class<? extends Addon> clz) {
+    public AddonDescription getAddonDescription(Class<? extends Addon> clz) {
         return this.addonConfigurations.get(clz);
+    }
+
+    @NotNull
+    public YamlConfiguration getAddonConfiguration(Class<? extends Addon> clz) throws IOException, InvalidConfigurationException, InvalidAddonException {
+        if (!addonExists(clz))
+            throw new InvalidAddonException("Addon class is not registered!");
+        Addon addon = getAddon(clz);
+        YamlConfiguration config = new YamlConfiguration();
+        config.load(new File(getAddonDirectory(), addon.id + ".yml"));
+        return config;
     }
 
     @SuppressWarnings("ConstantConditions")
@@ -277,4 +287,26 @@ public class AddonManager {
         }
     }
 
+    public static File getAddonDirectory() throws IOException {
+        File dir = new File(UhcCore.getPlugin().getDataFolder(), "addons");
+        File addonsDirectory = new File(UhcCore.getPlugin().getDataFolder(), "addons");
+        if (!addonsDirectory.isDirectory()) {
+            if (!addonsDirectory.delete())
+                throw new IOException("Couldn't delete invalid addons directory.");
+        }
+        if (!addonsDirectory.exists()) {
+            if (!addonsDirectory.mkdir())
+                throw new IOException("Couldn't create new addons directory");
+        }
+
+        return addonsDirectory;
+    }
+
+    public ClassLoader getClassLoader(Class<? extends Addon> clz) {
+        return this.classLoaders.get(getAddonFile(clz));
+    }
+
+    public File getAddonFile(Class<? extends Addon> clz) {
+        return this.addonFiles.get(clz);
+    }
 }

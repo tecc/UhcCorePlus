@@ -6,8 +6,8 @@ import com.gmail.val59000mc.game.GameState;
 import com.gmail.val59000mc.players.UhcPlayer;
 import com.gmail.val59000mc.scenarios.Option;
 import com.gmail.val59000mc.scenarios.ScenarioListener;
+import me.tecc.uhccoreplus.util.UCPUtil;
 import org.apache.commons.lang.math.RandomUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 
 import java.util.ArrayList;
@@ -15,24 +15,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class PowerSwapListener extends ScenarioListener {
+public class HealthSwapListener extends ScenarioListener {
     @Option
-    private long duration = 5 * 60;
+    private long interval = 5 * 60;
 
-    private long timeUntilNextSwap;
+    private long timer = -1;
 
     public void onEnable() {
-        timeUntilNextSwap = duration;
+        timer = interval;
     }
 
     @EventHandler
     public void onUhcTime(UhcTimeEvent event) {
         if (!getGameManager().getPvp()) return;
         if (getGameManager().getGameState() == GameState.DEATHMATCH) return;
+        if (timer == -1) timer = interval;
 
-        timeUntilNextSwap--;
-        if (timeUntilNextSwap == 0) {
-            timeUntilNextSwap = duration;
+        timer--;
+        if (timer == 0) {
+            timer = interval;
             try {
                 String result = swap();
                 broadcast(result);
@@ -42,23 +43,27 @@ public class PowerSwapListener extends ScenarioListener {
             }
             return;
         }
-        if (timeUntilNextSwap == 1) {
-            broadcast("&fSwapping health in &e&l1 &fsecond.");
+        if (timer == 1) {
+            broadcast("&fSwapping health in &4&l1 &fsecond.");
             return;
         }
-        if (timeUntilNextSwap <= 10) {
-            broadcast("&fSwapping health in &e&l" + timeUntilNextSwap + " seconds.");
+        if (timer <= 10) {
+            broadcast("&fSwapping health in &c&l" + timer + "&f seconds.");
             return;
         }
-        if (timeUntilNextSwap % 60 == 0) {
-            if (timeUntilNextSwap / 60 == 1)
-                broadcast("&fSwapping health in &e&l1&f minute.");
-            else broadcast("&fSwapping health in &e&l" + (timeUntilNextSwap / 60) + "&f minutes.");
+        if (timer <= 30 && timer % 10 == 0) {
+            broadcast("&fSwapping health in &6&l" + timer + "&f seconds.");
+            return;
+        }
+        if (timer % 60 == 0) {
+            if (timer / 60 == 1)
+                broadcast("&fSwapping health in &6&l1&f minute.");
+            else broadcast("&fSwapping health in &e&l" + (timer / 60) + "&f minutes.");
         }
     }
 
     private void broadcast(String message) {
-        getGameManager().broadcastInfoMessage(ChatColor.translateAlternateColorCodes('&', message));
+        getGameManager().broadcastInfoMessage(UCPUtil.colourise(message));
     }
 
     private String swap() throws UhcPlayerNotOnlineException {

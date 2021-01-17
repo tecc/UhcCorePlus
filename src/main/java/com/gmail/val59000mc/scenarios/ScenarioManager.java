@@ -8,11 +8,17 @@ import com.gmail.val59000mc.languages.Lang;
 import com.gmail.val59000mc.players.UhcPlayer;
 import com.gmail.val59000mc.utils.FileUtils;
 import com.gmail.val59000mc.utils.NMSUtils;
+import me.tecc.uhccoreplus.UCPScenarios;
+import me.tecc.uhccoreplus.addons.Addon;
+import me.tecc.uhccoreplus.addons.AddonManager;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
@@ -20,8 +26,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import javax.annotation.Nullable;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.nio.file.Files;
 import java.util.*;
 
 public class ScenarioManager {
@@ -34,7 +43,11 @@ public class ScenarioManager {
     public ScenarioManager() {
         registeredScenarios = new ArrayList<>();
         enabledScenarios = new HashMap<>();
-        Collections.addAll(registeredScenarios, Scenario.BUILD_IN_SCENARIOS);
+        Collections.addAll(registeredScenarios, getBuiltInScenarios());
+    }
+
+    public static Scenario[] getBuiltInScenarios() {
+        return ArrayUtils.addAll(Scenario.BUILD_IN_SCENARIOS, UCPScenarios.MINE_THE_MOST);
     }
 
     /**
@@ -321,19 +334,40 @@ public class ScenarioManager {
         }
 
         YamlFile cfg = FileUtils.saveResourceIfNotAvailable("scenarios.yml");
+
+        if (scenario.isAddonScenario()) {
+            Addon addon = scenario.getAddon();
+            File f = new File(AddonManager.getAddonDirectory(), addon.id + ".yml");
+            if (f.isDirectory()) {
+                if (!f.delete())
+                    throw new RuntimeException("Error code A301");
+            }
+            if (!f.exists()) {
+                ClassLoader loader = addon.getClassLoader();
+                InputStream input = loader.getResourceAsStream("config.yml");
+                if (input == null) {
+                    if (!f.createNewFile())
+                        throw new RuntimeException("Error code A300");
+                } else Files.copy(input, f.toPath());
+            }
+            cfg = new YamlFile(f);
+        }
+
         boolean pathChanges = false;
 
         ConfigurationSection section = cfg.getConfigurationSection(scenario.getKey());
         if (section == null) {
             // Perhaps stored under old path
             String oldPath = scenario.getKey().replace("_", "");
-            section = cfg.getConfigurationSection(oldPath);
+            if (getScenario(oldPath) == null) {
+                section = cfg.getConfigurationSection(oldPath);
 
-            // TODO: Remove conversion system on future update!
-            if (section != null) {
-                cfg.set(scenario.getKey(), section);
-                cfg.remove(oldPath);
-                pathChanges = true;
+                // TODO: Remove conversion system on future update!
+                if (section != null) {
+                    cfg.set(scenario.getKey(), section);
+                    cfg.set(oldPath, null);
+                    pathChanges = true;
+                }
             }
         }
 

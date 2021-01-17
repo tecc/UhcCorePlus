@@ -4,13 +4,15 @@ import com.gmail.val59000mc.UhcCore;
 import com.gmail.val59000mc.languages.Lang;
 import com.gmail.val59000mc.scenarios.scenariolisteners.*;
 import com.gmail.val59000mc.utils.UniversalMaterial;
-import me.tecc.uhccoreplus.scenarios.PowerSwapListener;
+import me.tecc.uhccoreplus.addons.Addon;
+import me.tecc.uhccoreplus.addons.AddonManager;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
@@ -64,11 +66,7 @@ public class Scenario {
     public static final Scenario NINE_SLOTS = new Scenario("nine_slots", UniversalMaterial.BARRIER, NineSlotsListener.class);
     public static final Scenario NETHER_START = new Scenario("nether_start", UniversalMaterial.LAVA_BUCKET, NetherStartListener.class);
 
-    public static final Scenario POWER_SWAP = new Scenario("power_swap", Material.APPLE, PowerSwapListener.class);
-
     public static final Scenario[] BUILD_IN_SCENARIOS = new Scenario[]{
-            POWER_SWAP,
-
             CUTCLEAN,
             FIRELESS,
             BOWLESS,
@@ -124,6 +122,8 @@ public class Scenario {
     private final int fromVersion;
 
     private Info info;
+    @Nullable
+    private Class<? extends Addon> addon;
 
     public Scenario(String key, UniversalMaterial material) {
         this(key, material.getType());
@@ -150,6 +150,11 @@ public class Scenario {
         this.material = material;
         this.listener = listener;
         this.fromVersion = fromVersion;
+    }
+
+    public Scenario(String key, Material material, Class<? extends ScenarioListener> listener, @Nullable Class<? extends Addon> addon) {
+        this(key, material, listener);
+        this.addon = addon;
     }
 
     public String getKey() {
@@ -193,6 +198,14 @@ public class Scenario {
 
     public boolean isCompatibleWithVersion() {
         return fromVersion <= UhcCore.getVersion();
+    }
+
+    public boolean isAddonScenario() {
+        return ArrayUtils.contains(ScenarioManager.getBuiltInScenarios(), this);
+    }
+
+    public Addon getAddon() {
+        return AddonManager.getAddonManager().getAddon(addon);
     }
 
     public static class Info {

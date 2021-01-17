@@ -5,8 +5,10 @@ import com.gmail.val59000mc.game.GameManager;
 import com.gmail.val59000mc.players.PlayersManager;
 import com.gmail.val59000mc.scenarios.Scenario;
 import com.gmail.val59000mc.scenarios.ScenarioManager;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
@@ -15,6 +17,7 @@ public abstract class Addon {
     private boolean enabled = false;
     @NotNull
     public final String id;
+    public final File addonFile;
     protected final Logger logger;
 
     public Addon() {
@@ -25,6 +28,7 @@ public abstract class Addon {
         id = config.getString("id");
         logger = Logger.getLogger("UCPA_" + id);
         logger.setParent(UhcCore.getPlugin().getLogger());
+        addonFile = AddonManager.getAddonManager().getAddonFile(this.getClass());
     }
 
     public boolean isEnabled() {
@@ -55,7 +59,7 @@ public abstract class Addon {
 
     @NotNull
     public AddonDescription getAddonDescription() {
-        return AddonManager.getAddonManager().getAddonConfig(this.getClass());
+        return AddonManager.getAddonManager().getAddonDescription(this.getClass());
     }
 
     public final void disable() {
@@ -76,5 +80,20 @@ public abstract class Addon {
 
     public PlayersManager getPlayersManager() {
         return getGameManager().getPlayersManager();
+    }
+
+    public YamlConfiguration getConfiguration() {
+        try {
+            return AddonManager.getAddonManager().getAddonConfiguration(this.getClass());
+        } catch (Exception e) {
+            logger.severe("Something went wrong whilst trying to get addon configuration for addon " + id);
+            e.printStackTrace();
+
+            return new YamlConfiguration();
+        }
+    }
+
+    public ClassLoader getClassLoader() {
+        return AddonManager.getAddonManager().getClassLoader(this.getClass());
     }
 }
