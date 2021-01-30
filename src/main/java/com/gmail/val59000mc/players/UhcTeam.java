@@ -16,6 +16,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,7 @@ public class UhcTeam {
     private boolean readyToStart;
     private Location startingLocation;
     private final int teamNumber;
+    private final UUID uuid;
     private String teamName;
     private String prefix;
     private final Inventory teamInventory;
@@ -37,6 +39,7 @@ public class UhcTeam {
         teamName = "Team " + teamNumber;
         prefix = GameManager.getGameManager().getTeamManager().getTeamPrefix();
         teamInventory = Bukkit.createInventory(null, 9 * 3, ChatColor.GOLD + "Team Inventory");
+        uuid = UUID.randomUUID();
     }
 
     public int getTeamNumber() {
@@ -218,4 +221,7 @@ public class UhcTeam {
         return startingLocation;
     }
 
+    public UUID getUniqueId() {
+        return this.uuid;
+    }
 }

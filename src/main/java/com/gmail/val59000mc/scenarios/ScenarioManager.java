@@ -11,19 +11,19 @@ import com.gmail.val59000mc.utils.NMSUtils;
 import me.tecc.uhccoreplus.UCPScenarios;
 import me.tecc.uhccoreplus.addons.Addon;
 import me.tecc.uhccoreplus.addons.AddonManager;
-import org.apache.commons.io.IOUtils;
+import me.tecc.uhccoreplus.util.UCPLogger;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -34,7 +34,7 @@ import java.nio.file.Files;
 import java.util.*;
 
 public class ScenarioManager {
-
+    private static final UCPLogger logger = UCPLogger.global();
     private static final int ROW = 9;
 
     private final List<Scenario> registeredScenarios;
@@ -47,7 +47,7 @@ public class ScenarioManager {
     }
 
     public static Scenario[] getBuiltInScenarios() {
-        return ArrayUtils.addAll(Scenario.BUILD_IN_SCENARIOS, UCPScenarios.MINE_THE_MOST);
+        return ArrayUtils.addAll(Scenario.BUILD_IN_SCENARIOS, UCPScenarios.SCENARIOS);
     }
 
     /**
@@ -87,8 +87,8 @@ public class ScenarioManager {
      *
      * @param scenario Scenario to activate.
      */
-    public void enableScenario(Scenario scenario) {
-        Validate.isTrue(isRegistered(scenario), "The specified scenario is not registered!");
+    public void enableScenario(@NotNull Scenario scenario) {
+        Validate.isTrue(isRegistered(scenario), "The specified scenario (" + scenario.getKey() + ") is not registered!");
 
         if (isEnabled(scenario)) {
             return;
@@ -141,7 +141,7 @@ public class ScenarioManager {
      * @param scenario The scenario to toggle.
      * @return Returns true if the scenario got enabled, false when disabled.
      */
-    public boolean toggleScenario(Scenario scenario) {
+    public boolean toggleScenario(@NotNull Scenario scenario) {
         if (isEnabled(scenario)) {
             disableScenario(scenario);
             return false;
@@ -201,7 +201,11 @@ public class ScenarioManager {
             List<String> defaultScenarios = cfg.get(MainConfig.DEFAULT_SCENARIOS);
             for (String scenarioKey : defaultScenarios) {
                 Scenario scenario = getScenario(scenarioKey);
-                Bukkit.getLogger().info("[UhcCore] Loading " + scenario.getKey());
+                if (scenario == null) {
+                    logger.warn("Not loading invalid scenario " + scenarioKey);
+                    continue;
+                }
+                logger.info("Loading " + scenario.getKey());
                 enableScenario(scenario);
             }
         }

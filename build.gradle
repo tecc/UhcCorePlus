@@ -1,13 +1,8 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:5.1.0'
-    }
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
 }
 
 allprojects {
@@ -21,26 +16,35 @@ allprojects {
     targetCompatibility = 1.8
 
     repositories {
-        mavenCentral()
+        jcenter()
         maven {
             // Spigot
-            url = 'https://hub.spigotmc.org/nexus/content/groups/public/'
+            name 'SpigotMC'
+            url 'https://hub.spigotmc.org/nexus/content/groups/public/'
         }
         maven {
             // VaultAPI
-            url = 'https://jitpack.io'
+            name 'Jitpack'
+            url 'https://jitpack.io'
         }
         maven {
             // WorldEdit
-            url = 'http://maven.sk89q.com/repo/'
+            name 'sk89q'
+            url 'http://maven.sk89q.com/repo/'
         }
         maven {
             // ProtocolLib
+            name 'dmulloy2'
             url "http://repo.dmulloy2.net/nexus/repository/public/"
         }
         // PaperLib
         maven {
+            name 'PaperMC'
             url 'https://papermc.io/repo/repository/maven-public/'
+        }
+        maven {
+            name 'CodeMC'
+            url 'https://repo.codemc.org/repository/maven-public/'
         }
     }
 
@@ -52,29 +56,29 @@ allprojects {
 }
 
 dependencies {
-    shadow 'com.google.code.findbugs:jsr305:3.0.2'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
     //shadow 'org.spigotmc:spigot-api:1.8.8-R0.1-SNAPSHOT'
     //shadow 'org.spigotmc:spigot-api:1.12.2-R0.1-SNAPSHOT'
     //shadow 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT'
     //shadow 'org.spigotmc:spigot-api:1.14.2-R0.1-SNAPSHOT'
     //shadow 'org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT'
-    shadow 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
-    shadow 'com.github.MilkBowl:VaultAPI:1.7'
-    compile 'com.github.WesJD.AnvilGUI:anvilgui:master-SNAPSHOT'
-    compile 'com.github.Mezy:BiomeMapping:master-SNAPSHOT'
-    compile "io.papermc:paperlib:1.0.5"
-    shadow 'com.comphenix.protocol:ProtocolLib:4.4.0'
-    compile project('Support-WorldEdit-6')
-    compile project('Support-WorldEdit-7')
-    compile 'commons-io:commons-io:2.8.0'
-    compile 'org.apache.commons:commons-lang3:3.11'
-    compile 'org.jetbrains:annotations:20.1.0'
+    implementation 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
+    implementation 'com.github.MilkBowl:VaultAPI:1.7'
+    implementation 'com.github.WesJD.AnvilGUI:anvilgui:master-SNAPSHOT'
+    implementation 'com.github.Mezy:BiomeMapping:master-SNAPSHOT'
+    implementation 'io.papermc:paperlib:1.0.5'
+    implementation 'com.comphenix.protocol:ProtocolLib:4.4.0'
+    implementation project('Support-WorldEdit-6')
+    implementation project('Support-WorldEdit-7')
+    implementation 'commons-io:commons-io:2.8.0'
+    implementation 'org.apache.commons:commons-lang3:3.11'
+    implementation 'org.jetbrains:annotations:20.1.0'
+    implementation 'com.vdurmont:semver4j:3.1.0'
+    implementation 'de.tr7zw:item-nbt-api:2.7.1'
 }
 
 shadowJar {
-    classifier = ''
-    configurations = [project.configurations.compile]
-    relocate 'io.papermc.lib', 'com.gmail.val59000mc.paperlib'
+    relocate 'de.tr7zw.changeme.nbtapi', 'me.tecc.nbtapi'
 }
 
 build.dependsOn(shadowJar)

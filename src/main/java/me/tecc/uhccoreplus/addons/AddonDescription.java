@@ -13,11 +13,19 @@ public class AddonDescription extends YamlConfiguration {
     }
 
     @NotNull
-    public String getId() {
+    public String id() {
         String id = this.getString("id");
         if (id == null)
             throw new InvalidAddonDescriptionException("No ID was found!");
         return id;
+    }
+
+    @NotNull
+    public String name() {
+        String name = this.getString("name");
+        if (name == null)
+            throw new InvalidAddonDescriptionException("No name was found!");
+        return name;
     }
 
     @NotNull

@@ -138,13 +138,23 @@ public class PlayersManager {
         }
     }
 
-    public UhcPlayer getUhcPlayer(String name) throws UhcPlayerDoesntExistException {
-        for (UhcPlayer uhcPlayer : getPlayersList()) {
-            if (uhcPlayer.getName().equals(name)) {
-                return uhcPlayer;
+    public UhcPlayer getUhcPlayer(String nameOrId) throws UhcPlayerDoesntExistException {
+        try {
+            UUID id = UUID.fromString(nameOrId);
+            for (UhcPlayer uhcPlayer : getPlayersList()) {
+                if (uhcPlayer.getUuid().equals(id)) {
+                    return uhcPlayer;
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            for (UhcPlayer uhcPlayer : getPlayersList()) {
+                if (uhcPlayer.getName().equals(nameOrId)) {
+                    return uhcPlayer;
+                }
             }
         }
-        throw new UhcPlayerDoesntExistException(name);
+
+        throw new UhcPlayerDoesntExistException(nameOrId);
     }
 
     public UhcPlayer getUhcPlayer(UUID uuid) throws UhcPlayerDoesntExistException {

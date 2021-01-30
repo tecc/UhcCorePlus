@@ -10,6 +10,7 @@ import com.gmail.val59000mc.scenarios.Option;
 import com.gmail.val59000mc.scenarios.Scenario;
 import com.gmail.val59000mc.scenarios.ScenarioListener;
 import com.gmail.val59000mc.utils.VersionUtils;
+import me.tecc.uhccoreplus.util.UCPLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -18,6 +19,7 @@ import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.plugin.EventExecutor;
 
 public class AchievementHunter extends ScenarioListener implements EventExecutor {
+    UCPLogger logger = UCPLogger.global();
 
     private enum Type {
         ACHIEVEMENTS("org.bukkit.event.player.PlayerAchievementAwardedEvent"),
@@ -49,6 +51,7 @@ public class AchievementHunter extends ScenarioListener implements EventExecutor
         try {
             event = (Class<? extends PlayerEvent>) Class.forName(type.event);
         } catch (ClassNotFoundException | ClassCastException ex) {
+            logger.error("Something went wrong when trying to find/cast a value.");
             ex.printStackTrace();
             getScenarioManager().disableScenario(Scenario.ACHIEVEMENT_HUNTER);
         }

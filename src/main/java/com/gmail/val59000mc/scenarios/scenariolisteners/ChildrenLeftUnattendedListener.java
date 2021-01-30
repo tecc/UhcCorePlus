@@ -15,7 +15,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-public class ChildrenLeftUnattended extends ScenarioListener {
+public class ChildrenLeftUnattendedListener extends ScenarioListener {
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {

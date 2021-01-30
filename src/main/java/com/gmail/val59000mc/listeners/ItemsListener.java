@@ -3,17 +3,19 @@ package com.gmail.val59000mc.listeners;
 import com.gmail.val59000mc.UhcCore;
 import com.gmail.val59000mc.configuration.MainConfig;
 import com.gmail.val59000mc.customitems.*;
+import com.gmail.val59000mc.exceptions.UhcPlayerDoesntExistException;
 import com.gmail.val59000mc.exceptions.UhcTeamException;
 import com.gmail.val59000mc.game.GameManager;
 import com.gmail.val59000mc.game.GameState;
 import com.gmail.val59000mc.languages.Lang;
-import com.gmail.val59000mc.players.PlayerState;
-import com.gmail.val59000mc.players.PlayersManager;
-import com.gmail.val59000mc.players.UhcPlayer;
-import com.gmail.val59000mc.players.UhcTeam;
+import com.gmail.val59000mc.players.*;
 import com.gmail.val59000mc.scenarios.Scenario;
 import com.gmail.val59000mc.scenarios.ScenarioManager;
 import com.gmail.val59000mc.utils.UniversalMaterial;
+import de.tr7zw.changeme.nbtapi.NBTItem;
+import me.tecc.uhccoreplus.util.NBT;
+import me.tecc.uhccoreplus.util.UCPLogger;
+import me.tecc.uhccoreplus.util.UCPUtil;
 import net.wesjd.anvilgui.AnvilGUI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -39,18 +41,18 @@ import org.bukkit.potion.PotionEffectType;
 
 public class ItemsListener implements Listener {
 
+    private UCPLogger logger = UCPLogger.global();
+
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onRightClickItem(PlayerInteractEvent event) {
-        if (
-                event.getAction() != Action.RIGHT_CLICK_AIR &&
-                        event.getAction() != Action.RIGHT_CLICK_BLOCK
-        ) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) {
             return;
         }
 
         Player player = event.getPlayer();
         GameManager gm = GameManager.getGameManager();
         UhcPlayer uhcPlayer = gm.getPlayersManager().getUhcPlayer(player);
+        @SuppressWarnings("deprecation")
         ItemStack hand = player.getItemInHand();
 
         if (GameItem.isGameItem(hand)) {
@@ -63,8 +65,6 @@ public class ItemsListener implements Listener {
         if ((gm.getGameState().equals(GameState.PLAYING) || gm.getGameState().equals(GameState.DEATHMATCH))
                 && UhcItems.isRegenHeadItem(hand)
                 && uhcPlayer.getState().equals(PlayerState.PLAYING)
-                && (event.getAction() == Action.RIGHT_CLICK_AIR
-                || event.getAction() == Action.RIGHT_CLICK_BLOCK)
         ) {
             event.setCancelled(true);
             uhcPlayer.getTeam().regenTeam(gm.getConfig().get(MainConfig.DOUBLE_REGEN_HEAD));
@@ -305,16 +305,15 @@ public class ItemsListener implements Listener {
             uhcPlayer.sendMessage("Something went wrong!");
             return;
         }
-
-        String line = meta.getLore().get(1).replace(ChatColor.DARK_GRAY.toString(), "");
-        UhcTeam team = GameManager.getGameManager().getTeamManager().getTeamByName(line);
+        TeamManager tm = GameManager.getGameManager().getTeamManager();
+        UhcTeam team = tm.getTeamById(NBT.itemGetUuid(item, NBT.ID_VALUE));
 
         if (team == null) {
             uhcPlayer.sendMessage(Lang.TEAM_MESSAGE_NO_LONGER_EXISTS);
             return;
         }
 
-        GameManager.getGameManager().getTeamManager().replyToTeamInvite(uhcPlayer, team, accepted);
+        tm.replyToTeamInvite(uhcPlayer, team, accepted);
     }
 
     private void openTeamRenameGUI(Player player, UhcTeam team) {
@@ -411,13 +410,6 @@ public class ItemsListener implements Listener {
             return;
         }
 
-        Player player = ((Player) e.getWhoClicked()).getPlayer();
-        ItemStack item = e.getCurrentItem();
-        ItemMeta meta = item.getItemMeta();
-        GameManager gm = GameManager.getGameManager();
-        PlayersManager pm = gm.getPlayersManager();
-        ScenarioManager scenarioManager = gm.getScenarioManager();
-
         boolean mainInventory = clickedInv.getTitle().equals(Lang.SCENARIO_GLOBAL_INVENTORY);
         boolean editInventory = clickedInv.getTitle().equals(Lang.SCENARIO_GLOBAL_INVENTORY_EDIT);
         boolean voteInventory = clickedInv.getTitle().equals(Lang.SCENARIO_GLOBAL_INVENTORY_VOTE);
@@ -427,10 +419,18 @@ public class ItemsListener implements Listener {
             return;
         }
 
+        Player player = ((Player) e.getWhoClicked()).getPlayer();
+        ItemStack item = e.getCurrentItem();
+        ItemMeta meta = item.getItemMeta();
+        GameManager gm = GameManager.getGameManager();
+        PlayersManager pm = gm.getPlayersManager();
+        ScenarioManager scenarioManager = gm.getScenarioManager();
+
         e.setCancelled(true);
         player.closeInventory();
 
         // Get scenario info when right click or when on the global inventory menu.
+        Scenario scenario = scenarioManager.getScenario(UCPUtil.getNbtFromItem(item, NBT.ID_VALUE));
         if (e.getClick() == ClickType.RIGHT || mainInventory) {
             // Handle edit item
             if (meta.getDisplayName().equals(Lang.SCENARIO_GLOBAL_ITEM_EDIT)) {
@@ -440,7 +440,7 @@ public class ItemsListener implements Listener {
             }
 
             // Clicked scenario
-            Scenario scenario = scenarioManager.getScenario(meta.getDisplayName());
+
 
             // Clicked item is not a scenario item
             if (scenario == null) {
@@ -458,9 +458,6 @@ public class ItemsListener implements Listener {
                 return;
             }
 
-            // Clicked scenario
-            Scenario scenario = scenarioManager.getScenario(meta.getDisplayName());
-
             // toggle scenario
             scenarioManager.toggleScenario(scenario);
 
@@ -468,9 +465,6 @@ public class ItemsListener implements Listener {
             player.openInventory(scenarioManager.getScenarioEditInventory());
         } else if (voteInventory) {
             UhcPlayer uhcPlayer = pm.getUhcPlayer(player);
-
-            // Clicked scenario
-            Scenario scenario = scenarioManager.getScenario(meta.getDisplayName());
 
             // toggle scenario
             if (uhcPlayer.getScenarioVotes().contains(scenario)) {

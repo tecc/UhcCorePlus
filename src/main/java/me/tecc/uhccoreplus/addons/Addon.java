@@ -5,6 +5,7 @@ import com.gmail.val59000mc.game.GameManager;
 import com.gmail.val59000mc.players.PlayersManager;
 import com.gmail.val59000mc.scenarios.Scenario;
 import com.gmail.val59000mc.scenarios.ScenarioManager;
+import me.tecc.uhccoreplus.util.UCPLogger;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +19,7 @@ public abstract class Addon {
     @NotNull
     public final String id;
     public final File addonFile;
-    protected final Logger logger;
+    protected final UCPLogger logger = UCPLogger.of(this.getClass());
 
     public Addon() {
         AddonDescription config = getAddonDescription();
@@ -26,8 +27,6 @@ public abstract class Addon {
             throw new RuntimeException("No ID found in addon description!");
         //noinspection ConstantConditions
         id = config.getString("id");
-        logger = Logger.getLogger("UCPA_" + id);
-        logger.setParent(UhcCore.getPlugin().getLogger());
         addonFile = AddonManager.getAddonManager().getAddonFile(this.getClass());
     }
 
@@ -45,10 +44,19 @@ public abstract class Addon {
         logger.info("Enabled addon " + id);
     }
 
+    /**
+     * Called when the addon is enabled.
+     * The addon may be enabled at any point <i>after</i> the world has been generated.
+     */
     public void onEnable() {
         logger.info("onEnable: " + id);
     }
 
+    /**
+     * Called when the addon is disabled.
+     * The addon may be disabled at any point after it has been enabled.
+     * Note that any scenarios registered by the plugin will automatically be disabled.
+     */
     public void onDisable() {
         logger.info("onDisable: " + id);
     }
@@ -86,7 +94,7 @@ public abstract class Addon {
         try {
             return AddonManager.getAddonManager().getAddonConfiguration(this.getClass());
         } catch (Exception e) {
-            logger.severe("Something went wrong whilst trying to get addon configuration for addon " + id);
+            logger.error("Something went wrong whilst trying to get addon configuration for addon " + id);
             e.printStackTrace();
 
             return new YamlConfiguration();

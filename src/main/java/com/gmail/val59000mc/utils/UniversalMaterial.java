@@ -78,8 +78,6 @@ public enum UniversalMaterial {
     ENCHANTING_TABLE("ENCHANTMENT_TABLE", "ENCHANTING_TABLE"),
     WOLF_SPAWN_EGG("MONSTER_EGG", "WOLF_SPAWN_EGG", (short) 95),
     CLOCK("WATCH", "CLOCK"),
-    IRON_SWORD,
-    DIAMOND_SWORD,
     EGG,
     ENCHANTED_BOOK,
     PAPER,
@@ -112,6 +110,11 @@ public enum UniversalMaterial {
     ROSE_BUSH("DOUBLE_PLANT", "ROSE_BUSH", (short) 4),
     PEONY("DOUBLE_PLANT", "PEONY", (short) 5),
     DEAD_BUSH,
+
+    // tools
+    WOODEN_SWORD("WOOD_SWORD", "WOODEN_SWORD"),
+    IRON_SWORD,
+    DIAMOND_SWORD,
 
     WOODEN_PICKAXE("WOOD_PICKAXE", "WOODEN_PICKAXE"),
     GOLDEN_PICKAXE("GOLD_PICKAXE", "GOLDEN_PICKAXE"),
@@ -147,7 +150,12 @@ public enum UniversalMaterial {
     RAW_CHICKEN("RAW_CHICKEN", "CHICKEN"),
     RAW_MUTTON("MUTTON", "MUTTON"),
     RAW_RABBIT("RABBIT", "RABBIT"),
-    RAW_PORK("PORK", "PORKCHOP");
+    RAW_PORK("PORK", "PORKCHOP"),
+
+    APPLE,
+
+    BONE
+    ;
 
     private final String name8, name13;
     private final short id8;

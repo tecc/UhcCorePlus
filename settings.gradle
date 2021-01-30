@@ -1,4 +1,4 @@
-rootProject.name = 'UhcCore'
+rootProject.name = 'UhcCorePlus'
 include 'Support-WorldEdit-6'
 include 'Support-WorldEdit-7'
 include 'AddonTest'

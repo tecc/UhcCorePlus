@@ -3,6 +3,7 @@ package com.gmail.val59000mc.languages;
 import com.gmail.val59000mc.UhcCore;
 import com.gmail.val59000mc.configuration.YamlFile;
 import com.gmail.val59000mc.scenarios.Scenario;
+import com.gmail.val59000mc.scenarios.ScenarioManager;
 import com.gmail.val59000mc.utils.FileUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -391,7 +392,7 @@ public class Lang {
 
         // load scenario info
         JsonObject defaultInfo = getDefaultScenarioInfo();
-        for (Scenario scenario : Scenario.BUILD_IN_SCENARIOS) {
+        for (Scenario scenario : ScenarioManager.getBuiltInScenarios()) {
             JsonObject scenarioDefault = defaultInfo.get(scenario.getKey()).getAsJsonObject();
             String defaultName = scenarioDefault.get("name").getAsString();
             JsonArray defaultDescription = scenarioDefault.get("description").getAsJsonArray();
@@ -492,7 +493,7 @@ public class Lang {
     private JsonObject getDefaultScenarioInfo() {
         try {
             InputStream in = getClass().getResourceAsStream("/scenario-descriptions.json");
-            Validate.notNull(in);
+            Validate.notNull(in, "Couldn't get the scenario descriptions.");
             JsonObject json = new JsonParser().parse(new InputStreamReader(in)).getAsJsonObject();
             in.close();
             return json;

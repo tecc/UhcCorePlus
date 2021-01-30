@@ -7,6 +7,7 @@ import com.gmail.val59000mc.scenarios.Scenario;
 import com.gmail.val59000mc.utils.FileUtils;
 import com.gmail.val59000mc.configuration.YamlFile;
 import com.gmail.val59000mc.utils.TimeUtils;
+import me.tecc.uhccoreplus.util.UCPLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -27,6 +28,7 @@ public class UhcCore extends JavaPlugin {
     private boolean bStats;
     private GameManager gameManager;
     private Updater updater;
+    private UCPLogger logger;
 
     @Override
     public void onEnable() {
@@ -57,9 +59,9 @@ public class UhcCore extends JavaPlugin {
 
         if (version == 0) {
             version = MIN_VERSION;
-            Bukkit.getLogger().warning("[UhcCore] Failed to detect server version! " + versionString + "?");
+            logger.warn("Failed to detect server version! " + versionString + "?");
         } else {
-            Bukkit.getLogger().info("[UhcCore] 1." + version + " Server detected!");
+            logger.info("[UhcCore] 1." + version + " Server detected!");
         }
     }
 
@@ -146,7 +148,7 @@ public class UhcCore extends JavaPlugin {
             try {
                 storage.save();
             } catch (IOException ex) {
-                Bukkit.getLogger().warning("[UhcCore] Failed to save storage.yml file!");
+                logger.error("Failed to save storage.yml file!");
                 ex.printStackTrace();
             }
         }

@@ -221,6 +221,7 @@ public class AddonManager {
 
     @Nullable
     public Addon getAddon(Class<? extends Addon> clz) {
+        if (clz == null) return null;
         return this.addons.get(clz);
     }
 
@@ -290,7 +291,7 @@ public class AddonManager {
     public static File getAddonDirectory() throws IOException {
         File dir = new File(UhcCore.getPlugin().getDataFolder(), "addons");
         File addonsDirectory = new File(UhcCore.getPlugin().getDataFolder(), "addons");
-        if (!addonsDirectory.isDirectory()) {
+        if (addonsDirectory.exists() && !addonsDirectory.isDirectory()) {
             if (!addonsDirectory.delete())
                 throw new IOException("Couldn't delete invalid addons directory.");
         }

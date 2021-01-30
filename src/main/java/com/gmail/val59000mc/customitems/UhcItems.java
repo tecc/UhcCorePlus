@@ -9,6 +9,9 @@ import com.gmail.val59000mc.players.UhcPlayer;
 import com.gmail.val59000mc.players.UhcTeam;
 import com.gmail.val59000mc.utils.UniversalMaterial;
 import com.gmail.val59000mc.utils.VersionUtils;
+import de.tr7zw.changeme.nbtapi.NBTItem;
+import me.tecc.uhccoreplus.util.UCPLogger;
+import me.tecc.uhccoreplus.util.NBT;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -24,6 +27,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.*;
 
 public class UhcItems {
+
+    private static final UCPLogger logger = UCPLogger.global();
 
     public static void giveGameItemTo(Player player, GameItem gameItem) {
         if (!gameItem.meetsUsageRequirements()) {
@@ -134,6 +139,9 @@ public class UhcItems {
                 ItemMeta meta = item.getItemMeta();
                 meta.setDisplayName(ChatColor.GREEN + leader.getName());
                 item.setItemMeta(meta);
+                NBTItem nbt = new NBTItem(item);
+                nbt.setUUID(NBT.ID_VALUE, leader.getUuid());
+                nbt.applyNBT(item);
 
                 inv.setItem(slot, item);
                 slot++;
@@ -158,6 +166,10 @@ public class UhcItems {
         ItemStack item = VersionUtils.getVersionUtils().createPlayerSkull(leaderName, leader.getUuid());
         List<String> membersNames = team.getMembersNames();
         ItemMeta im = item.getItemMeta();
+
+        if (im == null) {
+            logger.error("Something went wrong whilst creating team skull.");
+        }
 
         // Setting up lore with team members
         List<String> teamLore = new ArrayList<>();

@@ -1,11 +1,14 @@
 package com.gmail.val59000mc.scenarios;
 
 import com.gmail.val59000mc.UhcCore;
+import com.gmail.val59000mc.game.GameManager;
 import com.gmail.val59000mc.languages.Lang;
 import com.gmail.val59000mc.scenarios.scenariolisteners.*;
 import com.gmail.val59000mc.utils.UniversalMaterial;
+import de.tr7zw.changeme.nbtapi.NBTItem;
 import me.tecc.uhccoreplus.addons.Addon;
 import me.tecc.uhccoreplus.addons.AddonManager;
+import me.tecc.uhccoreplus.util.NBT;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -13,9 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class Scenario {
     public static final Scenario CUTCLEAN = new Scenario("cutclean", UniversalMaterial.IRON_INGOT, CutCleanListener.class);
@@ -50,7 +51,7 @@ public class Scenario {
     public static final Scenario ANONYMOUS = new Scenario("anonymous", UniversalMaterial.NAME_TAG, AnonymousListener.class);
     public static final Scenario GONE_FISHING = new Scenario("gone_fishing", UniversalMaterial.FISHING_ROD, GoneFishingListener.class);
     public static final Scenario INFINITE_ENCHANTS = new Scenario("infinite_enchants", UniversalMaterial.ENCHANTING_TABLE, InfiniteEnchantsListener.class);
-    public static final Scenario CHILDREN_LEFT_UNATTENDED = new Scenario("children_left_unattended", UniversalMaterial.WOLF_SPAWN_EGG, ChildrenLeftUnattended.class);
+    public static final Scenario CHILDREN_LEFT_UNATTENDED = new Scenario("children_left_unattended", UniversalMaterial.WOLF_SPAWN_EGG, ChildrenLeftUnattendedListener.class);
     public static final Scenario SILENT_NIGHT = new Scenario("silent_night", UniversalMaterial.CLOCK, SilentNightListener.class);
     // TODO: Fix bugs before releasing. public static final Scenario SHARED_HEALTH = new Scenario("shared_health", UniversalMaterial.RED_DYE, SharedHealthListener.class);
     public static final Scenario PERMAKILL = new Scenario("permakill", UniversalMaterial.IRON_SWORD, PermaKillListener.class);
@@ -148,7 +149,7 @@ public class Scenario {
 
     public Scenario(String key, Material material, Class<? extends ScenarioListener> listener, int fromVersion) {
         this.key = key;
-        this.material = material;
+        this.material = material != null ? material : UniversalMaterial.BARRIER.getType();
         this.listener = listener;
         this.fromVersion = fromVersion;
     }
@@ -162,7 +163,12 @@ public class Scenario {
         return key;
     }
 
+
+    public final Info DEFAULT_INFO = new Info(this.getKey(), "This is a default description. If you see this, something has gone wrong.");
     public Info getInfo() {
+        if (info == null) {
+            return DEFAULT_INFO;
+        }
         return info;
     }
 
@@ -180,20 +186,38 @@ public class Scenario {
     }
 
     public boolean equals(String name) {
-        return name.contains(info.getName()) ||
-                name.replace(" ", "").toLowerCase().equals(key) ||
-                name.replace(" ", "").toLowerCase().equals(key.replace("_", ""));
+        if (name.equalsIgnoreCase(key))
+            return true;
+        name = name.replace(" ", "");
+        if (name.equalsIgnoreCase(key))
+            return true;
+        if (name.equalsIgnoreCase(key.replaceAll("_", "")) &&
+                GameManager.getGameManager().getScenarioManager().getScenario(key.replaceAll("_", "")) != null)
+            return true;
+
+        return false;
     }
 
     public ItemStack getScenarioItem() {
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
 
-        meta.setDisplayName(Lang.SCENARIO_GLOBAL_ITEM_COLOR + info.getName());
+        if (meta == null) {
+            UhcCore.getPlugin().getLogger().severe("Scenario item meta is null, returning unfinished item.");
+            return item;
+        }
+
+        meta.setDisplayName(Lang.SCENARIO_GLOBAL_ITEM_COLOR + getInfo().getName());
         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES);
         meta.setLore(Collections.singletonList(Lang.SCENARIO_GLOBAL_ITEM_INFO));
 
         item.setItemMeta(meta);
+
+        // some nbt stuff
+        NBTItem nbt = new NBTItem(item);
+        nbt.setString(NBT.ID_VALUE, this.getKey());
+        nbt.applyNBT(item);
+
         return item;
     }
 
@@ -202,7 +226,7 @@ public class Scenario {
     }
 
     public boolean isAddonScenario() {
-        return ArrayUtils.contains(ScenarioManager.getBuiltInScenarios(), this);
+        return !ArrayUtils.contains(ScenarioManager.getBuiltInScenarios(), this);
     }
 
     public Addon getAddon() {

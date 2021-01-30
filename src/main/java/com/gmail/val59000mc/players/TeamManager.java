@@ -8,6 +8,7 @@ import org.bukkit.ChatColor;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class TeamManager {
 
@@ -152,4 +153,12 @@ public class TeamManager {
         return null;
     }
 
+    public UhcTeam getTeamById(UUID uuid) {
+        for (UhcTeam team : getUhcTeams()) {
+            if (team.getUniqueId().equals(uuid)) {
+                return team;
+            }
+        }
+        return null;
+    }
 }

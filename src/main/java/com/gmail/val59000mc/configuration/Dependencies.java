@@ -1,10 +1,12 @@
 package com.gmail.val59000mc.configuration;
 
 import com.gmail.val59000mc.utils.ProtocolUtils;
+import me.tecc.uhccoreplus.util.UCPLogger;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 public class Dependencies {
+    private static final UCPLogger logger = UCPLogger.global();
 
     // dependencies
     private static boolean worldEditLoaded;
@@ -14,10 +16,10 @@ public class Dependencies {
     public static void loadWorldEdit() {
         Plugin wePlugin = Bukkit.getPluginManager().getPlugin("WorldEdit");
         if (wePlugin == null || !wePlugin.getClass().getName().equals("com.sk89q.worldedit.bukkit.WorldEditPlugin")) {
-            Bukkit.getLogger().warning("[UhcCore] WorldEdit plugin not found, there will be no support of schematics.");
+            logger.warn("WorldEdit plugin not found, there will be no support of schematics.");
             worldEditLoaded = false;
         } else {
-            Bukkit.getLogger().info("[UhcCore] Hooked with WorldEdit plugin.");
+            logger.info("Hooked into WorldEdit plugin.");
             worldEditLoaded = true;
         }
     }
@@ -25,12 +27,12 @@ public class Dependencies {
     public static void loadVault() {
         Plugin vault = Bukkit.getPluginManager().getPlugin("Vault");
         if (vault == null || !vault.getClass().getName().equals("net.milkbowl.vault.Vault")) {
-            Bukkit.getLogger().warning("[UhcCore] Vault plugin not found, there will be no support of economy rewards.");
+            logger.warn("Vault plugin not found, there will be no support of economy rewards.");
             vaultLoaded = false;
             return;
         }
 
-        Bukkit.getLogger().info("[UhcCore] Hooked with Vault plugin.");
+        logger.info("Hooked into Vault plugin.");
         vaultLoaded = true;
 
         VaultManager.setupEconomy();
@@ -39,19 +41,19 @@ public class Dependencies {
     public static void loadProtocolLib() {
         Plugin protocolLib = Bukkit.getPluginManager().getPlugin("ProtocolLib");
         if (protocolLib == null || !protocolLib.getClass().getName().equals("com.comphenix.protocol.ProtocolLib")) {
-            Bukkit.getLogger().warning("[UhcCore] ProtocolLib plugin not found.");
+            logger.warn("ProtocolLib plugin not found.");
             protocolLibLoaded = false;
             return;
         }
 
-        Bukkit.getLogger().info("[UhcCore] Hooked with ProtocolLib plugin.");
+        logger.info("Hooked into ProtocolLib plugin.");
         protocolLibLoaded = true;
 
         try {
             ProtocolUtils.register();
         } catch (Exception ex) {
             protocolLibLoaded = false;
-            Bukkit.getLogger().severe("[UhcCore] Failed to load ProtocolLib, are you using the right version?");
+            logger.error("Failed to load ProtocolLib, are you using the right version?");
             ex.printStackTrace();
         }
     }
